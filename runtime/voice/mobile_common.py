@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-"""V30 开机集成的纯数据校验与原子状态写入。"""
+"""Pure data validation and atomic state updates for V30 boot integration."""
 from pathlib import Path
 import ipaddress, json, os, shlex
 
@@ -29,7 +29,7 @@ def runtime_environment(text):
 
 
 def hold_deadline(hold, *, boot, uptime, epoch, previous=0):
-    """保留跨进程/开机的运营商等待；不把旧 boot 的 uptime 用于新 boot。"""
+    """Preserve carrier backoff across process restarts and boots without mixing uptime domains."""
     if hold.get('boot') != boot:
         return previous
     elapsed = max(0, uptime - float(hold.get('written_at', 0)))

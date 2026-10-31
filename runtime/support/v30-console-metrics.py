@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""文字状态栏，只读系统状态；缓存仅存 /run，熄屏时不产生变化。"""
+"""Read-only console status bar; cache in /run and stop updates while blanked."""
 import datetime,fcntl,json,os,subprocess,sys,time,struct,termios
 from pathlib import Path
 RUN=Path('/run/v30-console')
@@ -68,7 +68,7 @@ def sample(previous):
         styled=left+f'#[fg=white,nobold]{label+" " if label else ""}#[fg={color},nobold]{value}#[fg=white,nobold]'+right
         return left+plain+right,styled
     def row(items):
-        # 圆角安全边距：横屏两侧至少4格(96px)，竖屏至少3格。
+        # Allow for rounded corners: four cells (96px) per side in landscape, three in portrait.
         margin=4 if columns>=90 else 3
         width=max(1,(columns-2*margin-3*(len(items)-1))//len(items))
         cells=[cell(*item,width) for item in items]

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""OpenRC 管理的持久 IMS 服务；不拨号、不自动接听、不发短信。"""
+"""OpenRC-managed IMS service; never dial, auto-answer or send SMS."""
 from pathlib import Path
 import ctypes, fcntl, hashlib, json, os, platform, signal, subprocess, time
 from mobile_common import atomic_json, hold_deadline, runtime_environment, start_ticks

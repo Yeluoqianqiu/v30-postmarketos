@@ -1,10 +1,11 @@
-# 贡献说明
+# Contributing
 
-- 先检查 [sources.lock.json](sources.lock.json) 与 [验证边界](docs/validation.md)，说明目标版本及问题。
-- 提交源码和可复现的主机测试；设备结果单列实际型号、版本和观察范围。不要把进程、注册或一次写成功当作双向音频/送达的证明。
-- 保留上游版权、SPDX 和作者信息，在来源记录中解释借用与修改。
-- 不提交设备凭据、固件、原始短信/语音、SIM 信息、个人 UUID、原始设备日志或分区镜像。
-- 运行 `python3 scripts/check.py`；会影响实际硬件的更改仍需所有者安排新的测试。
-- AI 协助按实际工具/模型记录，不能替真人作出来源认证。向其他上游提交时遵循其 DCO/GPG 与提交格式要求。
+- Start with [sources.lock.json](sources.lock.json) and the [validation boundaries](docs/validation.md). State the target version and concrete problem.
+- Provide source and reproducible host checks. Report hardware observations separately, with device, version and scope. A running process, registration or successful write is not proof of two-way audio or delivery.
+- Preserve upstream copyright, SPDX and author information. Explain borrowed and modified material in the provenance record.
+- Do not commit credentials, firmware, raw SMS/audio, SIM data, personal UUIDs, raw device logs or partition images.
+- Keep prose, comments and CLI messages in English. Retain Unicode protocol/test coverage; escaped literals are appropriate for non-English synthetic payloads.
+- Run `python3 scripts/check.py`. Changes affecting hardware still require the owner to arrange fresh tests.
+- Attribute AI assistance to the actual tool/model. AI cannot certify a human's contribution rights. Follow each upstream's DCO/GPG and commit conventions when submitting there.
 
-发布整理与主机测试不自动授予任何拨号、接听、发短信、重启或写分区的许可。
+Publication and host testing do not authorize calls, answering, SMS, reboots or partition writes.

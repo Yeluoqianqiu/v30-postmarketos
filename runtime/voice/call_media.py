@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""每次通话独占音频；IMS 父进程身份替代一次性测试的到期授权。"""
+"""Own audio for each call and validate the parent IMS process identity."""
 from pathlib import Path
 import ctypes, fcntl, hashlib, ipaddress, json, math, os, signal, stat, sys, time
 from audio_session import CallAudioSession

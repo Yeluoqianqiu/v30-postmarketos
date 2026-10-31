@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-"""实际Gio/GLib与私有D-Bus集成测试；合成SMS，绝不连接真实系统总线。"""
+"""Gio/GLib integration test on a private D-Bus with synthetic SMS only."""
 from pathlib import Path
 import json,os,subprocess,sys,time,threading,tempfile
 from gi.repository import Gio,GLib
@@ -53,14 +53,14 @@ def count():
  finally:store.close()
 try:
  w=watcher();wait_for(lambda:(root/'runtime/status.json').exists() and json.loads((root/'runtime/status.json').read_text())['ready'])
- ipath=ROOT+'/SMS/1';add(ipath,{'State':2,'PduType':1,'Number':'+8613800000000','Text':'中文第一段','Data':[],'Timestamp':'2026-10-31T08:00:00+08','MessageReference':7})
+ ipath=ROOT+'/SMS/1';add(ipath,{'State':2,'PduType':1,'Number':'+8613800000000','Text':'\u4e2d\u6587\u7b2c\u4e00\u6bb5','Data':[],'Timestamp':'2026-10-31T08:00:00+08','MessageReference':7})
  c.emit_signal(None,modem,MESSAGING,'Added',GLib.Variant('(ob)',(ipath,True)))
  time.sleep(2.5);assert count()==0,'Partial message must not be archived'
- props[ipath].update(State=3,Text='完整中文短信，包含第二段。')
+ props[ipath].update(State=3,Text='\u5b8c\u6574\u4e2d\u6587\u77ed\u4fe1，\u5305\u542b\u7b2c\u4e8c\u6bb5。')
  c.emit_signal(None,ipath,'org.freedesktop.DBus.Properties','PropertiesChanged',GLib.Variant('(sa{sv}as)',(SMS,{'State':GLib.Variant('u',3),'Text':GLib.Variant('s',props[ipath]['Text'])},[])))
  wait_for(lambda:count()==1);assert sends==[]
  w.terminate();assert w.wait(timeout=6)==0;w=watcher();wait_for(lambda:json.loads((root/'runtime/status.json').read_text())['ready']);time.sleep(1);assert count()==1
- out=Store(root/'outgoing/messages.sqlite');b=Bus();literal='中文, quote\' " `literal` $(literal)\n二行'
+ out=Store(root/'outgoing/messages.sqlite');b=Bus();literal='\u4e2d\u6587, quote\' " `literal` $(literal)\n\u4e8c\u884c'
  try:
   result,_,_=send_once(out,b,'13800000000',literal,'private-bus-one');assert result['state']=='submitted';send_once(out,b,'13800000000',literal,'private-bus-one');assert len(sends)==len(created)==1 and created[0]['text']==literal
  finally:out.close()

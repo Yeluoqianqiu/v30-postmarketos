@@ -11,7 +11,7 @@
   "packaging_unit_tests": {
     "passed": 3
   },
-  "charge_policy_trajectory": "passed",
+  "charge_policy_trajectory": "passed (logic simulation only; no full physical charge cycle or abnormal-temperature hardware test)",
   "private_bus_and_network_namespace_sms": "passed; synthetic service only; no real SMS",
   "pinned_kernel_archive_and_patch_sequence": "SHA512 inputs and full sequence passed",
   "imsd_preparation": "pinned clone+patch passed; 23 implementation/test files match the already built candidate",
@@ -25,5 +25,6 @@
     "Public packaging/path adaptations remain host-only",
     "No firmware or owner image is included",
     "No fresh physical test or CI result is claimed"
-  ]
+  ],
+  "report_scope": "Initial publication checkpoint before the English-only localization; not a fresh device qualification."
 }

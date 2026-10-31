@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""仅当前开机有效的 NAS 制式测试。协议取自 libqmi NAS JSON/enums。
-每次通过 qmicli QRTR lookup 动态发现 node 0 上的 NAS service 3。
-默认只读；--apply 仅在读回 CDMA-only 时设置 GSM/UMTS/LTE。
+"""Power-cycle-only NAS mode policy; protocol fields follow libqmi NAS JSON/enums.
+Discover NAS service 3 on modem node zero through qmicli QRTR lookup each time.
+Read-only by default; --apply changes only the known CDMA-only baseline to GSM/UMTS/LTE.
 """
 import ctypes, socket, struct, sys, time, subprocess, re
 libc=ctypes.CDLL(None,use_errno=True)

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-"""无设备测试：持久门禁、退避及多次通话的资源恢复。"""
+"""Host-only checks for ownership gates, backoff and per-call resource cleanup."""
 from pathlib import Path
 import json, os, tempfile, unittest
 from unittest.mock import patch

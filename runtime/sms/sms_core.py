@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-"""TTY短信持久记录；不依赖D-Bus，不自动重试发送。"""
+"""Persistent TTY SMS records; no D-Bus dependency or automatic send retries."""
 from pathlib import Path
 import hashlib,json,math,os,re,sqlite3,time,unicodedata,uuid
 
@@ -8,19 +8,19 @@ GSM_EXT=set('^{}\\[~]|€\f')
 
 def canonical(number):
     if not isinstance(number,str) or not re.fullmatch(r'\+?[0-9]{7,15}',number):
-        raise ValueError('请输入完整电话号码，不能使用短号或服务码')
+        raise ValueError('Enter a full phone number; short numbers and service codes are not supported')
     return '+86'+number if re.fullmatch(r'1[0-9]{10}',number) else number
 
 def message_info(text):
     if not isinstance(text,str) or not text or '\0' in text:
-        raise ValueError('短信正文不能为空或包含NUL')
+        raise ValueError('The message must be nonempty and must not contain NUL')
     if any(0xD800<=ord(c)<=0xDFFF or ord(c)>0xFFFF for c in text):
-        raise ValueError('当前支持GSM7及UCS2文字；请移除emoji或非BMP字符')
+        raise ValueError('GSM7 and UCS2 text are supported; remove emoji and non-BMP characters')
     if all(c in GSM_BASIC or c in GSM_EXT for c in text):
         units=sum(2 if c in GSM_EXT else 1 for c in text);parts=1 if units<=160 else math.ceil(units/153);encoding='GSM7'
     else:
         units=len(text);parts=1 if units<=70 else math.ceil(units/67);encoding='UCS2'
-    if parts>10:raise ValueError('正文超过10条短信分段上限')
+    if parts>10:raise ValueError('The message exceeds the ten-segment limit')
     return {'encoding':encoding,'units':units,'parts':parts}
 
 def terminal(text):
@@ -41,8 +41,8 @@ class Store:
     def __init__(self,path):
         self.path=Path(path);self.path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
         assert not self.path.parent.is_symlink() and self.path.parent.stat().st_uid==os.geteuid()
-        assert self.path.parent.stat().st_mode&0o077==0,'短信目录必须私有'
-        assert not self.path.is_symlink(),'短信数据库不能是符号链接'
+        assert self.path.parent.stat().st_mode&0o077==0,'The SMS directory must be private'
+        assert not self.path.is_symlink(),'The SMS database must not be a symbolic link'
         if self.path.exists():assert not self.path.is_symlink() and self.path.is_file() and self.path.stat().st_uid==os.geteuid()
         self.db=sqlite3.connect(self.path,timeout=10);self.path.chmod(0o600);self.db.row_factory=sqlite3.Row
         self.db.execute('PRAGMA journal_mode=WAL');self.db.execute('PRAGMA foreign_keys=ON')
@@ -77,11 +77,11 @@ class Store:
             return match
     def outgoing(self,number,text,request_id=None):
         number=canonical(number);info=message_info(text);request_id=request_id or str(uuid.uuid4())
-        if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}',request_id):raise ValueError('请求标识不合法')
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}',request_id):raise ValueError('Invalid request ID')
         with self.db:
             old=self.db.execute('SELECT * FROM messages WHERE request_id=?',(request_id,)).fetchone()
             if old:
-                if old['number']!=number or old['text']!=text:raise ValueError('请求标识已被其他内容使用')
+                if old['number']!=number or old['text']!=text:raise ValueError('The request ID was already used for a different recipient or message')
                 return dict(old),False,info
             now=time.time();cur=self.db.execute('INSERT INTO messages(direction,state,number,text,created,updated,request_id) VALUES(?,?,?,?,?,?,?)',('outgoing','creating',number,text,now,now,request_id));return self.get(cur.lastrowid),True,info
     def update(self,ident,**values):
@@ -90,7 +90,7 @@ class Store:
         with self.db:self.db.execute('UPDATE messages SET '+','.join(k+'=?' for k in values)+' WHERE id=?',(*values.values(),ident))
     def get(self,ident,mark_read=False):
         row=self.db.execute('SELECT * FROM messages WHERE id=?',(ident,)).fetchone()
-        if row is None:raise ValueError('短信编号不存在')
+        if row is None:raise ValueError('The message ID does not exist')
         if mark_read:self.update(ident,unread=0)
         return dict(row)
     def listing(self,limit=50,unread=False):

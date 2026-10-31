@@ -21,15 +21,21 @@
   },
   "runtime/voice/ims_supervisor.py": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "57982de0ffb2506fc1542654123ecca421e9d1d1acdd03bc290e968602d79c65"
+    "sha256": "51920c22be53192e60c5e6eade42c6dc12e77fea52b6f3c9642cdc5c7cf1028a",
+    "pre_localization_sha256": "57982de0ffb2506fc1542654123ecca421e9d1d1acdd03bc290e968602d79c65",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/voice/v30-phone": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "94cbfc42b6c924c3f47d5115387e4d7eab8d8e972f35b6b96bd70c3a0f267694"
+    "sha256": "678fc63ab2844987b7ecdbd8e1d5e9c5a1e65bbe3bbed5c2799cabb168ffad8e",
+    "pre_localization_sha256": "94cbfc42b6c924c3f47d5115387e4d7eab8d8e972f35b6b96bd70c3a0f267694",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/voice/call_media.py": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "21a8d209c7091d3eb3ba445e55bb76d756215eead271b244c8d9cafb85181c63"
+    "sha256": "7f8de8ff25681f770d352404cc2d56e23b14a7386d5e21a464cd3ee6e5bb826e",
+    "pre_localization_sha256": "21a8d209c7091d3eb3ba445e55bb76d756215eead271b244c8d9cafb85181c63",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/voice/physical.conf": {
     "origin": "r35 source reference; upstream harness PR #11",
@@ -45,11 +51,15 @@
   },
   "runtime/voice/mobile_common.py": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "799aad57ae571f140ef5ade997ff23be038d79f29df719b27b92438dda9c4d8c"
+    "sha256": "95df569970ff5e244f7be3e092d925c29c061aae9ed891a1665a08c77dbdccbe",
+    "pre_localization_sha256": "799aad57ae571f140ef5ade997ff23be038d79f29df719b27b92438dda9c4d8c",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/voice/test_integration.py": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "de9cbeeebca5e3a242fff0a5bc89f7dade5ebd76c42e6bc9f4199794c2980eb1"
+    "sha256": "f5d7d3ba59183860bbfde11ee5267d05845de7e1206ec090fd9bd128c9e9d555",
+    "pre_localization_sha256": "de9cbeeebca5e3a242fff0a5bc89f7dade5ebd76c42e6bc9f4199794c2980eb1",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/voice/v30-cellular": {
     "origin": "r35 source reference; upstream harness PR #11",
@@ -65,15 +75,21 @@
   },
   "runtime/sms/sms_bus.py": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "d4ae87063f41717fccf06637352fa33dc9436e8d58e6401e3998f5ef82c1bbe0"
+    "sha256": "89bcb78bc34b8514975b6a797b42475bce9701bb08ddff66ef53f1200d6abcc2",
+    "pre_localization_sha256": "d4ae87063f41717fccf06637352fa33dc9436e8d58e6401e3998f5ef82c1bbe0",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/sms/smsd.py": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "2b4d4bd4a2cfa29bca4c0896b28019c19c1fbc7a6f5b65ea87811947a6d1e74c"
+    "sha256": "1870a543da480e0660efd4d9a90dd1d1620ff5f3a5d66db4046302e541be429a",
+    "pre_localization_sha256": "2b4d4bd4a2cfa29bca4c0896b28019c19c1fbc7a6f5b65ea87811947a6d1e74c",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/sms/bench_private_bus.py": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "8f306c9349142d7caafc32292fa1e1ba3a058cd2bb4456c551d971f7afcd3c00"
+    "sha256": "dd4ceda77adb6d606fa80fa04a13d0194c26d0a0045dc0e369f44fcd7eae6dd9",
+    "pre_localization_sha256": "8f306c9349142d7caafc32292fa1e1ba3a058cd2bb4456c551d971f7afcd3c00",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/sms/v30-sms.init": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
@@ -81,39 +97,57 @@
   },
   "runtime/sms/v30-sms": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "1c4c8aa2afbcf61c589efe6c0e3bf713964c6cb6adb0d4d4f3888cf0c8b5008f"
+    "sha256": "32d4db3e695df6e414174d9cbeb59ba63b690cc033ac423d5d84df16d01ea1c5",
+    "pre_localization_sha256": "1c4c8aa2afbcf61c589efe6c0e3bf713964c6cb6adb0d4d4f3888cf0c8b5008f",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/sms/sms_core.py": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "12d5c127dcec6a6346e817f90c1c07b70ab1f1e17638826988772d80bd46cda8"
+    "sha256": "87cf0006b1893dd21bcdcdee6434ab48686899a02e713458f3597260ed99e430",
+    "pre_localization_sha256": "12d5c127dcec6a6346e817f90c1c07b70ab1f1e17638826988772d80bd46cda8",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/sms/test_sms.py": {
     "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
-    "sha256": "ea75c1fd08cbe05e4771bf22eae2ede9885fce6f9ccd9fa4a45652f7eea714ff"
+    "sha256": "bcf54ca7e91b195cd5a98b201810fc6821f294150c8a3f4b881b0053c6298838",
+    "pre_localization_sha256": "ea75c1fd08cbe05e4771bf22eae2ede9885fce6f9ccd9fa4a45652f7eea714ff",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-charge-limit.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "09a3c6f920f3914f4e3be7cedccd7f79270a87a2d39c58fc1edfb4d22433252b"
+    "sha256": "1df70d0fab3bebf482162d04075844ee27c96e1d5ea42ef249a1d92043dca15f",
+    "pre_localization_sha256": "09a3c6f920f3914f4e3be7cedccd7f79270a87a2d39c58fc1edfb4d22433252b",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-power-key.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "48672872d7f8ddc25097be076496e9f3c91a1ddfa0da63db2474c998a8059257"
+    "sha256": "acddff69f6d82c34b3bb0ec9ecc0c8408ec4a4b97f5e600a27c680014c51b659",
+    "pre_localization_sha256": "48672872d7f8ddc25097be076496e9f3c91a1ddfa0da63db2474c998a8059257",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-display.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "443e1f6084737cbcaaf2b7dc1a6173f7296f01d1f947e1664f1d4681ff584853"
+    "sha256": "abd76ba0ee329da1520efd604aaec38c93239d4d6d61f729ca9322f610dc7f1c",
+    "pre_localization_sha256": "443e1f6084737cbcaaf2b7dc1a6173f7296f01d1f947e1664f1d4681ff584853",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-console-login": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "272994cb9503fde4e47289665e3738716c5eb5a38eb077e54bf15d84de69e8c6"
+    "sha256": "e446f6584782e9454011940be5146198bda732d6750988c8d81a1da44c165473",
+    "pre_localization_sha256": "272994cb9503fde4e47289665e3738716c5eb5a38eb077e54bf15d84de69e8c6",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-console-metrics.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe"
+    "sha256": "a38acb5b094fef4b1ec80625f275c427b1ae3438db703d2be07a98fc365481bc",
+    "pre_localization_sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-console.conf": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "ca585064f3f1c9065ba898eeb318745ba5337993976e222e09842a429ed5f2fd"
+    "sha256": "42d8bbb6ac18d36abe1f82a05acef7f1cda5edef9e718b7cbc1d632819bb6684",
+    "pre_localization_sha256": "ca585064f3f1c9065ba898eeb318745ba5337993976e222e09842a429ed5f2fd",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-console-status.init": {
     "origin": "local source; published as board/carrier reference",
@@ -129,7 +163,9 @@
   },
   "runtime/support/v30-unicom-mode": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "9f3cd0ed4d423d4642e8d72b7e2042e605055930034bec8d8e94f4d940e92cc3"
+    "sha256": "84d7e985817fd0a5fef14f0272777a5b53bd9c9a3a575ce194343de13d18cdc9",
+    "pre_localization_sha256": "9f3cd0ed4d423d4642e8d72b7e2042e605055930034bec8d8e94f4d940e92cc3",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "runtime/support/v30-unicom-service": {
     "origin": "local source; published as board/carrier reference",
@@ -141,11 +177,15 @@
   },
   "runtime/support/v30-console-font.py": {
     "origin": "local console scaling; public font-state path adaptation",
-    "sha256": "45709ac57d54b81a08ba6f7a7ff2f7070309efc38e20a1b71c05a97c21f24525"
+    "sha256": "4b93f66b032d8252f6b18574ddbd8224e88f5537473f44fdc2d12bc235258c75",
+    "pre_localization_sha256": "45709ac57d54b81a08ba6f7a7ff2f7070309efc38e20a1b71c05a97c21f24525",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "tests/test_charge_policy.py": {
     "origin": "charge-policy trajectory regression",
-    "sha256": "7f027224651d7f12ccf3a10e66a83ea2bbf632b6354e528183d342faa7b92b11"
+    "sha256": "1291ab6eea673941d250d550fbde0460b6d9668621657c092f5811e34b2f10bf",
+    "pre_localization_sha256": "7f027224651d7f12ccf3a10e66a83ea2bbf632b6354e528183d342faa7b92b11",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "patches/imsd/0001-v30-interop.patch": {
     "origin": "Catcrafts imsd 2b5de7a plus local interop changes; GPL-3.0-only",
@@ -173,7 +213,9 @@
   },
   "scripts/build-imsd.py": {
     "origin": "manual C++26 module build used for upstream preparation",
-    "sha256": "90f161c96d9125d6a6a6e5450b0df99bd05eaa706f7b143849c95f19abcd75ed"
+    "sha256": "0f3d2cbb75e38cb644015a12eba27c5aa0672fdd9bdd9faa9b62217051f58355",
+    "pre_localization_sha256": "90f161c96d9125d6a6a6e5450b0df99bd05eaa706f7b143849c95f19abcd75ed",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "LICENSE": {
     "origin": "GPL-3.0-only license text",
@@ -253,15 +295,21 @@
   },
   "PROVENANCE.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "05e3b86d81c274e205e580a3bd27fa17a26f3f500897cb240d509780cff75075"
+    "sha256": "8d2399a9e6b721ea5734c7b56342716bf0b419264b70bb7fcb9e7bf9abc454be",
+    "pre_localization_sha256": "05e3b86d81c274e205e580a3bd27fa17a26f3f500897cb240d509780cff75075",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65"
+    "sha256": "db15bb1cab407368f8b876faf1c1eb51e7b75101d17cae3127e30e226e890c59",
+    "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "35241c2f98e94c7e18e4fd9a10347bd734607a0c16e06f5dc971812fa94d70ff"
+    "sha256": "c3d957323dcd7a2a2711226b1a8c27824946aad1405802efc1e1b6f463b6299a",
+    "pre_localization_sha256": "35241c2f98e94c7e18e4fd9a10347bd734607a0c16e06f5dc971812fa94d70ff",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   ".gitignore": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -269,11 +317,15 @@
   },
   "CONTRIBUTING.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "57ae287dfdff695593a3c0778f0a9d68e7073c68c246ca2585e47112a00efbfc"
+    "sha256": "2c71e1478151fb44a1b4734a50cb49d0fbf1da56291f2924ef5238f49318fff4",
+    "pre_localization_sha256": "57ae287dfdff695593a3c0778f0a9d68e7073c68c246ca2585e47112a00efbfc",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "sources.lock.json": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "94a36e21f73787e24725e942374c350ed497d6147519bbdf63484ea6f6fe3408"
+    "sha256": "fb24194911434abcbcd5edd24614635cd978259e75db4759a112686c90e0e1eb",
+    "pre_localization_sha256": "94a36e21f73787e24725e942374c350ed497d6147519bbdf63484ea6f6fe3408",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "LICENSES/GPL-2.0-only.txt": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -285,23 +337,33 @@
   },
   "docs/upstream.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "bcd9e966f9d46fe025f5c8b5a568ea9d3d8b9a9cfd82949456bb7f6e153a14b0"
+    "sha256": "8ed1dc995706d57dcb031e2ef22301741eb79edfe28f85b7726898e704076d1c",
+    "pre_localization_sha256": "bcd9e966f9d46fe025f5c8b5a568ea9d3d8b9a9cfd82949456bb7f6e153a14b0",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "docs/architecture.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "210cea73a66ba5d34844e1f076f77df2a7d97827efbbd99ba29ae1c61c20dcad"
+    "sha256": "72cf91b4bf51f532ae8cbafb143b572520a5622a4a583f1daab26ab50055b5a7",
+    "pre_localization_sha256": "210cea73a66ba5d34844e1f076f77df2a7d97827efbbd99ba29ae1c61c20dcad",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "docs/validation.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5"
+    "sha256": "8847698955d9b8fad71f027144ddbf63f8d02dd0348b31e4f254aca01b0e398e",
+    "pre_localization_sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "docs/build-and-install.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "1a99e15d33c492a39b78aeaae8e122a259f840a8f9fd892af0351c6863214c1b"
+    "sha256": "652e86cc11eb7c892f7d48ddcdafa4ac0c6bb1e562327d065efe8b1cfdfbc9a7",
+    "pre_localization_sha256": "1a99e15d33c492a39b78aeaae8e122a259f840a8f9fd892af0351c6863214c1b",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "provenance/host-validation.json": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "ac9b2c1e65f920088a3c8b3a18afdb867ce26bb551708a8fe6dbf9dedbb0b3ca"
+    "sha256": "a9d8479812626af2fb1de5ca500504847b114b392098793abb37e38cbfa712f2",
+    "pre_localization_sha256": "ac9b2c1e65f920088a3c8b3a18afdb867ce26bb551708a8fe6dbf9dedbb0b3ca",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "examples/kernel-cmdline.template": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -341,7 +403,9 @@
   },
   "scripts/check.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9"
+    "sha256": "59f4088480de0f07bdf0cc8118384936b664d711a16d6f661e49c09aa05c8372",
+    "pre_localization_sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   },
   "scripts/prepare-sources.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -378,5 +442,10 @@
   ".gitattributes": {
     "origin": "preserve literal patch context during Git whitespace checks",
     "sha256": "cc828eba2f63866093fcaa6feb105911ebf638e4be70724a3800d83d4adc8a21"
+  },
+  "provenance/english-localization-validation.json": {
+    "origin": "English publication and validation-scope update, 2026-10-31",
+    "sha256": "00f37decf1cab4a710176a929e38b31ed5cc151f14a743b99a481501163ea1f9",
+    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
   }
 }

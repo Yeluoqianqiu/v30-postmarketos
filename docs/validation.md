@@ -1,63 +1,54 @@
-# 验收、边界与回退
+# Validation boundaries and recovery
 
-## 既有设备结果
+## Historical device observations
 
-设备为一台 LG V30 US998，运营商中国联通；日期为 2026-10-31（Asia/Shanghai）。
-以下是贡献者报告的、范围明确的历史验收，不等于最新分支或所有设备的兼容保证。
+The contributor used one LG V30 US998 on China Unicom. The table combines earlier bring-up observations with local r35/r36 acceptance; the latter voice/SMS acceptance was recorded on 2026-10-31 (Asia/Shanghai). They do not qualify the latest kernel branch, other devices or every file in the subsequently published repository.
 
-| 项目 | 验收结果 |
+| Area | Observed scope |
 |---|---|
-| IMS 注册 | 实际 REGISTER / 订阅成功，默认开机自动恢复 |
-| 通话 | 早期一次真实呼出约 20 秒；修复后的 RAM/default 各一次呼入约 60 秒，操作者确认双方人声清楚及横屏 TTY |
-| 资源恢复 | 每次通话后十项混音器恢复，四个 PCM 关闭，音频进程清理；失败恢复和两次独立生命周期也有主机测试 |
-| 短信发送 | 一条短中文 UCS2，ModemManager 提交后对端确认正文完整 |
-| 短信接收 | 一条短中文完整归档，TTY 阅读内容匹配 |
-| 普通重启 | 短信服务恢复；原收件编号/正文保留无重复，发件没有再提交 |
-| 系统 | 服务恢复，蜂窝接口绑定 DNS/HTTPS 验证通过，TTY 横屏、蓝牙关闭，ext4 错误计数为零 |
+| IMS registration | Successful registration/subscription and automatic recovery after normal boot |
+| Calls | One earlier outgoing call of about 20 seconds; after the fix, incoming calls of about 60 seconds in RAM and after normal default boot, with operator confirmation of clear speech in both directions and landscape TTY |
+| Audio cleanup | Ten mixer controls restored, four PCM devices closed and audio processes cleaned up after the accepted calls; failure cleanup and separate call lifetimes also have host tests |
+| SMS send | One short Chinese UCS2 message, with recipient confirmation after ModemManager reported submission |
+| SMS receive | One short Chinese message fully archived and read back through the TTY CLI |
+| Normal reboot | SMS service resumed; incoming record/body retained without duplication, and the outgoing request was not resubmitted |
+| System checks | Services resumed, cellular-bound DNS/HTTPS checks passed, landscape TTY and Bluetooth-off remained, and ext4 reported zero errors at the checks |
+| Charge control | Earlier bring-up hardware checks exercised charge inhibition while retaining USB input power; this did not exercise a full physical 75/80% charging cycle or abnormal-temperature conditions |
 
-注册、active 信号或 socket 写成功都不能单独证明远端接听。submitted 也不等于已送达；
-这些真实结论均额外使用了操作者/对端反馈。通话不录音、不导出人声。公开仓库仅保留
-脱敏汇总，没有将私有原始捕获宣称为公开、不可变的证据封存。
+Registration, a local active signal or a successful socket write is not proof of remote answer or two-way speech. `submitted` is not proof of delivery. The accepted voice/SMS claims had additional operator or recipient feedback. No voice recording is distributed. This repository publishes sanitized summaries; it does not claim private raw captures are publicly verifiable immutable evidence.
 
-## 本仓库整理与测试
+## Host-only validation
 
-整理阶段没有连接或改动手机，没有新呼叫、短信、重启和分区操作。
+Publication, localization and review-status updates have not connected to or modified the phone. They have not initiated calls, SMS, reboots or partition writes.
 
-- SMS 23 项单测；通话集成 6 项（root Linux 可覆盖私有路径校验）。
-- 实际 Gio 调用的合成 ModemManager：私有 D-Bus + 私有网络命名空间，等待完整消息、
-  接收持久化、watcher 重启不重复、文字按字面传递、同 request-id 只一次 Create/Send。
-- 充电决策覆盖 75/80 滞回、重启保留、温度/传感器及健康异常。
-- 新的打包辅助测试覆盖 boot 中 owner ramdisk/无关头部保留、错误格式/截断拒绝，
-  rootfs 暂存及避免覆盖/误启用。
-- 锁定旧内核归档/recipe SHA512 与完整补丁顺序校验；旧音频 DT 属性单独核对。
-- imsd 补丁已在 aarch64 clang23/libc++ 上通过 8 组测试及 5 产品构建；手工模块构建，
-  未声称 Crafter lint 通过。
-- 新内核 PR #12 仅四个目标对象编译及 checkpatch；没有完整镜像或实机验收。
+- SMS logic: 23 unit cases.
+- Voice integration: six unit cases; Linux root covers private-path ownership validation. The root-specific case is skipped when run without root.
+- Synthetic ModemManager: actual Gio calls on a private D-Bus and network namespace. Checks cover partial-to-complete reception, persistence over watcher restart, no duplicate submission for a reused request ID, and literal Unicode/quote handling. No real modem or SMS is used.
+- Charge policy: simulated 75/80% hysteresis, restart-state retention, warm/cold recovery, invalid sensors and charger-health decisions. These are logic checks, not physical thermal-safety tests.
+- Packaging helpers: three unit cases cover preservation of the owner's ramdisk/unrelated boot header, rejection of truncated/unsupported input, and staging without overwriting an existing tree or enabling services.
+- Historical kernel inputs: source-archive/recipe SHA512 checks and the full patch sequence passed. The reconstructed microphone-route DTB matched the prior local DTB byte-for-byte.
+- Boot helper: reproduced the existing local r35 image byte-for-byte using private local inputs. Neither those inputs nor the image are published.
+- imsd candidate: eight suites and five products built on aarch64 clang23/libc++ using a manual module build. Crafter lint was not run. This is not a device redeployment test.
+- New kernel PR #12: four target objects compiled and five split patches passed strict checkpatch. No complete image was built or booted.
 
-独立仓库的路径适配、暂存器、boot 辅助器、字体捕获辅助和蓝牙最后关闭服务只做
-主机验证；它们不会继承一个不存在的新实机通过结论。可用 `scripts/check.py` 重跑
-本地检查；首次发布的具体主机结果见 [host-validation.json](../provenance/host-validation.json)。
+The complete published source tree has not been deployed from scratch to a clean device. Publication-specific font paths, staging, reconstruction helpers, final Bluetooth-off service, and English CLI/message adaptations remain host-validated only. Historical hardware results do not automatically transfer to these adaptations.
 
-## 新设备验收顺序
+[host-validation.json](../provenance/host-validation.json) retains the initial-publication checkpoint. Later scoped checks are recorded in the same provenance directory. Run `scripts/check.py` for the current host checks; successful host tests do not establish device compatibility.
 
-1. 保存自己的分区/系统恢复资料；核对 kernel/modules/DT/initramfs 和已知可恢复路径。
-2. 所有者在场与 USB 连接时安排 RAM-only 启动，确认 USB/TTY/文件系统和电源正常。
-3. 分别检验 Wi-Fi 和绑定蜂窝接口的 DNS/TCP/TLS/HTTPS；不能用单次 ping 判断掉网。
-4. 检验 IMS 注册和运营商退避。电话/SMS 由操作者明确选择号码与次数后单独安排，
-   不复用任何历史测试授权。
-5. 电话要听验两个方向的人声、持续时间、远端/本地挂断与资源恢复；SMS 要确认真正
-   收到的正文和重启后保留。最后检查退避、服务、路由、TTY、蓝牙与存储健康。
+## Qualification sequence for a new deployment
 
-仍开放：长期在线、续注册稳定性、真实 multipart SMS、存储满恢复、保持/转接/
-完整重协商、长通话、耳机切换、suspend/resume、其他型号/运营商及紧急呼叫。
+1. Preserve your own recovery material and verify the matching kernel, modules, DT, initramfs and recovery procedure.
+2. With the owner present and USB available, arrange a RAM-only test and verify USB, TTY, filesystem and power behavior.
+3. Check Wi-Fi and cellular separately. Bind DNS/TCP/TLS/HTTPS checks to the cellular interface; a single ping failure is not a connectivity diagnosis.
+4. Verify IMS registration and carrier backoff. The operator must explicitly select destinations and limits for any call/SMS test; old test allowances do not apply.
+5. For calls, confirm speech in both directions, duration, hangup behavior and resource cleanup. For SMS, confirm the received body and persistence across a separately arranged reboot. Recheck services, routing, TTY, Bluetooth and storage health.
 
-## 回退
+Open gates include long-term connectivity and re-registration, real multipart SMS, disk-full recovery, hold/transfer/full renegotiation, long calls, headset switching, suspend/resume, other variants/carriers and emergency calling.
 
-安装前保存原文件、runlevel、NM 连接和自己的已校验 boot/recovery。停止服务前先由
-操作者处理正在进行的通话；再按反向依赖停用 IMS/SMS/蜂窝集成，恢复自己的原文件。
+## Recovery and rollback
 
-- 短信 SQLite 是使用者数据。卸载服务不等于删除档案；关服务后保留数据库及 WAL/
-  checkpoint 备份，不自动删除 modem 原始短信。
-- 字体回退使用自己捕获的原字形，恢复自己的 tty1 行和 rotation；不要覆盖交互登录。
-- 不使用本仓库提供的历史号码、一次性标志或其他设备的备份。仓库不含自动 flash/
-  erase/recovery 流程；普通服务停止也不代表应该写内部 boot。
+Before installation, save original files, runlevels, NetworkManager connections and your own verified boot/recovery backups. Let the operator handle any active call before stopping services. Then disable the integration in reverse dependency order and restore the operator's original files.
+
+- The SMS SQLite archive is user data. Uninstalling the receiver does not imply deleting the archive. Stop it before a consistent database/WAL/checkpoint backup; do not automatically delete original modem messages.
+- Restore console glyphs from the same device's captured original font and restore its tty1 line/rotation without interrupting an interactive login.
+- Do not reuse another device's backups or historical one-shot test state. There is no automatic flash/erase/recovery procedure in this repository; stopping a service is not a reason to write an internal partition.

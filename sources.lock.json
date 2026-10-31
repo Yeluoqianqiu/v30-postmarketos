@@ -14,13 +14,15 @@
     "bluetooth": "off",
     "carrier_tested": "China Unicom",
     "audio": "ADC3/DEC8/TX8, MultiMedia1 capture, MultiMedia2 speaker playback",
-    "acceptance": "r35/r36, 2026-10-31; see docs/validation.md"
+    "acceptance": "r35/r36, 2026-10-31; see docs/validation.md",
+    "validation_scope": "Historical r35/r36 observations on one device; current publication, packaging and English-localization adaptations have host checks only. No fresh clean-device deployment of the complete published tree."
   },
   "current_upstream_candidates": {
     "kernel_base": "dc9c6692dbfba9c114eb116f48be9cf3e283ac0f",
     "branch": "joan/latest-clean-test",
     "kernel_pr": "https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/12",
     "harness_pr": "https://github.com/ShapeShifter499/lg-v30-port/pull/11",
-    "validation": "four target object builds; no image build or device boot"
+    "validation": "four target object builds; no image build or device boot",
+    "review_status": "Ready for review; open and not merged as checked 2026-10-31; validation scope unchanged"
   }
 }

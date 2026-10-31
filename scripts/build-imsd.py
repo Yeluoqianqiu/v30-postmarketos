@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""在隔离 Alpine aarch64 根中构建锁定并应用 V30 补丁的 imsd，固定 ARMv8-A 指令集。
+"""Build the pinned V30-patched imsd in an Alpine aarch64 root using ARMv8-A.
 
-直接复现 project.cpp 的模块/目标依赖，不替代其 Crafter lint 流程。
-调用：python3 scripts/build-imsd.py sources/imsd out/imsd
+Reproduce project.cpp module/product dependencies; this does not run Crafter lint.
+Usage: python3 scripts/build-imsd.py sources/imsd out/imsd
 """
 import hashlib
 import json

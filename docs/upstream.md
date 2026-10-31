@@ -1,26 +1,24 @@
-# 与上游的关系
+# Upstream relationships and review status
 
-本项目提供一个可审查的 US998 集成组合。Linux、设备驱动、postmarketOS、IMS 协议
-及媒体引擎分别由各自上游维护；本仓库不声称独立实现这些组件。
+This is an unofficial experimental US998 integration and reconstruction project. Linux drivers, postmarketOS, the IMS stack and the media engine remain the work of their respective upstreams.
 
-| 内容 | 位置 / 状态 |
+Status checked on 2026-10-31:
+
+| Work | Location and status |
 |---|---|
-| 纯 TTY SMS 与通话参考源码 | [lg-v30-port #11](https://github.com/ShapeShifter499/lg-v30-port/pull/11)，Draft |
-| 电量、充电抑制、IPA QMI、GCC GPU/MMSS 五项 | [linux-lg-v30-joan #12](https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/12)，Draft；基线 dc9c669…，只完成四目标对象构建 |
-| LG 六种安全提案、Via 保留、无 offer re-INVITE/ACK SDP | 本仓库 imsd 补丁；尚无 Forgejo PR，提交者尚缺 Forgejo 账号及该项目要求的 GPG 配置 |
-| IPA 系统头表、GLINK 死锁、ADC MUX8、MCLK 路由 | 新内核基线已包含，不在 #12 重复提交；旧实测组合仍需要相应来源补丁/路由 |
+| TTY SMS tooling and voice source reference | [lg-v30-port #11](https://github.com/ShapeShifter499/lg-v30-port/pull/11): **Ready for review**, open and not merged |
+| Fuel gauge, charge inhibition, IPA QMI and two GCC fixes | [linux-lg-v30-joan #12](https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/12): **Ready for review**, open and not merged; base `dc9c669…`; four target objects compiled, with no complete image or device boot |
+| LG six-tuple security offer, Via preservation and offerless re-INVITE/ACK SDP | Local imsd patch; no Forgejo PR. Submission still requires a Forgejo account and the project's configured GPG signing. |
+| IPA system header table, GLINK deadlock, ADC MUX8 and MCLK routes | Already present at the newer kernel base and not duplicated in #12. The historical reconstruction inputs still include the corresponding patches/routes. |
 
-GCC 两个提交保留 Dmitry Baryshkov 作者身份；移植和集成不是重新发明其时钟修复。
-旧实测内核中的诊断/兼容补丁仅留在 baseline，以解释和重建该组合；它们不等于
-适合直接合并到 Linux 主线的提交。
+The two GCC commits retain Dmitry Baryshkov's authorship. Their adaptation is not a newly invented clock fix. Diagnostic/compatibility patches are retained only in the historical baseline to explain and reconstruct that older stack; they are not presented as clean Linux-mainline submissions.
 
-## Draft PR 与 DCO
+## What Ready for review means
 
-Draft PR 是已经公开的草稿合并请求，可以查看和讨论，但要转为 Ready for review
-后才能合并。我们用它明确标示新内核尚未实机验收。参见 [GitHub 文档](https://docs.github.com/en/pull-requests/reference/pull-requests#draft-pull-requests)。
+Both PRs were initially drafts and have now been marked Ready for review. That allows normal review and eventual merge under upstream policy. It does not mean they have been approved, merged or device-qualified. Their existing validation limits continue to apply. See [GitHub's PR documentation](https://docs.github.com/en/pull-requests/reference/pull-requests#draft-pull-requests).
 
-DCO 是 Developer Certificate of Origin，贡献者声明自己有权按相应开源许可证
-提交代码，且知道署名记录会公开保留。`Signed-off-by` 记录该认证；它与 GPG 的
-密码学提交签名分别处理。原文：[DCO 1.1](https://developercertificate.org/)。
+## Developer Certificate of Origin
 
-Signed-off-by 的认证应由真人贡献者本人作出，不能由 AI 代作。
+The DCO records a contributor's certification of the right to submit code under its applicable open-source license, and acknowledgement that the sign-off record is public. `Signed-off-by` records that certification. GPG commit signing is a separate cryptographic mechanism. See [DCO 1.1](https://developercertificate.org/).
+
+A human contributor must make their own certification; AI cannot certify it on their behalf.

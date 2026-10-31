@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-"""ModemManager系统总线适配；使用唯一owner，避免对象路径跨重启复用。"""
+"""ModemManager system-bus adapter; bind paths to a unique bus owner and boot."""
 from pathlib import Path
 import re
 MM='org.freedesktop.ModemManager1'
@@ -9,7 +9,7 @@ SMS=MM+'.Sms'
 PROPS='org.freedesktop.DBus.Properties'
 
 def sms_path(path):
-    if not isinstance(path,str) or not re.fullmatch(ROOT+r'/SMS/[0-9]+',path):raise ValueError('非法SMS对象路径')
+    if not isinstance(path,str) or not re.fullmatch(ROOT+r'/SMS/[0-9]+',path):raise ValueError('Invalid SMS object path')
     return path
 
 class Bus:
@@ -24,7 +24,7 @@ class Bus:
     def snapshot(self):return self.call(ROOT,'org.freedesktop.DBus.ObjectManager','GetManagedObjects')[0]
     def context(self):
         modems=[p for p,v in self.snapshot().items() if MESSAGING in v]
-        if len(modems)!=1:raise RuntimeError('没有唯一可用的短信调制解调器')
+        if len(modems)!=1:raise RuntimeError('Exactly one available messaging modem is required')
         return self.source,modems[0]
     def properties(self,path):return self.call(sms_path(path),PROPS,'GetAll',self.GLib.Variant('(s)',(SMS,)))[0]
     def create(self,modem,number,text):

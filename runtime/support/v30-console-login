@@ -1,5 +1,5 @@
 #!/bin/sh
-# 由 tty1 的 getty 以 root 运行；tmux 中唯一初始进程是正常的 login。
+# Run as root by tty1 getty; the tmux pane starts the normal authenticated login path.
 set -eu
 umask 077
 mkdir -p /run/v30-console

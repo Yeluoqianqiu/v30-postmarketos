@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Linux 运行时的充电保护：80% 停充，75% 恢复；保留硬件保护。"""
+"""Runtime charge-limit policy: inhibit at 80%, resume at 75%; retain hardware safeguards."""
 import argparse
 import datetime
 import fcntl
@@ -14,7 +14,7 @@ STATE = Path('/var/lib/v30-charge-limit/state.json')
 
 
 def decide(capacity, temp, health, previous, thermal_hold):
-    """温度单位为 0.1°C；读数异常时停充，不绕过硬件保护。"""
+    """Temperature is in 0.1 degrees C; invalid inputs request charge inhibition."""
     if not 0 <= capacity <= 100 or not -400 <= temp <= 1000:
         return 'inhibit-charge', True, 'invalid-sensor'
     if health != 'Good':

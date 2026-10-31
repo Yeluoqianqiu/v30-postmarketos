@@ -1,4 +1,4 @@
-"""检验完整充放电轨迹、重启记忆与传感器/温度异常保护。"""
+"""Simulate policy trajectories, restart state and invalid sensor/temperature inputs."""
 import importlib.util
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('charge',Path(__file__).resolve().parents[1]/'runtime/support/v30-charge-limit.py')

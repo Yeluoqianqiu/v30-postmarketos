@@ -24,10 +24,10 @@ class Tests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'private/messages.sqlite';self.s=Store(self.path)
     def tearDown(self):self.s.close();self.tmp.cleanup()
     def message(self,**kw):
-        d={'Number':'+8613800000000','Text':'中文测试, quote\' " $()','Data':[],'Timestamp':'2026-10-31T07:00:00+08','PduType':1,'State':3,'MessageReference':1};d.update(kw);return d
+        d={'Number':'+8613800000000','Text':'\u4e2d\u6587\u6d4b\u8bd5, quote\' " $()','Data':[],'Timestamp':'2026-10-31T07:00:00+08','PduType':1,'State':3,'MessageReference':1};d.update(kw);return d
     def test_receive_waits_for_complete_multipart(self):
         p=self.message(State=2);self.assertIsNone(self.s.ingest(p,'owner/1'));self.assertEqual(self.s.counts()['total'],0)
-        p.update(State=3,Text='完整中文'*25);i=self.s.ingest(p,'owner/1');self.assertEqual(self.s.get(i)['text'],p['Text'])
+        p.update(State=3,Text='\u5b8c\u6574\u4e2d\u6587'*25);i=self.s.ingest(p,'owner/1');self.assertEqual(self.s.get(i)['text'],p['Text'])
     def test_repeated_signal_is_not_duplicate(self):
         a=self.s.ingest(self.message(),'owner/1');self.assertEqual(self.s.ingest(self.message(),'owner/1'),a);self.assertEqual(self.s.counts()['total'],1)
     def test_equal_live_messages_preserve_multiplicity_across_restart(self):
@@ -44,43 +44,43 @@ class Tests(unittest.TestCase):
     def test_binary_message_persists_without_fake_text(self):
         i=self.s.ingest(self.message(Text='',Data=[0,255,13]),'owner/1');self.assertEqual(json.loads(self.s.get(i)['data']),[0,255,13])
     def test_send_once_and_reused_request_never_resends(self):
-        b=Bus();r,f,info=send_once(self.s,b,'13800000000','中文短信','one');self.assertTrue(f);self.assertEqual(r['state'],'submitted');self.assertEqual(info['parts'],1)
-        _,f,_=send_once(self.s,b,'13800000000','中文短信','one');self.assertFalse(f);self.assertEqual(len(b.calls),2)
+        b=Bus();r,f,info=send_once(self.s,b,'13800000000','\u4e2d\u6587\u77ed\u4fe1','one');self.assertTrue(f);self.assertEqual(r['state'],'submitted');self.assertEqual(info['parts'],1)
+        _,f,_=send_once(self.s,b,'13800000000','\u4e2d\u6587\u77ed\u4fe1','one');self.assertFalse(f);self.assertEqual(len(b.calls),2)
     def test_lost_send_reply_keeps_unknown_no_retry(self):
-        b=Bus('send');r,_,_=send_once(self.s,b,'13800000000','原文','one');self.assertEqual(r['state'],'unknown');self.assertNotIn('private',str(r));send_once(self.s,b,'13800000000','原文','one');self.assertEqual(len(b.calls),2)
+        b=Bus('send');r,_,_=send_once(self.s,b,'13800000000','\u539f\u6587','one');self.assertEqual(r['state'],'unknown');self.assertNotIn('private',str(r));send_once(self.s,b,'13800000000','\u539f\u6587','one');self.assertEqual(len(b.calls),2)
     def test_lost_create_reply_never_recreates(self):
-        b=Bus('create');r,_,_=send_once(self.s,b,'13800000000','原文','one');self.assertEqual(r['state'],'unknown');send_once(self.s,b,'13800000000','原文','one');self.assertEqual(len(b.calls),1)
+        b=Bus('create');r,_,_=send_once(self.s,b,'13800000000','\u539f\u6587','one');self.assertEqual(r['state'],'unknown');send_once(self.s,b,'13800000000','\u539f\u6587','one');self.assertEqual(len(b.calls),1)
     def test_process_crash_during_send_durable_no_repeat(self):
         b=Bus('crash')
-        with self.assertRaises(KeyboardInterrupt):send_once(self.s,b,'13800000000','原文','one')
+        with self.assertRaises(KeyboardInterrupt):send_once(self.s,b,'13800000000','\u539f\u6587','one')
         self.assertEqual(self.s.get(1)['state'],'sending');other=Store(self.path)
-        try:send_once(other,b,'13800000000','原文','one');self.assertEqual(len(b.calls),2)
+        try:send_once(other,b,'13800000000','\u539f\u6587','one');self.assertEqual(len(b.calls),2)
         finally:other.close()
     def test_stale_owner_path_does_not_change_outgoing(self):
-        b=Bus('send');r,_,_=send_once(self.s,b,'13800000000','原文','one');reconcile_outgoing(self.s,'new-owner',r['sms_path'],{'State':5});self.assertEqual(self.s.get(r['id'])['state'],'unknown')
+        b=Bus('send');r,_,_=send_once(self.s,b,'13800000000','\u539f\u6587','one');reconcile_outgoing(self.s,'new-owner',r['sms_path'],{'State':5});self.assertEqual(self.s.get(r['id'])['state'],'unknown')
         reconcile_outgoing(self.s,b.source,r['sms_path'],{'State':5});self.assertEqual(self.s.get(r['id'])['state'],'submitted')
     def test_request_id_cannot_change_recipient_or_body(self):
-        b=Bus();send_once(self.s,b,'13800000000','原文','one')
-        with self.assertRaises(ValueError):send_once(self.s,b,'13900000000','原文','one')
+        b=Bus();send_once(self.s,b,'13800000000','\u539f\u6587','one')
+        with self.assertRaises(ValueError):send_once(self.s,b,'13900000000','\u539f\u6587','one')
         self.assertEqual(len(b.calls),2)
     def test_queue_is_not_network_submission(self):
         b=Bus();b.state=4;r,_,_=send_once(self.s,b,'13800000000','text');self.assertEqual(r['state'],'queued')
     def test_body_is_passed_literally_no_shell(self):
-        b=Bus();text='中文, \"quote\" \'single\'\n`cmd` $(cmd) \\';send_once(self.s,b,'13800000000',text);self.assertEqual(b.calls[0][3],text)
+        b=Bus();text='\u4e2d\u6587, \"quote\" \'single\'\n`cmd` $(cmd) \\';send_once(self.s,b,'13800000000',text);self.assertEqual(b.calls[0][3],text)
     def test_private_storage_and_dangling_symlink(self):
         self.assertEqual(self.path.stat().st_mode&0o777,0o600);self.assertEqual(self.path.parent.stat().st_mode&0o777,0o700)
         bad=self.path.parent/'bad';bad.symlink_to('/not-existing-v30-sms-target')
         with self.assertRaises(AssertionError):Store(bad)
     def test_sms_segments_and_supported_characters(self):
-        for text,parts,encoding in [('A'*160,1,'GSM7'),('^'*81,2,'GSM7'),('中'*70,1,'UCS2'),('中'*71,2,'UCS2')]:self.assertEqual((message_info(text)['parts'],message_info(text)['encoding']),(parts,encoding))
-        for text in ['', 'x\0x', '😀','中'*671]:
+        for text,parts,encoding in [('A'*160,1,'GSM7'),('^'*81,2,'GSM7'),('\u4e2d'*70,1,'UCS2'),('\u4e2d'*71,2,'UCS2')]:self.assertEqual((message_info(text)['parts'],message_info(text)['encoding']),(parts,encoding))
+        for text in ['', 'x\0x', '😀','\u4e2d'*671]:
             with self.assertRaises(ValueError):message_info(text)
     def test_full_numbers_only(self):
         self.assertEqual(canonical('13800000000'),'+8613800000000')
         for n in ['112','10010','13800000000;foo','+123','tel:+8613800000000']:
             with self.assertRaises(ValueError):canonical(n)
     def test_terminal_escape_and_bidi_are_visible_not_executed(self):
-        self.assertEqual(terminal('\x1b[2J\u202e内容'),'\\u001b[2J\\u202e内容')
+        self.assertEqual(terminal('\x1b[2J\u202e\u5185\u5bb9'),'\\u001b[2J\\u202e\u5185\u5bb9')
     def test_receive_archiver_never_sends(self):
         class ReceiveOnly:
             source='boot/:1.20'

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""仅调整文字控制台字形与方向；不改内核或显示模式。"""
+"""Adjust console glyphs and rotation without changing the kernel or display mode."""
 import base64,ctypes,json,os
 from pathlib import Path
 class Font(ctypes.Structure):
@@ -7,12 +7,12 @@ class Font(ctypes.Structure):
 lib=ctypes.CDLL(None,use_errno=True)
 source=json.loads(Path('/var/lib/v30-console/font-original.json').read_text())
 original=bytearray(base64.b64decode(source['bitmap']))
-# 槽0原本仅映射不可显示的NUL；在最终分辨率重绘U+2103，保持C的基线。
+# Slot zero maps the nondisplayable NUL; draw U+2103 while preserving the C baseline.
 assert source['width']==8 and source['height']==16 and source['charcount']==256
 original[:32]=bytes(32)
 fd=os.open('/dev/tty1',os.O_RDWR)
 rotation=Path('/sys/class/graphics/fbcon/rotate')
-# 先在未旋转时换字形，再旋转，避免保留旧旋转字形缓存。
+# Set the font before rotating to avoid retaining stale rotated glyph caches.
 rotation.write_text('0\n')
 results=[]
 for scale in [3,2]:
@@ -28,8 +28,8 @@ for scale in [3,2]:
                         for dx in range(scale):
                             xx=x*scale+dx
                             data[g*dststride*vpitch+(y*scale+dy)*dststride+xx//8] |= 0x80>>(xx%8)
-    # 保留24×48字符格与字高；每条水平连续笔画只收细右缘1像素。
-    # 方框线保持原样，避免接缝；仅处理可打印ASCII及度数符号。
+    # Keep the 24x48 cell and height; thin each horizontal run by one rightmost pixel.
+    # Preserve box-drawing joins; thin only printable ASCII and the degree symbol.
     def put(g,x,y,on=True):
         i=g*dststride*vpitch+y*dststride+x//8;bit=0x80>>(x%8)
         if on:data[i]|=bit
@@ -44,7 +44,7 @@ for scale in [3,2]:
                     if x-start>=3:put(g,x-1,y,False)
                     start=None
     for g in [*range(33,127),248]:slim(g)
-    # C直接沿用原字体，水平缩为2倍、垂直保持3倍；度圈独立置于左上。
+    # Reuse C from the original font at 2x width and 3x height; draw the degree ring separately.
     cscale=max(1,scale-1);offset=width-8*cscale
     for y in range(16):
         for x in range(8):

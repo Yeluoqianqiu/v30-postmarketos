@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""只归档已完整接收的短信和同步已有发送状态，绝不发送或自动回复。"""
+"""Archive complete incoming SMS and reconcile outgoing state; never send or auto-reply."""
 from pathlib import Path
 import json,os,signal,time
 from sms_core import Store,reconcile_outgoing

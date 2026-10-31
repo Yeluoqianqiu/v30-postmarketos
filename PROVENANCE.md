@@ -1,18 +1,18 @@
-# 来源、许可证与发布边界
+# Provenance, licensing and publication boundaries
 
-| 路径 | 来源与许可 |
+| Path | Origin and license |
 |---|---|
-| `baseline/kernel/` | ShapeShifter499 的 Linux 分支和本地 r30 打包修改。内核补丁继承原文件的 GPL-2.0 等许可；APKBUILD 中保留原始维护者元数据，表示历史来源，不代表上游维护本仓库。 |
-| `patches/current-kernel/` | 已投递的五个内核提交。GCC 两项源自 Dmitry Baryshkov，保留原作者、原始 Signed-off-by 和移植者签名。 |
-| `patches/imsd/` | Catcrafts imsd `2b5de7a…` 的 V30 互通增量，GPL-3.0-only；不能理解为 imsd 上游已经接收。 |
-| `runtime/voice/ims-pdn-up.sh`、D-Bus/polkit 文件 | 从 Catcrafts imsd 衍生，保留 Catcrafts 原始 GPL-3.0-only 与版权头。 |
-| 其余 `runtime/`、`scripts/`、`tests/`、本仓库文档 | 本地集成/工具与发布整理，GPL-3.0-only；参考来源见致谢。 |
-| 控制台字体 | 仓库不携带位图。使用者在设备上显式读取原控制台字形后缩放；原字体的许可仍适用。 |
+| `baseline/kernel/` | ShapeShifter499's Linux branch and local r30 packaging changes. Kernel patches retain original file licenses, including GPL-2.0. Historical maintainer metadata in APKBUILD records the source and does not imply upstream maintains this repository. |
+| `patches/current-kernel/` | Five submitted kernel commits. The two GCC changes derive from Dmitry Baryshkov and retain original authorship/sign-offs and the backporter's sign-off. |
+| `patches/imsd/` | V30 interoperability changes against Catcrafts imsd `2b5de7a…`, GPL-3.0-only. Their publication here does not imply upstream acceptance. |
+| `runtime/voice/ims-pdn-up.sh` and D-Bus/polkit files | Derived from Catcrafts imsd; original GPL-3.0-only and Catcrafts copyright headers are preserved. |
+| Other `runtime/`, `scripts/`, `tests/` and repository documentation | Local integration tools and publication adaptations, GPL-3.0-only; references are listed in the acknowledgements. Current prose and CLI localization changes have host validation only. |
+| Console font | No bitmap is bundled. The operator explicitly captures the device's original console glyphs before scaling them. The original font's license continues to apply. |
 
-根目录 LICENSE 和 LICENSES/GPL-3.0-only.txt 为 GPLv3 正文；LICENSES/GPL-2.0-only.txt 为 Linux 提供的 GPLv2 文本。根许可证不改变其他项目原有代码的许可。
+The root LICENSE and LICENSES/GPL-3.0-only.txt contain GPLv3. LICENSES/GPL-2.0-only.txt is the GPLv2 text supplied by Linux. The root license does not relicense third-party code.
 
-文件的来源标签与 SHA256 位于 [FILE_ORIGINS.json](provenance/FILE_ORIGINS.json)，公开文件的内容指纹位于 [SHA256SUMS](SHA256SUMS)。这些指纹用于完整性核对，不把尚未公开的原始设备记录宣称为公开、不可变的验收证据。
+[FILE_ORIGINS.json](provenance/FILE_ORIGINS.json) records source labels and current file hashes; [SHA256SUMS](SHA256SUMS) records public-file integrity. Translation changes are identified in the origin entries. These hashes do not turn private device captures into publicly verifiable or immutable acceptance evidence.
 
-未分发：原厂/设备提取固件、codec 二进制、个人 boot/initramfs、SIM/NV 状态、联系人/短信档案、凭据、私钥、原始设备日志、分区备份、个人分区 UUID。构建得到的二进制和操作者生成的配置放在 Git 忽略目录。
+Excluded from publication: vendor/device-extracted firmware, codec binaries, personal boot/initramfs images, SIM/NV state, contacts/SMS archives, credentials, private keys, raw device logs, partition backups and personal filesystem UUIDs. Generated binaries and operator configuration belong in ignored output directories.
 
-AI 协助声明为 `Assisted-by: Codex:OpenAI/GPT-6`；会话没有提供更细的模型变体，不虚构路由。既有贡献者署名不会被替换。
+AI assistance is declared as `Assisted-by: Codex:OpenAI/GPT-6`; a more specific model route was not exposed to the session. Existing contributor identities are not replaced.

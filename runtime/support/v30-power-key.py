@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""专用电源键短按切换屏幕；不更改限充、服务器唤醒或系统关机。"""
+"""Toggle the display on a short power-key press; leave charging and shutdown unchanged."""
 import fcntl,json,os,select,struct,subprocess,time
 from pathlib import Path
 EVENT=struct.Struct('llHHi');EVIOCGRAB=0x40044590
@@ -16,7 +16,7 @@ while True:
         matches=[p for p in Path('/sys/class/input').glob('event*') if (p/'device/name').read_text().strip()=='pm8941_pwrkey']
         if len(matches)!=1:raise OSError('Expected one pm8941_pwrkey event device')
         fd=os.open('/dev/input/'+matches[0].name,os.O_RDONLY|os.O_NONBLOCK)
-        # 只独占电源键，避免 VT 将同一次按键当作自动亮屏再触发一次翻转。
+        # Grab only the power key so the VT cannot wake and toggle on the same press.
         fcntl.ioctl(fd,EVIOCGRAB,1)
         log({'state':'listening','device':matches[0].name})
         pressed=None;last_toggle=0
