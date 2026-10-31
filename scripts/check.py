@@ -13,7 +13,7 @@ for p in files:
     except UnicodeError:fail.append(name+': unexpected binary');continue
     if re.search(r'/(?:Users|home)/[^\s/]+',text):fail.append(name+': private host path')
     if 'BEGIN '+'OPENSSH PRIVATE KEY' in text:fail.append(name+': private key header')
-    if re.search(r'[\u3400-\u9fff]',text):fail.append(name+': non-English CJK prose; use escaped Unicode test literals')
+    if name!='README.md' and re.search(r'[\u3400-\u9fff]',text):fail.append(name+': non-English CJK prose outside the localized README; use escaped Unicode test literals')
     if p.suffix=='.py':
         try:ast.parse(text,filename=name)
         except SyntaxError:fail.append(name+': Python syntax')

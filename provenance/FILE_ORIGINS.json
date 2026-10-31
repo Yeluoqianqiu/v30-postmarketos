@@ -301,9 +301,9 @@
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "c1102c368d91ab8823f97a733ddb43bc0d42bef6ccb4e22d16b8690980bb788a",
+    "sha256": "b1a834d3ff118efca01a3d764cfd4dfa037426f202318b5cf938318faeedfc9b",
     "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
-    "adaptation": "English project overview with links to the contribution map and open roadmap; documentation-only update, 2026-10-31."
+    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -317,9 +317,9 @@
   },
   "CONTRIBUTING.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "2c71e1478151fb44a1b4734a50cb49d0fbf1da56291f2924ef5238f49318fff4",
+    "sha256": "9ee9a5630f5060b53f798fe7e04ac8aa8bfccba8eb928178ea2a4d52f97d3d34",
     "pre_localization_sha256": "57ae287dfdff695593a3c0778f0a9d68e7073c68c246ca2585e47112a00efbfc",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
   },
   "sources.lock.json": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -403,9 +403,9 @@
   },
   "scripts/check.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "59f4088480de0f07bdf0cc8118384936b664d711a16d6f661e49c09aa05c8372",
+    "sha256": "ece9f0c0c24075e632dbbf0d6219db0a91b342583404efba4750220bad6c7201",
     "pre_localization_sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
   },
   "scripts/prepare-sources.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -455,5 +455,10 @@
   "docs/contributions.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
     "sha256": "594a24b2b76ca79e90326754525b9e06bd3c225ac5343877217e47319b9f697c"
+  },
+  "README.en.md": {
+    "origin": "English counterpart of the project README, 2026-10-31",
+    "sha256": "0f087934e121c8a70846e3c0e12e7a8e11eb1cd783222e0d5ebad7c6023252cc",
+    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
   }
 }

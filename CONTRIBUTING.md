@@ -4,7 +4,7 @@
 - Provide source and reproducible host checks. Report hardware observations separately, with device, version and scope. A running process, registration or successful write is not proof of two-way audio or delivery.
 - Preserve upstream copyright, SPDX and author information. Explain borrowed and modified material in the provenance record.
 - Do not commit credentials, firmware, raw SMS/audio, SIM data, personal UUIDs, raw device logs or partition images.
-- Keep prose, comments and CLI messages in English. Retain Unicode protocol/test coverage; escaped literals are appropriate for non-English synthetic payloads.
+- Keep prose, comments and CLI messages in English, except the localized Chinese overview in `README.md`. Keep it aligned with `README.en.md`, including evidence boundaries and version status. Retain Unicode protocol/test coverage; escaped literals are appropriate for non-English synthetic payloads.
 - Run `python3 scripts/check.py`. Changes affecting hardware still require the owner to arrange fresh tests.
 - Attribute AI assistance to the actual tool/model. AI cannot certify a human's contribution rights. Follow each upstream's DCO/GPG and commit conventions when submitting there.
 
