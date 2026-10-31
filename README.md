@@ -6,6 +6,8 @@ This project builds on **postmarketOS, Linux and ShapeShifter499's V30 mainline 
 
 **Validation applies to specific versions and tests.** Historical r35/r36 results came from one US998 on China Unicom. The published reconstruction tools and subsequent packaging, path and language adaptations have host validation only. The complete published tree has not undergone a fresh end-to-end deployment on a clean device. The newer kernel candidates have not been booted on the device. Ready for review describes the PR stage, not upstream acceptance or device qualification.
 
+See the [integration contribution map](docs/contributions.md) for our completed work and its upstream foundations, and the [open TODO / roadmap](TODO.md) for server reliability, ringing/caller ID, SMS improvements and remaining qualification work. Roadmap items include acceptance criteria and remain open until supported by evidence.
+
 ## Validation summary
 
 Historical observations summarized as of 2026-10-31 (Asia/Shanghai), including earlier charge-control checks:

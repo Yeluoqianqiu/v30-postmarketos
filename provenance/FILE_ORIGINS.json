@@ -301,9 +301,9 @@
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "db15bb1cab407368f8b876faf1c1eb51e7b75101d17cae3127e30e226e890c59",
+    "sha256": "c1102c368d91ab8823f97a733ddb43bc0d42bef6ccb4e22d16b8690980bb788a",
     "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "English project overview with links to the contribution map and open roadmap; documentation-only update, 2026-10-31."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -447,5 +447,13 @@
     "origin": "English publication and validation-scope update, 2026-10-31",
     "sha256": "00f37decf1cab4a710176a929e38b31ed5cc151f14a743b99a481501163ea1f9",
     "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+  },
+  "TODO.md": {
+    "origin": "Project contribution map and open-work roadmap, 2026-10-31",
+    "sha256": "ce743d9f6c3761b86bb9512089d58b033c7f9697b0ced799868f3885517e7215"
+  },
+  "docs/contributions.md": {
+    "origin": "Project contribution map and open-work roadmap, 2026-10-31",
+    "sha256": "594a24b2b76ca79e90326754525b9e06bd3c225ac5343877217e47319b9f697c"
   }
 }
