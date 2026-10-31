@@ -1,0 +1,378 @@
+{
+  "runtime/voice/link.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "a6e84da83636bcaa5576c4bdc07afda68c9bc1153e80bd9e9c804ab83f1b2562"
+  },
+  "runtime/voice/media_helpers.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "d7bef251f0d9be3d4db65d939518ce2d0d94c37f414aad38f45f8fe649f14573"
+  },
+  "runtime/voice/net.catcrafts.IMS1.policy": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "e3118281a7318c1816f97889b0333557d98686124a466b3d8b187ece361b1c8d"
+  },
+  "runtime/voice/v30-ipa": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "889956d288d5f2ac90c440f39791ff231fa11c1afbbca81026975c7875cd34f1"
+  },
+  "runtime/voice/gvariant_json.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "cce89d83699ddea5ba88772dee688b2bb954690ee772a9a68494e89efbfc4cf0"
+  },
+  "runtime/voice/ims_supervisor.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "57982de0ffb2506fc1542654123ecca421e9d1d1acdd03bc290e968602d79c65"
+  },
+  "runtime/voice/v30-phone": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "94cbfc42b6c924c3f47d5115387e4d7eab8d8e972f35b6b96bd70c3a0f267694"
+  },
+  "runtime/voice/call_media.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "21a8d209c7091d3eb3ba445e55bb76d756215eead271b244c8d9cafb85181c63"
+  },
+  "runtime/voice/physical.conf": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "61d4472a47c8ef8d52684ff088a007637e10abb3dc8dd325ab7f056a0e40a3f1"
+  },
+  "runtime/voice/net.catcrafts.IMS1.conf": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "fb6d5214ce77414c7e6e82ed68068ddea2c41b37de641642b6486068fb407bfc"
+  },
+  "runtime/voice/ims-pdn-up.sh": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "b70d148b39dc40c0e71d052397217e70af0ed878910aed8093c7cd36e3ead688"
+  },
+  "runtime/voice/mobile_common.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "799aad57ae571f140ef5ade997ff23be038d79f29df719b27b92438dda9c4d8c"
+  },
+  "runtime/voice/test_integration.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "de9cbeeebca5e3a242fff0a5bc89f7dade5ebd76c42e6bc9f4199794c2980eb1"
+  },
+  "runtime/voice/v30-cellular": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "57916b7425e1d81f9621c3c10f2d35e8029b774af740d2e3e928666a0e12409f"
+  },
+  "runtime/voice/audio_session.py": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "adb6fddac823d940fcd9aa96b1f13e0afa9e4f8c4456a61ba9998b64df0dcc90"
+  },
+  "runtime/voice/v30-ims": {
+    "origin": "r35 source reference; upstream harness PR #11",
+    "sha256": "26d3a591b7789e700bc900099f8a5eee2f461b6e54c2f5bb234cbf035f9408c0"
+  },
+  "runtime/sms/sms_bus.py": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "d4ae87063f41717fccf06637352fa33dc9436e8d58e6401e3998f5ef82c1bbe0"
+  },
+  "runtime/sms/smsd.py": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "2b4d4bd4a2cfa29bca4c0896b28019c19c1fbc7a6f5b65ea87811947a6d1e74c"
+  },
+  "runtime/sms/bench_private_bus.py": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "8f306c9349142d7caafc32292fa1e1ba3a058cd2bb4456c551d971f7afcd3c00"
+  },
+  "runtime/sms/v30-sms.init": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "ff8b6b7919004341215e2e68230f9aa7a4421d38ed0da29a33b3cd6f973dfb6d"
+  },
+  "runtime/sms/v30-sms": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "1c4c8aa2afbcf61c589efe6c0e3bf713964c6cb6adb0d4d4f3888cf0c8b5008f"
+  },
+  "runtime/sms/sms_core.py": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "12d5c127dcec6a6346e817f90c1c07b70ab1f1e17638826988772d80bd46cda8"
+  },
+  "runtime/sms/test_sms.py": {
+    "origin": "r36 SMS with upstream packaging adaptation; harness PR #11",
+    "sha256": "ea75c1fd08cbe05e4771bf22eae2ede9885fce6f9ccd9fa4a45652f7eea714ff"
+  },
+  "runtime/support/v30-charge-limit.py": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "09a3c6f920f3914f4e3be7cedccd7f79270a87a2d39c58fc1edfb4d22433252b"
+  },
+  "runtime/support/v30-power-key.py": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "48672872d7f8ddc25097be076496e9f3c91a1ddfa0da63db2474c998a8059257"
+  },
+  "runtime/support/v30-display.py": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "443e1f6084737cbcaaf2b7dc1a6173f7296f01d1f947e1664f1d4681ff584853"
+  },
+  "runtime/support/v30-console-login": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "272994cb9503fde4e47289665e3738716c5eb5a38eb077e54bf15d84de69e8c6"
+  },
+  "runtime/support/v30-console-metrics.py": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe"
+  },
+  "runtime/support/v30-console.conf": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "ca585064f3f1c9065ba898eeb318745ba5337993976e222e09842a429ed5f2fd"
+  },
+  "runtime/support/v30-console-status.init": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "ea53816e27b7584d78a1a343171339053b97f0b07e0cba244c6e01804ed18e78"
+  },
+  "runtime/support/v30-power-key.init": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "cb5f617a7abc5c7480ccadb589dc77b142248c2e0835dccac95574376bc9189a"
+  },
+  "runtime/support/v30-unicom-init": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "74cde846709df15dd14866c397408236a6df48502beeadb71bb4bd87e76f0b97"
+  },
+  "runtime/support/v30-unicom-mode": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "9f3cd0ed4d423d4642e8d72b7e2042e605055930034bec8d8e94f4d940e92cc3"
+  },
+  "runtime/support/v30-unicom-service": {
+    "origin": "local source; published as board/carrier reference",
+    "sha256": "d753e98cefc1a3ef33154a6aad3a488564e7f252fe12acc982ca700a0fea8b7a"
+  },
+  "runtime/support/v30-audio.init": {
+    "origin": "local audio-before-radio source; board reference",
+    "sha256": "8ede451e7a648c60c679116e56b719c04fd9c1b98bc09b5742100b6dfe4a263a"
+  },
+  "runtime/support/v30-console-font.py": {
+    "origin": "local console scaling; public font-state path adaptation",
+    "sha256": "45709ac57d54b81a08ba6f7a7ff2f7070309efc38e20a1b71c05a97c21f24525"
+  },
+  "tests/test_charge_policy.py": {
+    "origin": "charge-policy trajectory regression",
+    "sha256": "7f027224651d7f12ccf3a10e66a83ea2bbf632b6354e528183d342faa7b92b11"
+  },
+  "patches/imsd/0001-v30-interop.patch": {
+    "origin": "Catcrafts imsd 2b5de7a plus local interop changes; GPL-3.0-only",
+    "sha256": "45dafdc9b2b339905586dbe0c8365a4dde4d81ff8d88b1cf2038a488fa8ab02f"
+  },
+  "patches/current-kernel/0001-power-supply-pmi8998_fg-fix-charger-status-and-fallb.patch": {
+    "origin": "kernel PR #12; original GCC authorship/sign-offs retained",
+    "sha256": "6582395d382fd4fddb486402acc18cf66868dba7aef6cfabcd17aba843ea10fb"
+  },
+  "patches/current-kernel/0004-clk-qcom-gcc-msm8998-leave-the-GPU-BIMC-source-and-S.patch": {
+    "origin": "kernel PR #12; original GCC authorship/sign-offs retained",
+    "sha256": "1ab75b100dfb2eaa630b47006ced236915aaba4fc9c3a6baed00efb567084156"
+  },
+  "patches/current-kernel/0002-power-supply-qcom_smbx-expose-charge-inhibition-with.patch": {
+    "origin": "kernel PR #12; original GCC authorship/sign-offs retained",
+    "sha256": "16eaac34f7513feff6c312bc3a9142b61e46099f027f420175db579796dd87c3"
+  },
+  "patches/current-kernel/0003-net-ipa-allow-variable-length-QMI-server-requests.patch": {
+    "origin": "kernel PR #12; original GCC authorship/sign-offs retained",
+    "sha256": "b991da923b620272b09d3bde2d264614cd632a137ea8d10d9847738427c0a325"
+  },
+  "patches/current-kernel/0005-clk-qcom-gcc-msm8998-leave-the-MMSS-QM-clocks-on.patch": {
+    "origin": "kernel PR #12; original GCC authorship/sign-offs retained",
+    "sha256": "7ce572b9b0ec72734dd16ccfc505eea7e4ab2dc979dd0f756bec12824ea01dc9"
+  },
+  "scripts/build-imsd.py": {
+    "origin": "manual C++26 module build used for upstream preparation",
+    "sha256": "90f161c96d9125d6a6a6e5450b0df99bd05eaa706f7b143849c95f19abcd75ed"
+  },
+  "LICENSE": {
+    "origin": "GPL-3.0-only license text",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "LICENSES/GPL-3.0-only.txt": {
+    "origin": "GPL-3.0-only license text",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "baseline/kernel/v30-ipa-stage-r15.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "b6d415ff9696badc5231e6dd5763802c82c34bb4b3bed72d6c0fd27cf9668149"
+  },
+  "baseline/kernel/v30-icc-sync-hold-r16.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "a3a3bc466dc3f80f0e2b2e144e058c2f8f8477721efe0e113a9343280bcff7a7"
+  },
+  "baseline/kernel/v30-wcd934x-hw-readback-r29.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "9601cb6db2a741f304e5db1e13e4c21effb4d8d7bc97c76e48a9a82d103001e5"
+  },
+  "baseline/kernel/v30-ipa-qmi-hold.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "489ac8ececa63d7e1888e844e5fa1068b6b3483f9a718f5b5e6881fc25e08f80"
+  },
+  "baseline/kernel/v30-wcd934x-adc-mux8-r30.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "0381b463dd0391299fa83d0b47065ef22c49042a8c5cdb9ac02738f3f6205cb7"
+  },
+  "baseline/kernel/v30-glink-endpoint-deadlock.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "66165220fa654b8fa9ee4d471dffb450a5bed2fcce87048f673926ac61d5cc84"
+  },
+  "baseline/kernel/v30-ipa-diagnostic.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "14a1ca36cc4d471ccfbc433d3b234959c21ee99257dcbd4fa8db5af81e19d7c4"
+  },
+  "baseline/kernel/v30-wcd934x-amic-hold-r28.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "7bbecba319a8de01d5de4682e523fe72f8302107e8de348172f256016040158b"
+  },
+  "baseline/kernel/v30-ipa-system-header.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "7f399a0f22158e5a7bf08189ca265c70a4f1e8bf900de9a915d0eb961208e1d3"
+  },
+  "baseline/kernel/v30-charge-behaviour.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "87342fe61a5b7eadfed7ba339a99265e7be3158ed1247f4d5bc95341622c4854"
+  },
+  "baseline/kernel/v30-gcc-upstream-keep-on-r23.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "0427a96e01e0d8514e18a9c8db55462291947ffc238407821096ef6a36ed322d"
+  },
+  "baseline/kernel/config-lge-joan.aarch64": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "9d7580bde83e49e4e24c2df9cbb7616938b9590c980af70e8f4647e42c86e2d7"
+  },
+  "baseline/kernel/APKBUILD": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "70867cfa27fb84f231a8c32cbdbfbd886271f177c31624ca5d485bd455c26665"
+  },
+  "baseline/kernel/v30-icc-sync-trace-r17.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "02586d0a6be3892532e9ae8aebbf26c7ed40c8370da3d88d74c09142112fa8ee"
+  },
+  "baseline/kernel/v30-gcc-registration-diag-r20.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "c7035231de118a39f0a643e4848561febf6b5a7e0f0d7f8763cdfcbee3f7f4de"
+  },
+  "baseline/kernel/v30-fg-status.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "e36cb908a4354a08dce8f435e0366ead8a1ea79561b6ffefa806a179ae0aa090"
+  },
+  "baseline/kernel/v30-ipa-qmi-buffer.patch": {
+    "origin": "historical local r30 pmaports recipe, base 1b42626; not the cleaned upstream series",
+    "sha256": "980efb43b33124e6778a248fd5239aa1a283d9cdc6537076d251fac417595815"
+  },
+  "PROVENANCE.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "05e3b86d81c274e205e580a3bd27fa17a26f3f500897cb240d509780cff75075"
+  },
+  "README.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65"
+  },
+  "ACKNOWLEDGEMENTS.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "35241c2f98e94c7e18e4fd9a10347bd734607a0c16e06f5dc971812fa94d70ff"
+  },
+  ".gitignore": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "2d8d9879b1c2f611bbad416cb4331af7c3e12f6f4bfc4a5365742ce111c82d83"
+  },
+  "CONTRIBUTING.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "57ae287dfdff695593a3c0778f0a9d68e7073c68c246ca2585e47112a00efbfc"
+  },
+  "sources.lock.json": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "94a36e21f73787e24725e942374c350ed497d6147519bbdf63484ea6f6fe3408"
+  },
+  "LICENSES/GPL-2.0-only.txt": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "8780e78a1a737e127f25a65f6d95269bffd36158dc261114de7859b490bfc5aa"
+  },
+  "tests/test_packaging.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "637b011f4cdd34e5245b75612e93ed9533c68333f97f0b8f7952f294932781a1"
+  },
+  "docs/upstream.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "bcd9e966f9d46fe025f5c8b5a568ea9d3d8b9a9cfd82949456bb7f6e153a14b0"
+  },
+  "docs/architecture.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "210cea73a66ba5d34844e1f076f77df2a7d97827efbbd99ba29ae1c61c20dcad"
+  },
+  "docs/validation.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5"
+  },
+  "docs/build-and-install.md": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "1a99e15d33c492a39b78aeaae8e122a259f840a8f9fd892af0351c6863214c1b"
+  },
+  "provenance/host-validation.json": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "ac9b2c1e65f920088a3c8b3a18afdb867ce26bb551708a8fe6dbf9dedbb0b3ca"
+  },
+  "examples/kernel-cmdline.template": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "d58b2820d65f04f32222abadc2e1e60dbd0fda31360349d181b6e33123b5c410"
+  },
+  "examples/rmtfs.conf": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "e5bc419425dd4b87a348c587846930e777c409bb04aba6494b811c0caa02fd49"
+  },
+  "examples/v30-mobile.conf": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "fd5c33f99d2a7f76048fbf039abf34096ae8e428fff3dcc15c316366326cc165"
+  },
+  "examples/v30-ims.env": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "c233cf9ccc210431beaa234fccf80f0a0c4683bf2e23a1f7bee08f004ee910d3"
+  },
+  "examples/inittab-tty1.snippet": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "af6612cfb8ad87593b1d9617535519efc54672962f90a2656fb19b2179afa79d"
+  },
+  "examples/bluez-policy.conf": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "d4bd95e54a32cd6c4bfc1e5464a21376c6ea883f80ffef34d3dedcc555ac7a12"
+  },
+  "examples/packages.txt": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "6a0eee628f37371a5bfb92f7a29fd9e1bf1a6b1d5b9195911e86194c6673cd99"
+  },
+  "examples/v30-audio-compat.conf": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "ba49f744268ca5650ed5c012e3fa360225f6240a0faa951427ae148f5182b67e"
+  },
+  "scripts/stage-rootfs.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "0058be69476068101af554df231d02f768dc435b2611a18c0997df285df8b581"
+  },
+  "scripts/check.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9"
+  },
+  "scripts/prepare-sources.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "3bbcf5ca1cf165f331cc1cc7c7695b59d01540fe3deda99b5273e25144cb4bec"
+  },
+  "scripts/capture-console-font.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "08e46f26c9acf709a8677777da2f00994119879234e087c3d915cdfdbab4c7b0"
+  },
+  "scripts/patch-audio-dtb.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "026108c10567f7e8bd330c6a50f3a863239391e060b339411caa4078ffe5ee71"
+  },
+  "scripts/repack-boot.py": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "14d0f6b9a17bdc270a8a832448201c79592d8cff321c1540746df93d7f865d32"
+  },
+  "runtime/support/v30-charge-limit.init": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "77b140628fdcf03ee8ee14fdaeadb01298d5bb738603fd0cc00ea08f2bca70b0"
+  },
+  "runtime/support/v30-modem-modules.init": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "7a7e05594ab420e9a1cedb81812fec38383165a4504f4878e03c213748346432"
+  },
+  "runtime/support/v30-bluetooth-off.init": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "dd969395f57fbdce466f6f4d813acfd29be67667811e748f685d3b76622cc908"
+  },
+  "runtime/support/v30-wifi.init": {
+    "origin": "standalone source/documentation preparation, 2026-10-31",
+    "sha256": "78d464b2e2503d897b5ad41ac18d1be87e97870066eaeea685db6b826aa64723"
+  }
+}

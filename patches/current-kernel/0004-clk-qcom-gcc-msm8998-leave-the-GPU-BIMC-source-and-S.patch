@@ -1,0 +1,108 @@
+From 72564fa952b99f156cf25fc45ca0680e707571f4 Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Date: Mon, 19 Oct 2026 16:41:00 +0300
+Subject: [PATCH 4/5] clk: qcom: gcc-msm8998: leave the GPU BIMC source  and
+ SNOC DVM clocks on
+
+Adapt Dmitry Baryshkov's published October 19 fix to the joan working
+branch, preserving its existing clock hardware array and other changes.
+Stop registering the GPU BIMC source and SNOC DVM branches and enable their CBCRs at probe
+through qcom_cc_driver_data, as in the original patch. Preserve existing
+DT IDs and consumer handling. The combined CBCR list is address-sorted.
+
+Original author and Signed-off-by are preserved from the published patch.
+Link: https://lore.kernel.org/all/20261019-msm8998-fix-clocks-v1-1-370949e4d8a0@oss.qualcomm.com/
+Test: gcc-msm8998.o on native Alpine aarch64 against dc9c6692dbfb;
+strict checkpatch, sequential patch application and git diff --check.
+No boot of this rebased kernel was attempted.
+
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+
+Signed-off-by: ygc <yeqianqiu1995@gmail.com>
+Assisted-by: Codex:OpenAI/GPT-6
+---
+ drivers/clk/qcom/gcc-msm8998.c | 39 ++++++++++------------------------
+ 1 file changed, 11 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/clk/qcom/gcc-msm8998.c b/drivers/clk/qcom/gcc-msm8998.c
+index d8b1494..c5a1397 100644
+--- a/drivers/clk/qcom/gcc-msm8998.c
++++ b/drivers/clk/qcom/gcc-msm8998.c
+@@ -2154,19 +2154,6 @@ static struct clk_branch gcc_gpu_bimc_gfx_clk = {
+ 	},
+ };
+ 
+-static struct clk_branch gcc_gpu_bimc_gfx_src_clk = {
+-	.halt_reg = 0x7100c,
+-	.halt_check = BRANCH_HALT,
+-	.clkr = {
+-		.enable_reg = 0x7100c,
+-		.enable_mask = BIT(0),
+-		.hw.init = &(struct clk_init_data){
+-			.name = "gcc_gpu_bimc_gfx_src_clk",
+-			.ops = &clk_branch2_ops,
+-		},
+-	},
+-};
+-
+ static struct clk_branch gcc_gpu_cfg_ahb_clk = {
+ 	.halt_reg = 0x71004,
+ 	.halt_check = BRANCH_HALT_SKIP,
+@@ -2186,19 +2173,6 @@ static struct clk_branch gcc_gpu_cfg_ahb_clk = {
+ 	},
+ };
+ 
+-static struct clk_branch gcc_gpu_snoc_dvm_gfx_clk = {
+-	.halt_reg = 0x71018,
+-	.halt_check = BRANCH_HALT,
+-	.clkr = {
+-		.enable_reg = 0x71018,
+-		.enable_mask = BIT(0),
+-		.hw.init = &(struct clk_init_data){
+-			.name = "gcc_gpu_snoc_dvm_gfx_clk",
+-			.ops = &clk_branch2_ops,
+-		},
+-	},
+-};
+-
+ static struct clk_branch gcc_hmss_ahb_clk = {
+ 	.halt_reg = 0x48000,
+ 	.halt_check = BRANCH_HALT_VOTED,
+@@ -3112,9 +3086,7 @@ static struct clk_regmap *gcc_msm8998_clocks[] = {
+ 	[GCC_GP3_CLK] = &gcc_gp3_clk.clkr,
+ 	[GCC_BIMC_GFX_CLK] = &gcc_bimc_gfx_clk.clkr,
+ 	[GCC_GPU_BIMC_GFX_CLK] = &gcc_gpu_bimc_gfx_clk.clkr,
+-	[GCC_GPU_BIMC_GFX_SRC_CLK] = &gcc_gpu_bimc_gfx_src_clk.clkr,
+ 	[GCC_GPU_CFG_AHB_CLK] = &gcc_gpu_cfg_ahb_clk.clkr,
+-	[GCC_GPU_SNOC_DVM_GFX_CLK] = &gcc_gpu_snoc_dvm_gfx_clk.clkr,
+ 	[GCC_HMSS_AHB_CLK] = &gcc_hmss_ahb_clk.clkr,
+ 	[GCC_HMSS_AT_CLK] = &gcc_hmss_at_clk.clkr,
+ 	[GCC_HMSS_RBCPR_CLK] = &gcc_hmss_rbcpr_clk.clkr,
+@@ -3351,6 +3323,16 @@ static struct clk_hw *gcc_msm8998_hws[] = {
+ 	&gpll0_out_main_div2.hw,
+ };
+ 
++static const u32 gcc_msm8998_critical_cbcrs[] = {
++	0x7100c, /* GCC_GPU_BIMC_GFX_SRC_CLK */
++	0x71018, /* GCC_GPU_SNOC_DVM_GFX_CLK */
++};
++
++static const struct qcom_cc_driver_data gcc_msm8998_driver_data = {
++	.clk_cbcrs = gcc_msm8998_critical_cbcrs,
++	.num_clk_cbcrs = ARRAY_SIZE(gcc_msm8998_critical_cbcrs),
++};
++
+ static const struct qcom_cc_desc gcc_msm8998_desc = {
+ 	.config = &gcc_msm8998_regmap_config,
+ 	.clks = gcc_msm8998_clocks,
+@@ -3359,6 +3341,7 @@ static const struct qcom_cc_desc gcc_msm8998_desc = {
+ 	.num_resets = ARRAY_SIZE(gcc_msm8998_resets),
+ 	.gdscs = gcc_msm8998_gdscs,
+ 	.num_gdscs = ARRAY_SIZE(gcc_msm8998_gdscs),
++	.driver_data = &gcc_msm8998_driver_data,
+ 	.clk_hws = gcc_msm8998_hws,
+ 	.num_clk_hws = ARRAY_SIZE(gcc_msm8998_hws),
+ };
+-- 
+2.50.1 (Apple Git-155)
+

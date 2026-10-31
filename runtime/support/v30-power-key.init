@@ -1,0 +1,9 @@
+#!/sbin/openrc-run
+supervisor=supervise-daemon
+command=/usr/local/sbin/v30-power-key
+description="V30 power-key short press toggles console display"
+respawn_delay=3
+depend() {
+    need localmount
+    after udev v30-display-off
+}

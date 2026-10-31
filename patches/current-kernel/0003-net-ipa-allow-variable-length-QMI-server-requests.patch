@@ -1,0 +1,40 @@
+From 27f3f1cc4c853a2669bf633a29a28617b3290782 Mon Sep 17 00:00:00 2001
+From: ygc <yeqianqiu1995@gmail.com>
+Date: Sat, 31 Oct 2026 07:47:00 +0800
+Subject: [PATCH 3/5] net: ipa: allow variable-length QMI server requests
+
+The server receive size of eight bytes cannot hold variable CONFIG or
+FILTER request payloads. Size the receive payload for the u16 QMI length
+limit; qmi_handle_init() accounts for the QMI header itself. Keep the client
+response bound and message handling unchanged, without local debug traces.
+
+Test: ipa_qmi.o on native Alpine aarch64 against dc9c6692dbfb;
+strict checkpatch and git diff --check. The full new kernel has not been
+built into an image or booted.
+
+Signed-off-by: ygc <yeqianqiu1995@gmail.com>
+Assisted-by: Codex:OpenAI/GPT-6
+---
+ drivers/net/ipa/ipa_qmi_msg.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ipa/ipa_qmi_msg.h b/drivers/net/ipa/ipa_qmi_msg.h
+index 12fcce5..b57ae47 100644
+--- a/drivers/net/ipa/ipa_qmi_msg.h
++++ b/drivers/net/ipa/ipa_qmi_msg.h
+@@ -35,8 +35,10 @@
+ #define IPA_QMI_DRIVER_INIT_COMPLETE_REQ_SZ	4	/* -> server handle */
+ #define IPA_QMI_DRIVER_INIT_COMPLETE_RSP_SZ	7	/* <- server handle */
+ 
+-/* Maximum size of messages we expect the AP to receive (max of above) */
+-#define IPA_QMI_SERVER_MAX_RCV_SZ		8
++/* CONFIG and FILTER requests may carry variable-length payloads.  QMI
++ * stores their payload length in u16; qmi_handle_init() adds the header.
++ */
++#define IPA_QMI_SERVER_MAX_RCV_SZ		U16_MAX
+ #define IPA_QMI_CLIENT_MAX_RCV_SZ		25
+ 
+ /* Request message for the IPA_QMI_INDICATION_REGISTER request */
+-- 
+2.50.1 (Apple Git-155)
+

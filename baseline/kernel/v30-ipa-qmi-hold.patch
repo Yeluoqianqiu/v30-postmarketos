@@ -1,0 +1,37 @@
+--- a/drivers/net/ipa/ipa_qmi.c
++++ b/drivers/net/ipa/ipa_qmi.c
+@@ -542,11 +542,23 @@
+ 	.new_server	= ipa_client_new_server,
+ };
+ 
++/* A read-only module parameter: never enable a half-initialized QMI path
++ * at runtime. A separate boot/load is required for the handshake phase.
++ */
++static bool ipa_qmi_hold;
++module_param_named(qmi_hold, ipa_qmi_hold, bool, 0444);
++MODULE_PARM_DESC(qmi_hold, "V30 diagnostic: skip QMI setup and handshake");
++
+ /* Set up for QMI message exchange */
+ int ipa_qmi_setup(struct ipa *ipa)
+ {
+ 	struct ipa_qmi *ipa_qmi = &ipa->qmi;
+ 	int ret;
++
++	if (ipa_qmi_hold) {
++		dev_info(ipa->dev, "V30-STAGE QMI setup held before server registration\n");
++		return 0;
++	}
+ 
+ 	ipa_qmi->initial_boot = true;
+ 
+@@ -601,6 +613,10 @@
+ /* Tear down IPA QMI handles */
+ void ipa_qmi_teardown(struct ipa *ipa)
+ {
++	/* No work or QMI handles were initialized in hold mode. */
++	if (ipa_qmi_hold)
++		return;
++
+ 	cancel_work_sync(&ipa->qmi.init_driver_work);
+ 
+ 	qmi_handle_release(&ipa->qmi.client_handle);

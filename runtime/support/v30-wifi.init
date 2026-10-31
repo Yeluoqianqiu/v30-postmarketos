@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+description="LG V30 WCN3990 WLAN bring-up"
+depend() {
+    need v30-modem-modules tqftpserv rmtfs
+    before networkmanager
+}
+start() {
+    ebegin "Starting LG V30 WCN3990 WLAN"
+    modprobe ath10k_snoc || { eend 1; return 1; }
+    local elapsed=0
+    while [ "$elapsed" -lt 35 ]; do
+        if [ -d /sys/class/net/wlan0 ]; then
+            eend 0
+            return 0
+        fi
+        sleep 1
+        elapsed=$((elapsed + 1))
+    done
+    eend 1 "wlan0 did not appear within 35 seconds; USB SSH remains available"
+    return 1
+}

@@ -1,0 +1,74 @@
+--- a/drivers/clk/qcom/common.c
++++ b/drivers/clk/qcom/common.c
+@@ -4,6 +4,9 @@
+  */
+ 
+ #include <linux/export.h>
++#include <linux/init.h>
++#include <linux/kstrtox.h>
++#include <linux/panic.h>
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/platform_device.h>
+@@ -20,6 +23,15 @@
+ #include "clk-regmap.h"
+ #include "reset.h"
+ #include "gdsc.h"
++
++/* V30 RAM-boot diagnostic only; off unless explicitly requested. */
++static bool v30_gcc_diag;
++
++static int __init v30_gcc_diag_setup(char *arg)
++{
++	return kstrtobool(arg, &v30_gcc_diag);
++}
++early_param("v30.gcc_diag", v30_gcc_diag_setup);
+ 
+ struct qcom_cc {
+ 	struct qcom_reset_controller reset;
+@@ -332,6 +344,11 @@
+ 	struct clk_regmap **rclks = desc->clks;
+ 	size_t num_clk_hws = desc->num_clk_hws;
+ 	struct clk_hw **clk_hws = desc->clk_hws;
++	bool trace = v30_gcc_diag &&
++		of_device_is_compatible(dev->of_node, "qcom,gcc-msm8998");
++
++	if (trace)
++		dev_emerg(dev, "V30-R20 GCC probe begin clocks=%zu\n", num_clks);
+ 
+ 	cc = devm_kzalloc(dev, sizeof(*cc), GFP_KERNEL);
+ 	if (!cc)
+@@ -412,14 +429,29 @@
+ 	}
+ 
+ 	for (i = 0; i < num_clks; i++) {
++		const char *name;
++
+ 		if (!rclks[i])
+ 			continue;
+ 
++		name = rclks[i]->hw.init ? rclks[i]->hw.init->name : "<none>";
++		if (trace)
++			dev_emerg(dev, "V30-R20 GCC register begin id=%d name=%s\n",
++				  i, name);
+ 		ret = devm_clk_register_regmap(dev, rclks[i]);
+-		if (ret)
+-			goto put_rpm;
+-	}
+-
++		if (trace)
++			dev_emerg(dev, "V30-R20 GCC register end id=%d name=%s ret=%d\n",
++				  i, name, ret);
++		if (ret) {
++			if (trace)
++				panic("V30-R20 GCC registration failed id=%d name=%s ret=%d",
++				      i, name, ret);
++			goto put_rpm;
++		}
++	}
++
++	if (trace)
++		dev_emerg(dev, "V30-R20 GCC clocks complete; publishing provider\n");
+ 	ret = devm_of_clk_add_hw_provider(dev, qcom_cc_clk_hw_get, cc);
+ 	if (ret)
+ 		goto put_rpm;

@@ -1,0 +1,1 @@
+panic=5 pmos_boot_uuid=YOUR_BOOT_FS_UUID pmos_root_uuid=YOUR_ROOT_FS_UUID pmos_rootfsopts=defaults nocoldplug modprobe.blacklist=ipa v30.icc_hold_sync=0 v30.icc_trace=0 v30.gcc_diag=0 loglevel=4 fbcon=rotate:1

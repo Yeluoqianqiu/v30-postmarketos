@@ -1,0 +1,115 @@
+diff --git a/drivers/net/ipa/ipa_cmd.c b/drivers/net/ipa/ipa_cmd.c
+--- a/drivers/net/ipa/ipa_cmd.c
++++ b/drivers/net/ipa/ipa_cmd.c
+@@ -69,6 +69,12 @@ struct ipa_cmd_hw_hdr_init_local {
+ #define HDR_INIT_LOCAL_FLAGS_TABLE_SIZE_FMASK		GENMASK(11, 0)
+ #define HDR_INIT_LOCAL_FLAGS_HDR_ADDR_FMASK		GENMASK(27, 12)
+ 
++/* IPA_CMD_HDR_INIT_SYSTEM */
++
++struct ipa_cmd_hw_hdr_init_system {
++	__le64 hdr_table_addr;
++};
++
+ /* IPA_CMD_REGISTER_WRITE */
+ 
+ /* For IPA v4.0+, the pipeline clear options are encoded in the opcode */
+@@ -138,6 +144,7 @@ struct ipa_cmd_ip_packet_tag_status {
+ union ipa_cmd_payload {
+ 	struct ipa_cmd_hw_ip_fltrt_init table_init;
+ 	struct ipa_cmd_hw_hdr_init_local hdr_init_local;
++	struct ipa_cmd_hw_hdr_init_system hdr_init_system;
+ 	struct ipa_cmd_register_write register_write;
+ 	struct ipa_cmd_ip_packet_init ip_packet_init;
+ 	struct ipa_cmd_hw_dma_mem_mem dma_shared_mem;
+@@ -427,6 +434,23 @@ void ipa_cmd_hdr_init_local_add(struct gsi_trans *trans, u32 offset, u16 size,
+ 			  opcode);
+ }
+ 
++void ipa_cmd_hdr_init_system_add(struct gsi_trans *trans, dma_addr_t addr)
++{
++	struct ipa *ipa = container_of(trans->gsi, struct ipa, gsi);
++	enum ipa_cmd_opcode opcode = IPA_CMD_HDR_INIT_SYSTEM;
++	struct ipa_cmd_hw_hdr_init_system *payload;
++	union ipa_cmd_payload *cmd_payload;
++	dma_addr_t payload_addr;
++
++	cmd_payload = ipa_cmd_payload_alloc(ipa, &payload_addr);
++	payload = &cmd_payload->hdr_init_system;
++
++	payload->hdr_table_addr = cpu_to_le64(addr);
++
++	gsi_trans_cmd_add(trans, payload, sizeof(*payload), payload_addr,
++			  opcode);
++}
++
+ void ipa_cmd_register_write_add(struct gsi_trans *trans, u32 offset, u32 value,
+ 				u32 mask, bool clear_full)
+ {
+diff --git a/drivers/net/ipa/ipa_cmd.h b/drivers/net/ipa/ipa_cmd.h
+--- a/drivers/net/ipa/ipa_cmd.h
++++ b/drivers/net/ipa/ipa_cmd.h
+@@ -21,6 +21,7 @@ struct ipa_mem;
+  * @IPA_CMD_IP_V4_ROUTING_INIT:	Initialize IPv4 routing table
+  * @IPA_CMD_IP_V6_ROUTING_INIT:	Initialize IPv6 routing table
+  * @IPA_CMD_HDR_INIT_LOCAL:	Initialize IPA-local header memory
++ * @IPA_CMD_HDR_INIT_SYSTEM:	Locate the header table in system memory
+  * @IPA_CMD_REGISTER_WRITE:	Register write performed by IPA
+  * @IPA_CMD_IP_PACKET_INIT:	Set up next packet's destination endpoint
+  * @IPA_CMD_DMA_SHARED_MEM:	DMA command performed by IPA
+@@ -36,6 +37,7 @@ enum ipa_cmd_opcode {
+ 	IPA_CMD_IP_V4_ROUTING_INIT	= 0x7,
+ 	IPA_CMD_IP_V6_ROUTING_INIT	= 0x8,
+ 	IPA_CMD_HDR_INIT_LOCAL		= 0x9,
++	IPA_CMD_HDR_INIT_SYSTEM		= 0xa,
+ 	IPA_CMD_REGISTER_WRITE		= 0xc,
+ 	IPA_CMD_IP_PACKET_INIT		= 0x10,
+ 	IPA_CMD_DMA_SHARED_MEM		= 0x13,
+@@ -98,6 +100,16 @@ void ipa_cmd_table_init_add(struct gsi_trans *trans, enum ipa_cmd_opcode opcode,
+ void ipa_cmd_hdr_init_local_add(struct gsi_trans *trans, u32 offset, u16 size,
+ 				dma_addr_t addr);
+ 
++/**
++ * ipa_cmd_hdr_init_system_add() - Add a system header table command
++ * @trans:	GSI transaction
++ * @addr:	DMA address of the header table in system memory
++ *
++ * Tells the IPA where the header table in system memory starts.  Unlike
++ * the local table, nothing is copied: the IPA reads headers from @addr.
++ */
++void ipa_cmd_hdr_init_system_add(struct gsi_trans *trans, dma_addr_t addr);
++
+ /**
+  * ipa_cmd_register_write_add() - Add a register write command to a transaction
+  * @trans:	GSI transaction
+diff --git a/drivers/net/ipa/ipa_mem.c b/drivers/net/ipa/ipa_mem.c
+--- a/drivers/net/ipa/ipa_mem.c
++++ b/drivers/net/ipa/ipa_mem.c
+@@ -88,7 +88,7 @@ int ipa_mem_setup(struct ipa *ipa)
+ 	/* Get a transaction to define the header memory region and to zero
+ 	 * the processing context and modem memory regions.
+ 	 */
+-	trans = ipa_cmd_trans_alloc(ipa, 4);
++	trans = ipa_cmd_trans_alloc(ipa, 5);
+ 	if (!trans) {
+ 		dev_err(ipa->dev, "no transaction for memory setup\n");
+ 		return -EBUSY;
+@@ -107,6 +107,17 @@ int ipa_mem_setup(struct ipa *ipa)
+ 
+ 	ipa_cmd_hdr_init_local_add(trans, offset, size, addr);
+ 
++	/* The default route set by ipa_endpoint_default_route_set() names the
++	 * header table in system memory, as the downstream driver does, but
++	 * unlike that driver we never locate one, so the IPA takes headers
++	 * from wherever its base register points.  On IPA v3.1 (msm8998)
++	 * that is IOVA 0, and the uplink path reads it as soon as it carries
++	 * traffic.  Give the IPA a table to read: the zeroed DMA buffer, an
++	 * empty table as far as the hardware is concerned.
++	 */
++	if (ipa->version == IPA_VERSION_3_1)
++		ipa_cmd_hdr_init_system_add(trans, addr);
++
+ 	ipa_mem_zero_region_add(trans, IPA_MEM_MODEM_PROC_CTX);
+ 	ipa_mem_zero_region_add(trans, IPA_MEM_AP_PROC_CTX);
+ 	ipa_mem_zero_region_add(trans, IPA_MEM_MODEM);
+

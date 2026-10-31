@@ -1,0 +1,15 @@
+/out/
+/sources/
+/cache/
+/stage/
+__pycache__/
+*.py[cod]
+*.img
+*.dtb
+*.apk
+*.sqlite*
+*.raw
+*.pcm
+*.rtp
+.env
+.DS_Store

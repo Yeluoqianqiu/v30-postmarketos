@@ -1,0 +1,103 @@
+# Reference: <https://postmarketos.org/vendorkernel>
+# Kernel config based on: arch/arm64/configs/defconfig (with USB gadget,
+# pstore, display/backlight and Qualcomm GPU/UFS/SDHCI/QMP-PHY drivers
+# forced built-in)
+maintainer="Lance <Gero3977@gmail.com>"
+_flavor="lge-joan"
+pkgname=linux-$_flavor
+pkgver=7.2.0_rc2
+pkgrel=30
+_commit="1b42626b2b448d8fe97d7e2e0a63dec93c3bdaae"
+pkgdesc="Mainline kernel for the LG V30 (joan)"
+arch="aarch64"
+_carch="arm64"
+_config="config-$_flavor.$arch"
+url="https://github.com/ShapeShifter499/linux-lg-v30-joan"
+license="GPL-2.0-only"
+options="!strip !check !tracedeps
+	pmb:cross-native
+"
+makedepends="
+	bash
+	bc
+	bison
+	elfutils-dev
+	findutils
+	flex
+	linux-headers
+	openssl-dev
+	pahole
+	perl
+	postmarketos-installkernel
+	python3
+	xz
+	zlib-dev
+"
+
+source="
+	$pkgname-$_commit.tar.gz::$url/archive/$_commit.tar.gz
+	$_config
+	v30-fg-status.patch
+	v30-charge-behaviour.patch
+	v30-ipa-system-header.patch
+	v30-ipa-diagnostic.patch
+	v30-ipa-qmi-buffer.patch
+	v30-ipa-qmi-hold.patch
+	v30-ipa-stage-r15.patch
+	v30-icc-sync-hold-r16.patch
+	v30-icc-sync-trace-r17.patch
+	v30-gcc-upstream-keep-on-r23.patch
+	v30-gcc-registration-diag-r20.patch
+	v30-glink-endpoint-deadlock.patch
+	v30-wcd934x-amic-hold-r28.patch
+	v30-wcd934x-hw-readback-r29.patch
+	v30-wcd934x-adc-mux8-r30.patch
+"
+builddir="$srcdir/linux-lg-v30-joan-$_commit"
+
+prepare() {
+	default_prepare
+	cp "$srcdir/$_config" .config
+	make ARCH="$_carch" olddefconfig
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1))-$_flavor"
+}
+
+package() {
+	mkdir -p "$pkgdir/boot"
+
+	make zinstall modules_install dtbs_install \
+		ARCH="$_carch" \
+		INSTALL_PATH="$pkgdir/boot" \
+		INSTALL_MOD_PATH="$pkgdir" \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_DTBS_PATH="$pkgdir/boot/dtbs"
+	rm -f "$pkgdir"/lib/modules/*/build "$pkgdir"/lib/modules/*/source
+
+	install -D "$builddir/include/config/kernel.release" \
+		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
+}
+
+sha512sums="
+478886684c4436ee023005d0e2d90be9a47542ecce173d7e438bb761a7e3d9cb7cae52b02716733a55497d8d220fdf23a8a54bb3c9934dc260aaa68a76caac61  linux-lge-joan-1b42626b2b448d8fe97d7e2e0a63dec93c3bdaae.tar.gz
+f2e4a3e9ee0fa6b96efade71dc1e55c33a6f1d97c41de612ddd344d47a41f7a495964798ebdfd51ab267bd6256d8487fec633f6ac3c3f7a1c5a0ab489ceb1a00  config-lge-joan.aarch64
+532fb3a17b89cc0244c975a3fb98ed4af1cc38569fcfd91e34dda21746aaa9d5fd9781eba76d5fa004e691bebd739c233a321a288c1d22ab4e40b23d95468f1b  v30-fg-status.patch
+2d8aa8ce7d81c064990c95c40df438992e16048faca9587fb08bc84fae553e169143d2b0147727df8309ef60f67aceed4c91d6b3e6048b69e65f91fd4af0ca6f  v30-charge-behaviour.patch
+1d0d5ac00bfa542f800e9c4ee0228c1ce6b703ffd352febe1e35213f119807f84eb57b69fc64be03417bf471f7380d04ff2f16e5299476d77e33b71c0fd8c742  v30-ipa-system-header.patch
+e448e372cfeae1d9f268400c0140d18a5cd81d0c6328cce8c01fd98528cfa97d69e0a211d7a20448c3c9c89f787358530bea0b15bd36f820ae65762e6be1b0c4  v30-ipa-diagnostic.patch
+64f973ba5279cab31e6423074873a210c688051155557b52fd6045e70bfdae173c0f12f3712905ff769dc78faebcc95e39024c7f46eb454b1b9f78216977ca67  v30-ipa-qmi-buffer.patch
+f5420d5e92dcfcf03676e5bd5d70b78bffe52f7a4d987ec45a19bcb814b2fd2156544eca92bf4e53bd82df8da5307737438996c794d47b89a42964d930af1dc2  v30-ipa-qmi-hold.patch
+d983b14ee3bf5fa4ab67374f030d68b1c61ce6a7e6a8546b45836356eaa1834b71e6e5629c90cca07626398a82e787ad2d94c139615b9aefabf583da34a67a4a  v30-ipa-stage-r15.patch
+9a04f514be273cc5aee173984c7a5c056297329109311d1f622450728f76a05940c877989666ae4eb915cf1319e2f3fc8bede92302e386c399d885b8641d6c0a  v30-icc-sync-hold-r16.patch
+22f2198a8eb79aefedaff289838dab02fd5f35c3e410bf69bda4d8a94918ed8e6af829a914bb2aa406737d181b8ccfae082a7d3c3e0a3fa30247abb18cd68080  v30-icc-sync-trace-r17.patch
+5c188a3c6169efc16de951e03a5e37c386bf2e91aaa0843e7bb700273be82d1d7ff66365d610172269f17f7e9efa96000ce99fa20ef48c0d4a3e78581d185fc3  v30-gcc-upstream-keep-on-r23.patch
+d7978745b4afd12d7295d88cf79a3da491853edc0b60d7cf697c5de5d1fdb7046178187f8e3c09c66277d475e9a0542cecd6525e1347b6d0c339671a332d7f0d  v30-gcc-registration-diag-r20.patch
+f8a819629d9e9d17785d1212bf3fe5463001ee7faabe19fa9ae3cfe7c0a73d0ad4b39a789e2c3e9cae68262218a15e700760a2c56d496ac49b996ffe88495766  v30-glink-endpoint-deadlock.patch
+97cfc4ee263e779ab7b94f1fd6cd54c7151a12fb695a344b66fee79c82377538e3f6b4a75794a8ff22ce84297f831f23fd95d907f1c304f0319d2b69493d14c2  v30-wcd934x-amic-hold-r28.patch
+60a7b87b157429a6117c86ef702c87020dcce9ebf4f245a4acfa467a85948e545e148b04c0f7a539ee9825288202760e21e86f9f1a830e8df27b10402697a139  v30-wcd934x-hw-readback-r29.patch
+fa8db3c40cf4a835d4c168cbfbb1d816a7a897f02ffe31a88936bfa62a3695f7ebe5c22090e4c9901d4eb856f77e6e710276601f75e4a0b38672d1aa864783f9  v30-wcd934x-adc-mux8-r30.patch
+"

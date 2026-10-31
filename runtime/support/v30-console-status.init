@@ -1,0 +1,10 @@
+#!/sbin/openrc-run
+supervisor=supervise-daemon
+command=/usr/local/sbin/v30-console-metrics
+command_args="--daemon"
+description="Read-only text status bar for the V30 console"
+respawn_delay=5
+depend() {
+    need localmount
+    after v30-charge-limit
+}

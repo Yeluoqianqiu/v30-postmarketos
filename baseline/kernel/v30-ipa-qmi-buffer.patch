@@ -1,0 +1,51 @@
+--- a/drivers/net/ipa/ipa_qmi_msg.h
++++ b/drivers/net/ipa/ipa_qmi_msg.h
+@@ -41,7 +41,11 @@
+ #define IPA_QMI_DRIVER_INIT_COMPLETE_RSP_SZ	7	/* <- server handle */
+ 
+ /* Maximum size of messages we expect the AP to receive (max of above) */
+-#define IPA_QMI_SERVER_MAX_RCV_SZ		8
++/* CONFIG/FILTER requests added by the joan port can exceed 4 KiB.
++ * QMI encodes payload length in u16; accept a complete wire message.
++ * qmi_handle_init() adds the QMI header separately.
++ */
++#define IPA_QMI_SERVER_MAX_RCV_SZ		U16_MAX
+ #define IPA_QMI_CLIENT_MAX_RCV_SZ		25
+ 
+ /* Request message for the IPA_QMI_INDICATION_REGISTER request */
+--- a/drivers/net/ipa/ipa_qmi.c
++++ b/drivers/net/ipa/ipa_qmi.c
+@@ -250,6 +250,7 @@
+ 	ipa_qmi = container_of(qmi, struct ipa_qmi, server_handle);
+ 	ipa = container_of(ipa_qmi, struct ipa, qmi);
+ 
++	dev_info(ipa->dev, "V30-STAGE QMI request %#x acknowledge\n", msg_id);
+ 	(*counter)++;
+ 
+ 	rsp.rsp.result = QMI_RESULT_SUCCESS_V01;
+@@ -258,6 +259,7 @@
+ 	ret = qmi_send_response(qmi, sq, txn, msg_id,
+ 				IPA_QMI_DRIVER_INIT_COMPLETE_RSP_SZ,
+ 				ipa_driver_init_complete_rsp_ei, &rsp);
++	dev_info(ipa->dev, "V30-STAGE QMI request %#x ack result=%d\n", msg_id, ret);
+ 	if (ret)
+ 		dev_err(ipa->dev, "error %d acknowledging QMI %#x\n",
+ 			ret, msg_id);
+--- a/drivers/net/ipa/ipa_modem.c
++++ b/drivers/net/ipa/ipa_modem.c
+@@ -57,6 +57,7 @@
+ 	int ret;
+ 
+ 	dev = ipa->dev;
++	dev_info(dev, "V30-STAGE netdev open begin\n");
+ 	ret = pm_runtime_get_sync(dev);
+ 	if (ret < 0)
+ 		goto err_power_put;
+@@ -69,6 +70,7 @@
+ 	if (ret)
+ 		goto err_disable_tx;
+ 
++	dev_info(dev, "V30-STAGE netdev endpoints enabled\n");
+ 	netif_start_queue(netdev);
+ 
+ 	(void)pm_runtime_put_autosuspend(dev);

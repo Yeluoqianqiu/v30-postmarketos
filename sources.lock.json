@@ -1,0 +1,26 @@
+{
+  "tested_stack": {
+    "device": "LG V30 US998",
+    "distribution": "postmarketOS / Alpine aarch64 OpenRC",
+    "kernel_base": "1b42626b2b448d8fe97d7e2e0a63dec93c3bdaae",
+    "kernel_release": "7.2.0-rc2-v30-r30",
+    "kernel_url": "https://github.com/ShapeShifter499/linux-lg-v30-joan",
+    "kernel_archive": "https://codeload.github.com/ShapeShifter499/linux-lg-v30-joan/tar.gz/1b42626b2b448d8fe97d7e2e0a63dec93c3bdaae",
+    "imsd_base": "2b5de7a60b3d9ecedab5fa34da40b2d3c8b26cab",
+    "imsd_url": "https://forgejo.catcrafts.net/Catcrafts/imsd.git",
+    "pmaports_reference": "3bbdff8cf5c1362c039c7f97ade1ca4b73085d1c",
+    "pmaports_url": "https://github.com/ShapeShifter499/pmaports-lge-joan",
+    "tty_rotate": 1,
+    "bluetooth": "off",
+    "carrier_tested": "China Unicom",
+    "audio": "ADC3/DEC8/TX8, MultiMedia1 capture, MultiMedia2 speaker playback",
+    "acceptance": "r35/r36, 2026-10-31; see docs/validation.md"
+  },
+  "current_upstream_candidates": {
+    "kernel_base": "dc9c6692dbfba9c114eb116f48be9cf3e283ac0f",
+    "branch": "joan/latest-clean-test",
+    "kernel_pr": "https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/12",
+    "harness_pr": "https://github.com/ShapeShifter499/lg-v30-port/pull/11",
+    "validation": "four target object builds; no image build or device boot"
+  }
+}

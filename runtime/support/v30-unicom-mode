@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""仅当前开机有效的 NAS 制式测试。协议取自 libqmi NAS JSON/enums。
+每次通过 qmicli QRTR lookup 动态发现 node 0 上的 NAS service 3。
+默认只读；--apply 仅在读回 CDMA-only 时设置 GSM/UMTS/LTE。
+"""
+import ctypes, socket, struct, sys, time, subprocess, re
+libc=ctypes.CDLL(None,use_errno=True)
+libc.connect.argtypes=[ctypes.c_int,ctypes.c_void_p,ctypes.c_uint]
+s=socket.socket(42,socket.SOCK_DGRAM)
+discovery=subprocess.run(['qmicli','-v','-d','qrtr://0','--dms-get-operating-mode'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=18)
+if discovery.returncode:raise RuntimeError('QMI endpoint discovery failed')
+ports=set(int(p) for p in re.findall(r'added server on 0:(\d+) -> service 3, version',discovery.stdout))
+if len(ports)!=1:raise RuntimeError('Expected exactly one NAS service on modem node 0')
+port=ports.pop()
+print('Discovered NAS endpoint:',f'0:{port}',flush=True)
+addr=struct.pack('<HHII',42,0,0,port)
+if libc.connect(s.fileno(),ctypes.c_char_p(addr),len(addr)) != 0:
+    raise OSError(ctypes.get_errno(),'QRTR connect failed')
+transaction=0
+def request(message,payload=b''):
+    global transaction
+    transaction+=1
+    s.send(struct.pack('<BHHH',0,transaction,message,len(payload))+payload)
+    end=time.monotonic()+12
+    while time.monotonic()<end:
+        s.settimeout(max(.01,end-time.monotonic()))
+        p=s.recv(65535)
+        if len(p)<7:continue
+        flags,t,m,n=struct.unpack_from('<BHHH',p)
+        if flags!=2 or t!=transaction or m!=message:continue
+        if len(p)!=n+7:raise ValueError('Invalid QMI length')
+        fields={};pos=7
+        while pos<len(p):
+            if pos+3>len(p):raise ValueError('Truncated TLV')
+            tag,size=struct.unpack_from('<BH',p,pos);pos+=3
+            if pos+size>len(p):raise ValueError('Truncated TLV value')
+            fields[tag]=p[pos:pos+size];pos+=size
+        if fields.get(2)!=b'\0\0\0\0':raise RuntimeError('QMI result '+repr(fields.get(2)))
+        return fields
+    raise TimeoutError('QMI response missing')
+before=request(0x34)
+mask=struct.unpack('<H',before[0x11])[0]
+print('NAS current mode mask:',hex(mask),flush=True)
+if '--apply' in sys.argv and mask!=0x1c:
+    if mask!=1:raise RuntimeError('Expected known CDMA-only baseline; refusing modification')
+    # 0x17=Change Duration, value 0=POWER_CYCLE; 0x11=Mode Preference.
+    # GSM bit 2 | UMTS bit 3 | LTE bit 4. No band/NV/PLMN changes.
+    payload=struct.pack('<BHB',0x17,1,0)+struct.pack('<BHH',0x11,2,0x1c)
+    request(0x33,payload)
+    actual=mask
+    for attempt in range(15):
+        time.sleep(2)
+        after=request(0x34)
+        actual=struct.unpack('<H',after[0x11])[0]
+        if actual==0x1c:break
+    print('NAS temporary mode mask:',hex(actual),'until next modem power cycle',flush=True)
+    if actual!=0x1c:raise RuntimeError('Mode readback did not converge within 30 seconds')
+s.close()

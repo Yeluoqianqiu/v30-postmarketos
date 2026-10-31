@@ -1,0 +1,771 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index a01b265..b734b73 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1062,6 +1062,22 @@ journal says it was not handed over.
+ 
+ ### 7.6 Calls and the media plane
+ 
++Response builders retain every Via header in request order (RFC 3261
++8.2.6.2), including both SDP and bodyless responses. `tests/Messages` pins
++multi-proxy responses. The optional bounded `TRACE_CALL_SIP` diagnostic
++is documented in the README; it adds metadata only and leaves the bus ABI
++unchanged.
++
++An offerless incoming re-INVITE sends the existing SDP as an offer in its
++200 response and awaits a matching-CSeq ACK answer, bounded to 32 seconds.
++The cached response is reused for duplicate INVITEs without extending the
++deadline; stale ACKs cannot consume a pending offer. A bodyless UPDATE stays
++bodyless. Only the existing media leg is supported: changed offers get 488,
++and an unsupported or missing ACK answer ends the dialog with BYE. Complete
++transaction timers and timed 2xx retransmission remain outside this change.
++The local active signal precedes the initial ACK, so never use it alone as
++proof of remote answer or working audio.
++
+ `CallMachine` owns one call's SIP dialog, outgoing or incoming, and never
+ touches a socket, a clock or a subprocess: each event returns `Action`s for
+ the shell (send this on the client flow, answer that request on the channel
+@@ -1187,6 +1203,9 @@ account `user`, its old default.
+ Lines the operator (and the scripts) look for, all prefixed `imsd: `:
+ 
+ - `LOCAL=… P-CSCF=…`, `SIP transport: …`, `SIM slot=… IMSI=… domain=…` at start.
++- `Security-Client profile: lg-generic (6 mechanisms)` when the explicit
++  multi-offer diagnostic is active; an unmatched reply defers with
++  `Security-Server has no mechanism matching the offered profile`.
+ - `RESUME via existing SA (cseq N)`, `REGISTERED (resumed + true-refreshed)`,
+   `FRESH registration`, `Security-Server: …`, `REGISTERED (fresh)`.
+ - `bring-up deferred: …; next: fresh registration in N s` — one line; `in N
+@@ -1511,6 +1530,21 @@ documentation: the tables are in the README.
+ 
+ ### 10.1 imsd
+ 
++`IPSEC_OFFER_PROFILE=lg-generic` expands the US998 Ims6 generic capability
++mask `0x00070003` (read-only extraction 2026-10-31) into SHA1/MD5 crossed
++with AES/NULL/3DES, one header row per tuple with explicit ESP/transport
++mode, following the AOS serializer documented by joan-volte-lineage. Default `single` preserves the old request and selection
++behavior. The diagnostic profile requires working kernel support for every
++advertised tuple, selects the highest-q exact common tuple (RFC 3329 2.3.1),
++refuses unoffered algorithms and absent/ambiguous integrity identifiers,
++and keeps Security-Verify's complete server list across a matching resume.
++The extracted capability mask alone is not a carrier profile. Subsequent
++registration and voice-call tests passed on China Unicom with an LG V30
++US998; other carriers were not tested. Unit tests cover the unchanged
++default and the multi-offer paths.
++With `DUMP_SIP=1`, `imsd-register-initial.raw` also preserves the initial
++request under the existing private dump directory; it contains identities.
++
+ The README's first table. The protected client/server ports are fixed at
+ 45061/45062 (`imsd::util::PortUc`/`PortUs`) — changing them in source also
+ requires updating the firewall rules `ims-pdn-up.sh` installs. `PCSCF` and
+diff --git a/README.md b/README.md
+index b2f35de..f3b321f 100644
+--- a/README.md
++++ b/README.md
+@@ -75,6 +75,7 @@ Configuration is environment variables in `/etc/imsd.env`, none are required.
+ | `PCSCF_DISCOVERED` | *(from the PDN's PCO)* | the IPv6 P-CSCF list the network put in the ims PDN's PCO, comma-separated in the order the modem reports it; the first entry `CanonicalIp6` accepts is used when `PCSCF` is unset. The packaged service gets it via `/run/imsd.env` from `ims-pdn-up.sh`, which reads it from the modem with `imsd-pcscf` (at most eight; it routes the first; imsd routes the P-CSCF it uses — the fresh target, the resumed SA peer — itself as well); entries `CanonicalIp6` does not read — an IPv4 address, a name, an IPv6 literal with a zone or a dotted-quad tail (an IPv4-mapped entry in hex only) — are ignored (logged by the engine when the daemon goes on to register); `PCSCF_DISCOVERY=found|none|failed|skipped` beside it says how the list came to be — `failed` (the reader did not answer) makes a daemon with nothing to resume exit 1 for the restart instead of idling. In `/etc/imsd.env` it is a bench seam |
+ | `IMSD_PCSCF` | `/usr/libexec/imsd-pcscf` | the P-CSCF reader `ims-pdn-up.sh` runs — a bench seam (the mock bench's fake reader; a stub through a unit drop-in on the dev phone), from the environment |
+ | `PCSCF_PORT` | `5060` | unprotected SIP port for the initial REGISTER |
++| `IPSEC_OFFER_PROFILE` | `single` | `single` preserves SHA1 + `EALG`. Opt-in `lg-generic` offers SHA1/MD5 × AES/NULL/3DES, from LG US998 Ims6 generic mask `0x00070003`; `EALG` does not restrict that profile. Each mechanism uses its own header row with explicit ESP/transport mode, matching the stock serializer. Requires all six combinations to work in the kernel. Selects the highest server preference among exact offered tuples and refuses an unmatched/ambiguous response. Repeats the same list in protected requests and uses it when validating stored Security-Verify. Registration and fixed-media voice calls verified on China Unicom with an LG V30 US998; not a general carrier-compatibility guarantee |
+ | `DEV` | `qmapmux0.0` | ims-PDN netdev; the packaged service passes the real one via `/run/imsd.env` |
+ | `LOCAL` | *(auto)* | UE address (compared in RFC 5952 form). The packaged service gets the PDN address ModemManager assigned, via `/run/imsd.env` from `ims-pdn-up.sh`; a manual run prefers a global IPv6 on `DEV` that is neither temporary nor `dynamic` (RA-derived), then any non-temporary one, then the first (the kernel's temporary SLAAC address is listed first, and a registration bound to it is lost when the kernel retires it) |
+ | `USER_AGENT` | `imsd/<version>` | REGISTER User-Agent. Some networks fingerprint UAs; setting your device's stock build string reproduces the stock modem's registration exactly. Empty omits the header |
+@@ -88,7 +89,8 @@ Configuration is environment variables in `/etc/imsd.env`, none are required.
+ | `RTP_PORT` | `50004` | local RTP port advertised in SDP |
+ | `PRECOND` | `0` | `1` offers SDP QoS preconditions |
+ | `CODECS` | *(empty — defaults)* | comma-separated codec preference list over `AMR-WB`, `AMR` (or `AMR-NB`), `PCMA`, `PCMU`: restricts and orders both the codecs offered on an outgoing call and those accepted from an inbound offer (default: offer AMR-WB + AMR, accept all four in that order). A bench knob — a network whose gateway transcodes every caller up to AMR-WB otherwise never lets the narrowband path run |
+-| `DUMP_SIP` | `0` | `1` writes raw REGISTER-200/SUBSCRIBE-200 dumps, the last refused REGISTER or SUBSCRIBE final (`imsd-register-fail.raw`, `imsd-subscribe-fail.raw`), the last inbound INVITE (`imsd-invite-in.raw`) and the last outgoing INVITE (`imsd-invite-out.raw`), mode 0600, for debugging — they contain your IMSI/MSISDN and addresses. A refused REGISTER or SUBSCRIBE is logged with its status line and any Retry-After / Warning / Reason / Server headers |
++| `DUMP_SIP` | `0` | `1` writes the initial REGISTER and raw REGISTER-200/SUBSCRIBE-200 dumps, the last refused REGISTER or SUBSCRIBE final (`imsd-register-fail.raw`, `imsd-subscribe-fail.raw`), the last inbound INVITE (`imsd-invite-in.raw`) and the last outgoing INVITE (`imsd-invite-out.raw`), mode 0600, for debugging — they contain your IMSI/MSISDN and addresses. A refused REGISTER or SUBSCRIBE is logged with its status line and any Retry-After / Warning / Reason / Server headers |
++| `TRACE_CALL_SIP` | `0` | `1` enables engine-thread call metadata diagnostics, capped at 512 records per process: fixed method/event names, numeric CSeq/status, Via count, byte counts, socket result/errno, Content-Type class, body length and audio-line presence. No identities, addresses, authentication, SDP or audio are added by this trace. A successful socket write is not remote acceptance. Existing logs and `DUMP_SIP` keep their existing privacy properties. |
+ | `DUMP_DIR`, `OUT_DIR` | state dir | where dumps / per-call media stats land |
+ | `IMSD_MEDIA` | *(auto)* | path to `imsd-media` (default: next to `imsd`, else `/usr/libexec/imsd-media`) |
+ | `IMSD_ENV` | `/etc/imsd.env` | the configuration file's path — a bench seam for manual runs of `ims-pdn-up.sh` (the packaged unit reads `/etc/imsd.env` through `EnvironmentFile=`). The file's existence changes nothing |
+@@ -129,6 +131,27 @@ updating the firewall rules `ims-pdn-up.sh` installs.
+ Both `imsd-dialerd` and `imsd-ofonod` are users of this ABI.
+ A new desktop needs a new translation daemon, not changes here.
+ 
++### Incoming in-dialog offer/answer
++
++An offerless re-INVITE on an accepted incoming call receives the current
++session SDP as an offer in the 200 response. Its matching-CSeq ACK must
++contain a compatible answer. Old ACKs cannot complete a newer exchange;
++repeated INVITEs receive the cached response without extending the 32-second
++ACK deadline. A missing or unsupported ACK answer ends the dialog with BYE.
++A bodyless UPDATE remains bodyless.
++
++This path deliberately retains the existing media endpoint, codec, payload,
++octet alignment and DTMF parameters. Unsupported offered changes receive 488;
++media redirection, hold/transfer, a complete SIP transaction layer and timed
++2xx retransmission are not implemented. Local `active` still precedes the
++initial ACK and is not proof of remote answer or two-way audio.
++
++Validated with unit cases and isolated TCP/UDP peers, then incoming calls on
++an LG V30 US998 / China Unicom, including a roughly 60-second call after a
++normal default-system boot with human confirmation of clear two-way speech.
++No raw subscriber traces are included in this contribution.
++
++
+ ## License
+ 
+ GPL-3.0-only — see [LICENSE](LICENSE).
+diff --git a/implementations/main.cpp b/implementations/main.cpp
+index 6af25b2..8b984e2 100644
+--- a/implementations/main.cpp
++++ b/implementations/main.cpp
+@@ -67,6 +67,37 @@ std::string SelfDir;  // dir of argv[0], for locating imsd-media
+ 
+ void Log(std::string_view m) { std::println("imsd: {}", m); std::fflush(stdout); }
+ 
++// Engine-thread-only, bounded metadata. Never print a request URI, header
++// value, SDP, identity, authentication material, or media payload here.
++void TraceSip(std::string_view event, std::string_view msg, long sent = -2, int error = 0) {
++    static const bool enabled = EnvOr("TRACE_CALL_SIP", "0") == "1";
++    static unsigned count = 0;
++    if (!enabled || count >= 512) return;
++    auto cs = imsd::sip::Header(msg, "CSeq").value_or("");
++    auto space = cs.find(' ');
++    auto method = space == std::string_view::npos ? std::string_view{} : cs.substr(space + 1);
++    bool callMethod = false;
++    for (auto known : {"INVITE", "ACK", "PRACK", "UPDATE", "CANCEL", "BYE"})
++        if (method == known) callMethod = true;
++    if (!callMethod) return;
++    unsigned seq = 0;
++    auto number = cs.substr(0, space);
++    auto parsed = std::from_chars(number.data(), number.data() + number.size(), seq);
++    if (parsed.ec != std::errc{} || parsed.ptr != number.data() + number.size()) seq = 0;
++    const auto boundary = msg.find("\r\n\r\n");
++    const auto body = boundary == std::string_view::npos ? std::string_view{} : msg.substr(boundary + 4);
++    auto contentType = imsd::sip::Header(msg, "Content-Type").value_or("");
++    std::string normalized(contentType.substr(0, contentType.find(';')));
++    while (!normalized.empty() && normalized.back() == ' ') normalized.pop_back();
++    for (char& ch : normalized) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
++    const std::string_view type = contentType.empty() ? "none" : normalized == "application/sdp" ? "sdp" : "other";
++    ++count;
++    Log(std::format("call-sip event={} method={} cseq={} status={} via={} bytes={} sent={} errno={} ct={} body={} audio={}",
++                    event, method, seq, imsd::sip::Status(msg).value_or(0),
++                    imsd::sip::Headers(msg, "Via").size(), msg.size(), sent, error, type, body.size(), body.contains("m=audio") ? 1 : 0));
++    if (count == 512) Log("call-sip limit reached");
++}
++
+ bool Is6(std::string_view a) { return a.contains(':'); }
+ 
+ // ---- subprocess exec ------------------------------------------------------
+@@ -486,9 +517,10 @@ public:
+         std::size_t off = 0;
+         while (off < msg.size()) {
+             ssize_t w = send(fd_, msg.data() + off, msg.size() - off, MSG_NOSIGNAL);
+-            if (w <= 0) { alive_ = false; return false; }
++            if (w <= 0) { int err = errno; TraceSip("flow-send", msg, static_cast<long>(off), err); alive_ = false; return false; }
+             off += static_cast<std::size_t>(w);
+         }
++        TraceSip("flow-send", msg, static_cast<long>(off));
+         return true;
+     }
+     void SendKeepalive() {
+@@ -640,7 +672,9 @@ public:
+                         if (udpUc_ >= 0) rs = udpUc_;
+                     }
+                     out.push_back({std::move(msg), [rs, s, sll](const std::string& r) mutable {
+-                        sendto(rs, r.data(), r.size(), 0, reinterpret_cast<sockaddr*>(&s), sll);
++                        ssize_t sent = sendto(rs, r.data(), r.size(), 0, reinterpret_cast<sockaddr*>(&s), sll);
++                        int err = sent < 0 ? errno : 0;
++                        TraceSip("udp-reply", r, static_cast<long>(sent), err);
+                     }});
+                 }
+             }
+@@ -658,7 +692,9 @@ public:
+                 if (!imsd::sip::Status(*m).has_value()) {
+                     int fd = it->fd;
+                     out.push_back({*m, [fd](const std::string& r) {
+-                        (void)!write(fd, r.data(), r.size());
++                        ssize_t sent = write(fd, r.data(), r.size());
++                        int err = sent < 0 ? errno : 0;
++                        TraceSip("tcp-reply", r, static_cast<long>(sent), err);
+                     }});
+                 }
+             }
+@@ -1000,6 +1036,10 @@ public:
+         rtpPort_ = std::atoi(EnvOr("RTP_PORT", "50004").c_str());
+         precond_ = EnvOr("PRECOND", "0") == "1";
+         ealgOffer_ = EnvOr("EALG", "aes-cbc");
++        std::string offerProfile = EnvOr("IPSEC_OFFER_PROFILE", "single");
++        if (offerProfile == "lg-generic") ctx_.securityOffers = imsd::ipsec::LgGenericSecurityOffers();
++        else if (offerProfile != "single") throw std::runtime_error("IPSEC_OFFER_PROFILE must be single or lg-generic");
++        if (!ctx_.securityOffers.empty()) Log("Security-Client profile: lg-generic (6 mechanisms)");
+         // SIP_TRANSPORT: the protected leg's transport. auto (default) = TCP,
+         // and when the P-CSCF never answers the TCP connect, a fresh
+         // registration over UDP; tcp / udp force one. The challenge (first
+@@ -1121,7 +1161,7 @@ public:
+             MaybeResubscribe();
+             if (!call_ && sip_.Alive() && Mono() - lastKa_ > 30) { sip_.SendKeepalive(); lastKa_ = Mono(); }
+             ReapMedia();
+-            if (call_ && call_->State() != imsd::engine::CallState::Active && Mono() > deadline_) {
++            if (call_ && call_->NeedsDeadline() && Mono() > deadline_) {
+                 Execute(call_->OnDeadline());
+                 MaybeDropCall();
+             }
+@@ -1502,7 +1542,7 @@ private:
+         // the default offer in the same bytes, not a list such as O2's six,
+         // which the RFC has the server answer with a 494; a refused resume
+         // registers fresh where there is a fresh target (§7.2 step 1 otherwise).
+-        auto rsv = imsd::ipsec::ChooseResumeSecurityVerify(ps->securityServer.value_or(""), *sa, ealgOffer_);
++        auto rsv = imsd::ipsec::ChooseResumeSecurityVerify(ps->securityServer.value_or(""), *sa, ealgOffer_, ctx_.securityOffers);
+         ss_ = rsv.value;
+         using Source = imsd::ipsec::ResumeSecurityVerify::Source;
+         switch (rsv.source) {
+@@ -1598,6 +1638,7 @@ private:
+             close(us); throw std::runtime_error("bind init port failed");
+         }
+         std::string reg1 = imsd::msg::BuildRegisterInitial(ctx_, callidReg, ftag, rng_.Token(16), spiUc, spiUs);
++        DumpRaw("imsd-register-initial.raw", reg1);
+         sockaddr_storage pa; socklen_t pl = MakeAddr(pcscf_, pcscfPort_, pa);
+         sendto(us, reg1.data(), reg1.size(), 0, reinterpret_cast<sockaddr*>(&pa), pl);
+         std::string resp = AwaitInitialFinal(us, callidReg);
+@@ -1629,8 +1670,12 @@ private:
+         // six and marks one; ims ledger F11). An answer we cannot use is a
+         // deferral on the throttle schedule, not a fatal: a fatal restarts
+         // imsd every RestartSec, an initial REGISTER each time.
+-        auto ss = imsd::ipsec::ParseSecurityServer(ss_, "hmac-sha-1-96", ealgOffer_);
+-        if (!ss) throw ThrottledError("Security-Server has no ipsec-3gpp mechanism");
++        auto ss = ctx_.securityOffers.empty()
++            ? imsd::ipsec::ParseSecurityServer(ss_, "hmac-sha-1-96", ealgOffer_)
++            : imsd::ipsec::ParseSecurityServer(ss_, ctx_.securityOffers);
++        if (!ss) throw ThrottledError(ctx_.securityOffers.empty()
++            ? "Security-Server has no ipsec-3gpp mechanism"
++            : "Security-Server has no mechanism matching the offered profile");
+         const imsd::ipsec::SecurityMechanism& mech = ss->Selected();
+         const imsd::ipsec::SecurityMechanism& carrier = ss->Carrier();
+         Log(std::format("selected mechanism {} of {}{}: {}", ss->selected + 1, ss->mechanisms.size(), ss->offerMatched ? "" : " (none matches our offer; taking the P-CSCF's)", mech.text));
+@@ -2429,6 +2474,7 @@ private:
+     }
+ 
+     void DispatchRequest(const std::string& msg) {
++        TraceSip("request", msg);
+         std::string callid(imsd::sip::Header(msg, "Call-ID").value_or(""));
+         std::size_t sp = msg.find(' ');
+         std::string method = msg.substr(0, sp == std::string::npos ? 0 : sp);
+@@ -2521,6 +2567,7 @@ private:
+                 case T::SendResponse:
+                     if (callReply_) callReply_(a.text);
+                     else if (reply_) reply_(a.text);
++                    else TraceSip("no-reply-channel", a.text, -1);
+                     break;
+                 case T::StartMedia: StartMedia(a.media); break;
+                 case T::StopMedia: StopMedia(); break;
+diff --git a/interfaces/Imsd-Engine.cppm b/interfaces/Imsd-Engine.cppm
+index 7c1d4ce..1c08672 100644
+--- a/interfaces/Imsd-Engine.cppm
++++ b/interfaces/Imsd-Engine.cppm
+@@ -388,6 +388,7 @@ export namespace imsd::engine {
+         std::string_view DirectionStr() const { return engine::DirectionStr(direction_); }
+         const std::string& Reason() const { return reason_; }
+         bool Terminated() const { return state_ == CallState::Terminated; }
++        bool NeedsDeadline() const { return state_ != CallState::Active || pendingOfferAck_.has_value(); }
+ 
+         // Build + queue the INVITE for the current attempt and arm the ring
+         // timeout.
+@@ -467,7 +468,10 @@ export namespace imsd::engine {
+                 extra.push_back(std::format("Session-Expires: {}", v));
+                 extra.push_back("Require: timer");
+             }
+-            a.push_back(Respond(imsd::msg::BuildInviteResponse(ctx_, invite_, 200, "OK", d_.itag, localSdp_, extra)));
++            lastInviteSeq_ = Sequence(invite_);
++            lastRemoteSeq_ = lastInviteSeq_;
++            lastInviteResponse_ = imsd::msg::BuildInviteResponse(ctx_, invite_, 200, "OK", d_.itag, localSdp_, extra);
++            a.push_back(Respond(lastInviteResponse_));
+             a.push_back(StartMediaAct(leg));
+             state_ = CallState::Active;
+             a.push_back(StateAct("accepted"));
+@@ -542,8 +546,17 @@ export namespace imsd::engine {
+         std::vector<Action> OnRequest(std::string_view msg) {
+             std::vector<Action> a;
+             std::string_view method = Method(msg);
+-            if (method == "ACK")
+-                return a;   // ACK is never responded to (RFC 3261 17.1.1.2)
++            if (method == "ACK") {
++                // A delayed offer in a re-INVITE 2xx is answered in its ACK
++                // (RFC 3261 13.2.1, 14.2). Older ACKs cannot consume it.
++                if (pendingOfferAck_ && Sequence(msg) == pendingOfferAck_) {
++                    pendingOfferAck_.reset();
++                    if (!SameIncomingMedia(msg)) return EndOffer("missing or unsupported re-INVITE ACK answer");
++                }
++                return a;   // ACK itself never gets a response.
++            }
++            if (direction_ == Direction::Incoming && state_ == CallState::Active && (method == "INVITE" || method == "UPDATE"))
++                return IncomingRefresh(msg, method);
+             std::string_view body = Body(msg);
+             if (body.contains("m=audio")) answerSdp_ = std::string(body);
+             if (direction_ == Direction::Incoming && state_ == CallState::Incoming) {
+@@ -565,9 +578,8 @@ export namespace imsd::engine {
+             if (method == "UPDATE" || method == "INVITE") {
+                 std::optional<std::string> ans;
+                 if (direction_ == Direction::Incoming) {
+-                    // session-refresh: re-state the answer we gave if the
+-                    // refresh carries an offer; a bodyless refresh gets a
+-                    // bodyless 200 (RFC 3311/4028)
++                    // Early-dialog handling; active incoming dialogs use
++                    // IncomingRefresh, which distinguishes INVITE and UPDATE.
+                     if (body.contains("m=audio")) ans = localSdp_;
+                 } else {
+                     imsd::sdp::Offer offer;
+@@ -687,10 +699,13 @@ export namespace imsd::engine {
+             return a;
+         }
+ 
+-        // A setup deadline fired (never armed once Active).
++        // Setup deadline, or the bounded wait for a delayed-offer answer.
+         std::vector<Action> OnDeadline() {
+             std::vector<Action> a;
+-            if (state_ == CallState::Active) return a;
++            if (state_ == CallState::Active) {
++                if (pendingOfferAck_) return EndOffer("re-INVITE ACK answer timed out");
++                return a;
++            }
+             if (direction_ == Direction::Incoming) {
+                 if (state_ == CallState::Incoming) {
+                     // rang unanswered past the safety net; the missed call
+@@ -734,6 +749,11 @@ export namespace imsd::engine {
+         std::string invite_;    // incoming only: the inbound INVITE verbatim
+         std::string last180_;   // incoming only: our provisional, for retransmits
+         std::string localSdp_;  // incoming only: the SDP answer we sent
++        std::optional<unsigned> lastInviteSeq_;
++        std::optional<unsigned> lastRemoteSeq_;
++        std::string lastInviteResponse_;
++        std::optional<unsigned> pendingOfferAck_;
++        MediaLeg currentMedia_;
+         imsd::msg::Dialog d_;
+         int nextCseq_ = 2;
+         bool cancelled_ = false;
+@@ -804,6 +824,74 @@ export namespace imsd::engine {
+             return at == std::string_view::npos ? std::string_view{}
+                                                 : msg.substr(at + 4);
+         }
++        static std::optional<unsigned> Sequence(std::string_view msg) {
++            auto cs = imsd::sip::Header(msg, "CSeq").value_or("");
++            auto digits = cs.substr(0, cs.find_first_of(" \t"));
++            unsigned seq = 0;
++            auto [end, error] = std::from_chars(digits.data(), digits.data() + digits.size(), seq);
++            if (error != std::errc{} || end != digits.data() + digits.size()) return std::nullopt;
++            return seq;
++        }
++        bool SameIncomingMedia(std::string_view msg) const {
++            auto ct = imsd::sip::Header(msg, "Content-Type").value_or("");
++            ct = imsd::sip::Trim(ct.substr(0, ct.find(';')));
++            if (ct.size() != 15 || !imsd::sip::IEqualsPrefix(ct, "application/sdp")) return false;
++            auto body = Body(msg);
++            // The existing media wrapper has one fixed leg. Reject changes
++            // we cannot apply rather than acknowledge them with stale SDP.
++            if (body.contains("a=inactive") || body.contains("a=sendonly") || body.contains("a=recvonly")) return false;
++            auto first = body.find("\nm=");
++            if (first == std::string_view::npos || body.find("\nm=", first + 1) != std::string_view::npos) return false;
++            auto mediaLine = body.substr(first + 1, body.find('\n', first + 1) - first - 1);
++            if (!mediaLine.starts_with("m=audio ") || !mediaLine.contains(" RTP/AVP ")) return false;
++            auto leg = imsd::sdp::ParseAnswer(body, codecs_);
++            return leg.ip == currentMedia_.remoteIp && leg.port == currentMedia_.remotePort
++                && leg.codec == currentMedia_.codec && leg.payloadType == currentMedia_.payloadType
++                && leg.octetAlign == currentMedia_.octetAlign && leg.dtmfPt == currentMedia_.dtmfPt;
++        }
++        std::vector<Action> EndOffer(std::string_view why) {
++            pendingOfferAck_.reset();
++            nextCseq_++;
++            std::vector<Action> a{Send(imsd::msg::BuildInDialog(ctx_, d_, "BYE", nextCseq_, rng_.Token(20)))};
++            Append(a, Finish("error", why));
++            return a;
++        }
++        std::vector<Action> IncomingRefresh(std::string_view msg, std::string_view method) {
++            const auto seq = Sequence(msg);
++            if (method == "INVITE" && seq && seq == lastInviteSeq_)
++                return {Respond(lastInviteResponse_)};
++            if (pendingOfferAck_)
++                return {Respond(imsd::msg::BuildInviteResponse(ctx_, msg, 491, "Request Pending", d_.itag))};
++            if (!seq || (lastRemoteSeq_ && *seq < *lastRemoteSeq_))
++                return {Respond(imsd::msg::BuildInviteResponse(ctx_, msg, 500, "Server Internal Error", d_.itag))};
++            const bool hasBody = !Body(msg).empty();
++            if (hasBody && !SameIncomingMedia(msg))
++                return {Respond(imsd::msg::BuildInviteResponse(ctx_, msg, 488, "Not Acceptable Here", d_.itag))};
++            std::vector<std::string> extra;
++            if (auto se = imsd::sip::Header(msg, "Session-Expires")) {
++                std::string value(*se);
++                if (!value.contains("refresher=")) value += ";refresher=uac";
++                extra.push_back(std::format("Session-Expires: {}", value));
++                extra.push_back("Require: timer");
++            }
++            // RFC 3261 14.2: an offerless INVITE gets an offer in 2xx.
++            // Retain the negotiated payload mappings and session version;
++            // bodyless UPDATE (RFC 3311) does not start offer/answer.
++            const auto sdp = hasBody || method == "INVITE" ? std::optional<std::string_view>(localSdp_) : std::nullopt;
++            std::string response = imsd::msg::BuildResponse200(ctx_, msg, sdp, extra);
++            std::vector<Action> a{Respond(response)};
++            lastRemoteSeq_ = seq;
++            if (auto ct = imsd::sip::Header(msg, "Contact")) d_.remoteTarget = AngleUri(*ct);
++            if (method == "INVITE") {
++                lastInviteSeq_ = seq;
++                lastInviteResponse_ = std::move(response);
++                if (!hasBody) {
++                    pendingOfferAck_ = seq;
++                    a.push_back(Deadline(32.0));   // 64*T1, not reset by retransmissions
++                }
++            }
++            return a;
++        }
+         static std::string_view Method(std::string_view msg) {
+             std::size_t sp = msg.find(' ');
+             return sp == std::string_view::npos ? msg : msg.substr(0, sp);
+@@ -887,6 +975,7 @@ export namespace imsd::engine {
+             return a;
+         }
+         Action StartMediaAct(const MediaLeg& leg) {
++            currentMedia_ = leg;
+             dtmfPt_ = leg.dtmfPt;
+             Action a{Action::Type::StartMedia};
+             a.media = leg;
+diff --git a/interfaces/Imsd-Ipsec.cppm b/interfaces/Imsd-Ipsec.cppm
+index 7cde032..3337745 100644
+--- a/interfaces/Imsd-Ipsec.cppm
++++ b/interfaces/Imsd-Ipsec.cppm
+@@ -83,6 +83,20 @@ export namespace imsd::ipsec {
+         return ealg == "null" || ealg == "aes-cbc" || ealg == "des-ede3-cbc";
+     }
+ 
++    struct SecurityOffer {
++        std::string alg;
++        std::string ealg;
++    };
++
++    // LG US998 Ims6 generic configuration, aos_reg_0_ipsec_algs=0x00070003
++    // (read-only extraction 2026-10-31). This is capability evidence, not
++    // carrier policy by itself. No client q preferences are imposed.
++    std::vector<SecurityOffer> LgGenericSecurityOffers() {
++        return {{"hmac-sha-1-96", "aes-cbc"}, {"hmac-sha-1-96", "null"},
++                {"hmac-sha-1-96", "des-ede3-cbc"}, {"hmac-md5-96", "aes-cbc"},
++                {"hmac-md5-96", "null"}, {"hmac-md5-96", "des-ede3-cbc"}};
++    }
++
+     namespace detail {
+         // ESP cipher argv triple for `ip xfrm state add ... <enc>`, matching
+         // imscall.setup_sa: aes-cbc keyed with CK; 3DES uses CK||CK[:8] to
+@@ -310,6 +324,36 @@ export namespace imsd::ipsec {
+         return ss;
+     }
+ 
++    // Explicit multi-offer negotiation: select the highest-q common tuple
++    // (RFC 3329 2.3.1). Unlike the legacy single-offer compatibility path,
++    // never silently install an unoffered or ambiguous algorithm.
++    std::optional<SecurityServer> ParseSecurityServer(std::string_view value, std::span<const SecurityOffer> offers) {
++        auto ss = ParseSecurityServer(value, "hmac-sha-1-96", "aes-cbc");
++        if (!ss || offers.empty()) return std::nullopt;
++        auto transport = [](const SecurityMechanism& m) {
++            return m.name == "ipsec-3gpp" && (m.prot.empty() || m.prot == "esp")
++                && (m.mod.empty() || m.mod == "trans");
++        };
++        auto offered = [&](const SecurityMechanism& m) {
++            return transport(m) && std::ranges::any_of(offers, [&](const SecurityOffer& o) {
++                return m.alg == detail::Lower(o.alg)
++                    && NormalizeEalg(m.ealg) == NormalizeEalg(detail::Lower(o.ealg));
++            });
++        };
++        auto selected = detail::Best(ss->mechanisms, offered);
++        if (!selected) return std::nullopt;
++        ss->selected = *selected;
++        ss->carrier = *selected;
++        ss->offerMatched = true;
++        if (!ss->Selected().spiPs) {
++            auto carrier = detail::Best(ss->mechanisms, [&](const SecurityMechanism& m) {
++                return transport(m) && m.spiPs.has_value();
++            });
++            if (carrier) ss->carrier = *carrier;
++        }
++        return ss;
++    }
++
+     // What a warm SA in the kernel tells us — enough for a refresh re-REGISTER
+     // to re-bind without re-authenticating.
+     struct ExistingSa {
+@@ -447,12 +491,13 @@ export namespace imsd::ipsec {
+         std::size_t mechanisms = 0;                // of the stored list, when it is used
+         std::optional<std::uint32_t> storedSpiPs;  // the stored list's spi-s (OtherSa); nullopt = none parsed
+     };
+-    ResumeSecurityVerify ChooseResumeSecurityVerify(std::string_view stored, const ExistingSa& sa, std::string_view offeredEalg) {
++    ResumeSecurityVerify ChooseResumeSecurityVerify(std::string_view stored, const ExistingSa& sa, std::string_view offeredEalg, std::span<const SecurityOffer> offers = {}) {
+         ResumeSecurityVerify r;
+         r.value = sa.securityServer;
+         if (stored.empty()) return r;
+         r.source = ResumeSecurityVerify::Source::OtherSa;
+-        if (auto parsed = ParseSecurityServer(stored, "hmac-sha-1-96", offeredEalg)) {
++        if (auto parsed = offers.empty() ? ParseSecurityServer(stored, "hmac-sha-1-96", offeredEalg)
++                                        : ParseSecurityServer(stored, offers)) {
+             const SecurityMechanism& c = parsed->Carrier();
+             r.storedSpiPs = c.spiPs;
+             if (c.spiPc == sa.spiPc && c.spiPs == sa.spiPs && c.portPc == sa.portPc && c.portPs == sa.portPs) {
+diff --git a/interfaces/Imsd-Messages.cppm b/interfaces/Imsd-Messages.cppm
+index dcb28de..3ec40cf 100644
+--- a/interfaces/Imsd-Messages.cppm
++++ b/interfaces/Imsd-Messages.cppm
+@@ -25,6 +25,7 @@ import std;
+ import :Util;
+ import :Aka;
+ import :Sip;
++import :Ipsec;
+ 
+ export namespace imsd::msg {
+ 
+@@ -43,6 +44,8 @@ export namespace imsd::msg {
+         // to, or was told to use, UDP.
+         std::string transport = "TCP";
+         std::string ealgOffer = "aes-cbc";
++        // Empty preserves the legacy single SHA1/EALG offer byte-for-byte.
++        std::vector<imsd::ipsec::SecurityOffer> securityOffers;
+         // RFC 7254 IMEI URN for +sip.instance (e.g. urn:gsma:imei:35999999-
+         // 000000-1); empty omits the parameter.
+         std::string instanceId;
+@@ -94,6 +97,17 @@ export namespace imsd::msg {
+     // registration, new SPIs and a new client port on a reregistration
+     // (TS 24.229 5.1.1.4.2 d; TS 33.203 7.4.0: the server port stays).
+     inline std::string SecurityClient(const Context& c, std::uint32_t spiUc, std::uint32_t spiUs, int portUc, int portUs) {
++        if (!c.securityOffers.empty()) {
++            std::string header;
++            for (const auto& offer : c.securityOffers) {
++                if (!header.empty()) header += "\r\n";
++                // Match stock serialization: one row per mechanism, with
++                // explicit ESP/transport mode (JoanSecAgree's AOS audit).
++                header += std::format("Security-Client: ipsec-3gpp; alg={}; prot=esp; mod=trans; ealg={}; spi-c={}; spi-s={}; port-c={}; port-s={}",
++                                      offer.alg, offer.ealg, spiUc, spiUs, portUc, portUs);
++            }
++            return header;
++        }
+         return std::format("Security-Client: ipsec-3gpp; alg=hmac-sha-1-96; ealg={}; " "spi-c={}; spi-s={}; port-c={}; port-s={}", c.ealgOffer, spiUc, spiUs, portUc, portUs);
+     }
+     inline std::string SecurityClient(const Context& c, std::uint32_t spiUc, std::uint32_t spiUs) {
+@@ -455,10 +469,9 @@ export namespace imsd::msg {
+         return std::format("{}\r\n", detail::Join(l));
+     }
+ 
+-    // A response to an inbound INVITE — the UAS side of call setup. Unlike
+-    // BuildResponse200 (first Via only, fine for hop-by-hop CANCEL/BYE
+-    // answers), an INVITE response travels the whole proxy chain back to the
+-    // caller: it must echo EVERY Via in order, return the Record-Route set on
++    // A response to an inbound INVITE — the UAS side of call setup. Like
++    // BuildResponse200, it must echo EVERY Via in order so the response can
++    // travel the whole proxy chain back to the caller. Return the Record-Route set on
+     // dialog-establishing (1xx/2xx) responses, and mint the dialog's local
+     // half by tagging To (all but 100 Trying, which is hop-by-hop and
+     // tagless). 1xx/2xx carry our Contact (the dialog's remote target for the
+@@ -495,12 +508,15 @@ export namespace imsd::msg {
+         return std::format("{}\r\n", detail::Join(l));
+     }
+ 
+-    // A 200 OK for an inbound request: echo Via/From/To/Call-ID/CSeq in order,
++    // A 200 OK for an inbound request: echo every Via in order, then
++    // From/To/Call-ID/CSeq (RFC 3261 8.2.6.2),
+     // then either an SDP answer (with our Contact) or an empty body.
+     // `extra` appends headers (Session-Expires echo for refreshes...).
+     std::string BuildResponse200(const Context& c, std::string_view request, std::optional<std::string_view> sdp = std::nullopt, std::span<const std::string> extra = {}) {
+         std::vector<std::string> l = {"SIP/2.0 200 OK"};
+-        for (std::string_view h : {"Via", "From", "To", "Call-ID", "CSeq"})
++        for (auto v : imsd::sip::Headers(request, "Via"))
++            l.push_back(std::format("Via: {}", v));
++        for (std::string_view h : {"From", "To", "Call-ID", "CSeq"})
+             if (auto v = imsd::sip::Header(request, h)) l.push_back(std::format("{}: {}", h, *v));
+         for (const auto& e : extra)
+             l.push_back(e);
+diff --git a/tests/Engine/main.cpp b/tests/Engine/main.cpp
+index 75e1555..96fdee7 100644
+--- a/tests/Engine/main.cpp
++++ b/tests/Engine/main.cpp
+@@ -538,6 +538,81 @@ int main() {
+         Check(m.Terminated(), "terminated");
+     }
+ 
++    // Synthetic in-dialog delayed-offer and fixed-media refresh cases.
++    {
++        auto request = [](std::string_view method, int seq, std::string_view body = "") {
++            return std::format("{} sip:me SIP/2.0\r\n"
++                "Via: SIP/2.0/UDP [2001:db8::105]:5100;branch=z9hG4bKrefresh{}\r\n"
++                "From: <sip:caller@ims.invalid>;tag=caller1\r\n"
++                "To: <sip:me@ims.invalid>;tag=local\r\n"
++                "Call-ID: mt-call-abc123\r\nCSeq: {} {}\r\n"
++                "Contact: <sip:new-target@[2001:db8::99]:5060>\r\n"
++                "Supported: timer\r\nSession-Expires: 1800;refresher=uac\r\n"
++                "{}Content-Length: {}\r\n\r\n{}", method, seq, seq, method,
++                body.empty() ? "" : "Content-Type: application/sdp\r\n", body.size(), body);
++        };
++        auto bodyOf = [](std::string_view wire) {
++            return std::string(wire.substr(wire.find("\r\n\r\n") + 4));
++        };
++        imsd::util::Rng rng;
++        CallMachine m(c, rng, "ims-call-refresh", IncomingInvite{MtInvite()}, 50004);
++        m.OnInvite();
++        auto accepted = m.OnAccept();
++        auto original = Responded(accepted, "SIP/2.0 200");
++        Check(original != nullptr, "refresh initial answer available");
++        std::string local = original ? bodyOf(original->text) : "";
++        auto retransmit = m.OnRequest(MtInvite());
++        auto repeated = Responded(retransmit, "SIP/2.0 200");
++        Check(repeated && original && repeated->text == original->text, "refresh initial INVITE retransmission repeats exact final");
++        m.OnRequest(request("ACK", 1));
++        const auto refresh = request("INVITE", 2);
++        auto offered = m.OnRequest(refresh);
++        const auto* offer = Responded(offered, "SIP/2.0 200");
++        Check(offer && bodyOf(offer->text) == local && !local.empty(), "refresh bodyless re-INVITE gets existing session SDP offer");
++        Check(offer && offer->text.contains("Contact: "), "refresh re-INVITE answer has Contact");
++        Check(offer && offer->text.contains("Session-Expires: 1800;refresher=uac\r\n"), "refresh re-INVITE retains session timer");
++        Check(!Has(offered, Action::Type::StartMedia), "refresh offer waits for ACK without restarting media");
++        auto repeat = m.OnRequest(refresh);
++        const auto* cached = Responded(repeat, "SIP/2.0 200");
++        Check(cached && offer && cached->text == offer->text, "refresh re-INVITE retransmission is byte identical");
++        Check(!Has(repeat, Action::Type::SetDeadline), "refresh retransmission cannot extend ACK deadline");
++        Check(m.OnRequest(request("ACK", 1)).empty(), "refresh stale ACK cannot consume pending SDP answer");
++        auto overlap = m.OnRequest(request("INVITE", 3));
++        Check(Responded(overlap, "SIP/2.0 491") != nullptr, "refresh overlapping offer refused while ACK answer outstanding");
++        std::string peer = bodyOf(MtInvite());
++        Check(m.OnRequest(request("ACK", 2, peer)).empty(), "refresh valid ACK answer keeps media running and receives no response");
++        Check(m.OnDeadline().empty(), "refresh completed offer not terminated by stale timer");
++        Check(!m.NeedsDeadline(), "refresh completed offer disables active-call deadline");
++        auto update = m.OnRequest(request("UPDATE", 4));
++        const auto* u = Responded(update, "SIP/2.0 200");
++        Check(u && bodyOf(u->text).empty(), "refresh bodyless UPDATE stays bodyless");
++        auto withOffer = m.OnRequest(request("INVITE", 5, peer));
++        const auto* ans = Responded(withOffer, "SIP/2.0 200");
++        Check(ans && bodyOf(ans->text) == local, "refresh unchanged offered media gets negotiated SDP answer");
++        std::string changed = peer;
++        changed.replace(changed.find("27864"), 5, "27866");
++        auto refused = m.OnRequest(request("INVITE", 6, changed));
++        Check(Responded(refused, "SIP/2.0 488") != nullptr && !m.Terminated(), "refresh unsupported media change refused without breaking existing session");
++        auto unsupported = request("INVITE", 7, peer);
++        unsupported.replace(unsupported.find("application/sdp"), 15, "application/xml");
++        Check(Responded(m.OnRequest(unsupported), "SIP/2.0 488") != nullptr, "refresh SDP-like bytes with wrong type refused");
++        std::string secure = peer;
++        secure.replace(secure.find("RTP/AVP"), 7, "RTP/SAVP");
++        Check(Responded(m.OnRequest(request("INVITE", 7, secure)), "SIP/2.0 488") != nullptr, "refresh unsupported media transport refused");
++        auto badUpdate = m.OnRequest(request("UPDATE", 7, changed));
++        Check(Responded(badUpdate, "SIP/2.0 488") != nullptr, "refresh offered UPDATE cannot silently change endpoint");
++        m.OnRequest(request("INVITE", 7));
++        Check(m.NeedsDeadline(), "refresh pending delayed answer arms active-call deadline");
++        auto badAck = m.OnRequest(request("ACK", 7));
++        Check(Sent(badAck, "BYE ") && m.Terminated(), "refresh missing delayed answer terminates with BYE, never replies to ACK");
++        Check(!Has(badAck, Action::Type::SendResponse), "refresh invalid ACK receives no SIP response");
++        CallMachine timeout(c, rng, "ims-call-refresh-timeout", IncomingInvite{MtInvite()}, 50004);
++        timeout.OnInvite();timeout.OnAccept();timeout.OnRequest(request("ACK", 1));
++        timeout.OnRequest(request("INVITE", 2));
++        auto expired = timeout.OnDeadline();
++        Check(Sent(expired, "BYE ") && timeout.Terminated(), "refresh missing ACK times out with BYE and cleanup");
++    }
++
+     // ---- reliable 180 when the caller requires 100rel; PRACK answered
+     {
+         imsd::util::Rng rng(23);
+diff --git a/tests/Ipsec/main.cpp b/tests/Ipsec/main.cpp
+index 9e75c7a..bd46227 100644
+--- a/tests/Ipsec/main.cpp
++++ b/tests/Ipsec/main.cpp
+@@ -292,6 +292,51 @@ int main() {
+         auto bare = ParseSecurityServer("ipsec-3gpp; q=0.1; alg=hmac-sha-1-96; ealg=null;", "hmac-sha-1-96", "null");
+         Check(bare && bare->mechanisms.size() == 1 && bare->offerMatched && !bare->Carrier().spiPs && !bare->Carrier().portPs, "no spi-s: absent, not zero");
+     }
++    // ---- explicit multi-offer negotiation (synthetic, no subscriber data)
++    {
++        auto offers = LgGenericSecurityOffers();
++        Check(offers.size() == 6, "LG generic mask expands to six mechanisms");
++        auto o2 = ParseSecurityServer(O2, offers);
++        Check(o2 && o2->selected == 5 && o2->carrier == 3 && o2->offerMatched,
++              "multi-offer chooses highest server q and preserves separate SPI carrier");
++        constexpr std::string_view answer =
++            "ipsec-3gpp;q=0.5;alg=hmac-sha-1-96;ealg=aes-cbc;spi-c=11;spi-s=12;port-c=5101;port-s=5102,"
++            "ipsec-3gpp;q=0.9;alg=hmac-md5-96;spi-c=21;spi-s=22;port-c=5201;port-s=5202";
++        auto md5 = ParseSecurityServer(answer, offers);
++        Check(md5 && md5->selected == 1 && md5->carrier == 1 && md5->Selected().alg == "hmac-md5-96"
++              && NormalizeEalg(md5->Selected().ealg) == "null", "higher-q MD5/null beats SHA1/AES");
++        for (const auto& offer : offers) {
++            auto ss = ParseSecurityServer(std::format("ipsec-3gpp;alg={};ealg={};spi-c=1;spi-s=2;port-c=5001;port-s=5002", offer.alg, offer.ealg), offers);
++            Check(ss && ss->offerMatched && ss->Selected().alg == offer.alg
++                  && NormalizeEalg(ss->Selected().ealg) == offer.ealg, "each advertised tuple can be selected");
++        }
++        std::vector<SecurityOffer> subset = {{"hmac-sha-1-96", "aes-cbc"}, {"hmac-md5-96", "null"}};
++        Check(!ParseSecurityServer("ipsec-3gpp;alg=hmac-sha-1-96;ealg=null;spi-s=2", subset),
++              "tuple membership is exact, not a cross product of separate allow lists");
++        Check(!ParseSecurityServer("ipsec-3gpp;alg=hmac-sha-256-128;ealg=aes-cbc;spi-s=2", offers),
++              "unknown integrity algorithm does not fall back to SPI-carrying entry");
++        Check(!ParseSecurityServer("ipsec-3gpp;alg=hmac-sha-1-96;ealg=aes-gcm;spi-s=2", offers),
++              "unoffered cipher is rejected");
++        Check(!ParseSecurityServer("ipsec-3gpp;ealg=null;spi-s=2", offers),
++              "missing integrity algorithm is ambiguous under multi-offer");
++        Check(!ParseSecurityServer("ipsec-3gpp;alg=hmac-sha-1-96;ealg=aes-cbc;prot=ah;spi-s=2", offers),
++              "unsupported AH transport cannot be selected");
++        Check(!ParseSecurityServer("ipsec-3gpp;alg=hmac-sha-1-96;ealg=aes-cbc;mod=tun;spi-s=2", offers),
++              "unsupported tunnel mode cannot be selected");
++        Check(!ParseSecurityServer(answer, std::span<const SecurityOffer>{}), "empty offer has no common mechanism");
++        auto tie = ParseSecurityServer("ipsec-3gpp;q=0.5;alg=hmac-md5-96;ealg=null,ipsec-3gpp;q=0.5;alg=hmac-sha-1-96;ealg=aes-cbc", offers);
++        Check(tie && tie->selected == 0, "equal preference keeps server order");
++        ExistingSa sa;
++        sa.spiPc = 21; sa.spiPs = 22; sa.portPc = 5201; sa.portPs = 5202;
++        sa.securityServer = "rebuilt fallback";
++        auto resumed = ChooseResumeSecurityVerify(answer, sa, "aes-cbc", offers);
++        Check(resumed.source == ResumeSecurityVerify::Source::Stored && resumed.value == answer,
++              "resume preserves full server list for the selected multi-offer pair");
++        sa.spiPs = 99;
++        auto stale = ChooseResumeSecurityVerify(answer, sa, "aes-cbc", offers);
++        Check(stale.source == ResumeSecurityVerify::Source::OtherSa && stale.value == sa.securityServer,
++              "multi-offer resume refuses a stored list for another pair");
++    }
+     // ---- the resume's Security-Verify: the stored list only for the SA pair the kernel holds
+     {
+         using Source = ResumeSecurityVerify::Source;
+diff --git a/tests/Messages/main.cpp b/tests/Messages/main.cpp
+index 041ab0a..732daff 100644
+--- a/tests/Messages/main.cpp
++++ b/tests/Messages/main.cpp
+@@ -185,6 +185,34 @@ int main() {
+     Eq(BuildRegisterInitial(c, "REGCALLID@2001:db8::db43", "FTAG5678",
+                             "REGBRANCH123456", 7449812u, 176466735u),
+        Reg1, "unprotected REGISTER");
++    {
++        Context multi = c;
++        multi.securityOffers = imsd::ipsec::LgGenericSecurityOffers();
++        constexpr std::string_view offer =
++            "Security-Client: ipsec-3gpp; alg=hmac-sha-1-96; prot=esp; mod=trans; ealg=aes-cbc; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062\r\n"
++            "Security-Client: ipsec-3gpp; alg=hmac-sha-1-96; prot=esp; mod=trans; ealg=null; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062\r\n"
++            "Security-Client: ipsec-3gpp; alg=hmac-sha-1-96; prot=esp; mod=trans; ealg=des-ede3-cbc; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062\r\n"
++            "Security-Client: ipsec-3gpp; alg=hmac-md5-96; prot=esp; mod=trans; ealg=aes-cbc; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062\r\n"
++            "Security-Client: ipsec-3gpp; alg=hmac-md5-96; prot=esp; mod=trans; ealg=null; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062\r\n"
++            "Security-Client: ipsec-3gpp; alg=hmac-md5-96; prot=esp; mod=trans; ealg=des-ede3-cbc; spi-c=7449812; spi-s=176466735; port-c=45061; port-s=45062";
++        Eq(SecurityClient(multi, 7449812u, 176466735u), offer, "six complete offers, common ports and SPIs, no client q");
++        auto replaceOffer = [&](std::string text) {
++            std::size_t start = text.find("Security-Client:");
++            text.replace(start, text.find("\r\n", start) - start, offer);
++            return text;
++        };
++        Eq(BuildRegisterInitial(multi, "REGCALLID@2001:db8::db43", "FTAG5678",
++                                "REGBRANCH123456", 7449812u, 176466735u),
++           replaceOffer(std::string(Reg1)), "initial request changes only Security-Client rows");
++        std::string auth = AuthAka(multi, "NONCEXYZ", "CNONCE0123456789", "RESP0000");
++        Eq(BuildRegisterProtected(multi, "REGCALLID@2001:db8::db43", "FTAG5678",
++                                  "REGBRANCH123456", 2, 7449812u, 176466735u, auth),
++           replaceOffer(std::string(Reg2)), "protected request repeats full offer and keeps Security-Verify verbatim");
++        multi.securityOffers.clear();
++        Eq(BuildRegisterInitial(multi, "REGCALLID@2001:db8::db43", "FTAG5678",
++                                "REGBRANCH123456", 7449812u, 176466735u),
++           Reg1, "empty profile restores original single-offer request");
++    }
+     {
+         std::string auth = AuthAka(c, "NONCEXYZ", "CNONCE0123456789", "RESP0000");
+         Eq(BuildRegisterProtected(c, "REGCALLID@2001:db8::db43", "FTAG5678",
+@@ -399,6 +427,20 @@ int main() {
+         Check(r2.ends_with(Sdp), "200 w/ SDP body");
+     }
+ 
++    // RFC 3261 8.2.6.2: every Via value must survive, in order. An
++    // UPDATE or BYE sent through two proxies cannot lose the lower hop.
++    {
++        const std::string vias =
++            "Via: SIP/2.0/TCP [2001:db8::1]:5060;branch=z9hG4bKfirst\r\n"
++            "Via: SIP/2.0/TCP [2001:db8::2]:5060;branch=z9hG4bKsecond\r\n";
++        const std::string req = "UPDATE sip:me@here SIP/2.0\r\n" + vias +
++            "From: <sip:them@far>;tag=T\r\nTo: <sip:me@here>;tag=M\r\n"
++            "Call-ID: two-proxies@fixture\r\nCSeq: 8 UPDATE\r\n"
++            "Content-Length: 0\r\n\r\n";
++        Check(BuildResponse200(c, req).contains(vias), "bodyless 200 preserves all Via values in order");
++        Check(BuildResponse200(c, req, Sdp).contains(vias), "SDP 200 preserves all Via values in order");
++    }
++
+     // ---- s53 oracle diff: UUID Contact user-part + User-Agent ------------
+     {
+         Context c = MakeCtx();

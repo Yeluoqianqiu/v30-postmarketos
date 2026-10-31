@@ -1,0 +1,30 @@
+#!/sbin/openrc-run
+description="LG V30 tested speaker route and audio dependencies"
+depend() {
+    need localmount v30-charge-limit v30-modem-modules tqftpserv rmtfs sshd
+    after v30-wifi
+    before alsa v30-unicom
+}
+start() {
+    ebegin "Initializing LG V30 speaker audio after startup settles"
+    local up
+    up=$(cut -d. -f1 /proc/uptime)
+    if [ "$up" -lt 120 ]; then sleep "$((120 - up))"; fi
+    local module elapsed=0 modules
+    modules="q6afe_dai q6afe_clocks q6asm_dai snd_soc_sdm845 snd_soc_tfa989x"
+    # Full hardware topology still requires WCD/SLIM and the headphone DAC.
+    # The separate speaker-only DT candidate avoids those unverified paths.
+    if [ -d /sys/firmware/devicetree/base/sound/slim-playback-dai-link ]; then
+        modules="qcom_q6v5_pas slim_qcom_ngd_ctrl wcd934x snd_soc_wcd934x snd_soc_es9218p $modules"
+    fi
+    for module in $modules qcom_q6v5_pas; do
+        modprobe "$module" || { eend 1 "$module failed"; return 1; }
+    done
+    while ! grep -q LGV30 /proc/asound/cards && [ "$elapsed" -lt 30 ]; do
+        sleep 1; elapsed=$((elapsed + 1))
+    done
+    grep -q LGV30 /proc/asound/cards || { eend 1 "LG-V30 sound card absent"; return 1; }
+    amixer -q -c LGV30 cset "name=Speaker Playback Volume" 8 &&
+        amixer -q -c LGV30 cset "name=TERT_MI2S_RX Audio Mixer MultiMedia1" 1
+    eend $?
+}

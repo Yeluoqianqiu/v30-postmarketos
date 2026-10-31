@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+# Only radio policy for this power cycle; no NV writes and no SIM PIN attempts.
+card=$(timeout 20 qmicli -d qrtr://0 --uim-get-card-status)
+if ! printf '%s\n' "$card" | grep -q "Card state: 'present'"; then
+    echo 'No SIM present; cellular setup skipped.'
+    exit 0
+fi
+if ! printf '%s\n' "$card" | grep -q "Application state: 'ready'"; then
+    echo 'SIM application is not ready; no PIN or policy changes attempted.' >&2
+    exit 1
+fi
+timeout 20 qmicli -d qrtr://0 --dms-set-operating-mode=online
+/usr/local/sbin/v30-unicom-mode --apply

@@ -1,0 +1,168 @@
+--- a/drivers/interconnect/core.c
++++ b/drivers/interconnect/core.c
+@@ -10,6 +10,7 @@
+ #include <linux/device.h>
+ #include <linux/idr.h>
+ #include <linux/init.h>
++#include <linux/kstrtox.h>
+ #include <linux/interconnect.h>
+ #include <linux/interconnect-provider.h>
+ #include <linux/list.h>
+@@ -24,6 +25,17 @@
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
++
++/* Diagnostic-only, active only while the final ICC sync holds its locks. */
++static bool v30_icc_trace;
++bool v30_icc_sync_trace_active;
++EXPORT_SYMBOL_GPL(v30_icc_sync_trace_active);
++
++static int __init v30_icc_trace_setup(char *arg)
++{
++	return kstrtobool(arg, &v30_icc_trace);
++}
++early_param("v30.icc_trace", v30_icc_trace_setup);
+ 
+ static DEFINE_IDR(icc_idr);
+ static LIST_HEAD(icc_providers);
+@@ -1219,26 +1231,40 @@
+ 	struct icc_provider *p;
+ 	struct icc_node *n;
+ 	static int count;
++	int ret;
+ 
+ 	count++;
++	if (v30_icc_trace)
++		dev_notice(dev, "V30-R17 ICC provider sync count=%d total=%d\n", count, providers_count);
+ 
+ 	if (count < providers_count)
+ 		return;
+ 
+ 	mutex_lock(&icc_lock);
+ 	mutex_lock(&icc_bw_lock);
++	v30_icc_sync_trace_active = v30_icc_trace;
+ 	synced_state = true;
+ 	list_for_each_entry(p, &icc_providers, provider_list) {
+ 		dev_dbg(p->dev, "interconnect provider is in synced state\n");
+ 		list_for_each_entry(n, &p->nodes, node_list) {
+ 			if (n->init_avg || n->init_peak) {
++				if (v30_icc_trace)
++					dev_notice(p->dev, "V30-R17 node begin %s init=%u/%u old=%u/%u\n",
++						   n->name, n->init_avg, n->init_peak, n->avg_bw, n->peak_bw);
+ 				n->init_avg = 0;
+ 				n->init_peak = 0;
+ 				aggregate_requests(n);
+-				p->set(n, n);
++				if (v30_icc_trace)
++					dev_notice(p->dev, "V30-R17 node set %s avg=%u peak=%u\n", n->name, n->avg_bw, n->peak_bw);
++				ret = p->set(n, n);
++				if (v30_icc_trace)
++					dev_notice(p->dev, "V30-R17 node end %s ret=%d\n", n->name, ret);
+ 			}
+ 		}
+ 	}
++	v30_icc_sync_trace_active = false;
++	if (v30_icc_trace)
++		dev_notice(dev, "V30-R17 ICC final sync complete\n");
+ 	mutex_unlock(&icc_bw_lock);
+ 	mutex_unlock(&icc_lock);
+ }
+--- a/drivers/interconnect/qcom/icc-rpm.c
++++ b/drivers/interconnect/qcom/icc-rpm.c
+@@ -15,6 +15,8 @@
+ 
+ #include "icc-common.h"
+ #include "icc-rpm.h"
++
++extern bool v30_icc_sync_trace_active;
+ 
+ /* QNOC QoS */
+ #define QNOC_QOS_MCTL_LOWn_ADDR(n)	(0x8 + (n * 0x1000))
+@@ -363,12 +365,20 @@
+ 	active_rate = agg_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE];
+ 	sleep_rate = agg_clk_rate[QCOM_SMD_RPM_SLEEP_STATE];
+ 
++	if (v30_icc_sync_trace_active)
++		dev_notice(provider->dev, "V30-R17 rpm node src_qn %s begin\n", src_qn->name);
+ 	ret = qcom_icc_rpm_set(src_qn, src_qn->sum_avg, qp->ignore_enxio);
++	if (v30_icc_sync_trace_active)
++		dev_notice(provider->dev, "V30-R17 rpm node src_qn %s end ret=%d\n", src_qn->name, ret);
+ 	if (ret)
+ 		return ret;
+ 
+ 	if (dst_qn) {
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 rpm node dst_qn %s begin\n", dst_qn->name);
+ 		ret = qcom_icc_rpm_set(dst_qn, dst_qn->sum_avg, qp->ignore_enxio);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 rpm node dst_qn %s end ret=%d\n", dst_qn->name, ret);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -389,7 +399,12 @@
+ 		active_rate = max_t(u64, active_rate, sleep_rate);
+ 		/* ARM32 caps clk_set_rate arg to u32.. Nothing we can do about that! */
+ 		active_rate = min_t(u64, 1000ULL * active_rate, ULONG_MAX);
+-		return clk_set_rate(qp->bus_clk, active_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 ccf rate begin hz=%llu\n", active_rate);
++		ret = clk_set_rate(qp->bus_clk, active_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 ccf rate end ret=%d\n", ret);
++		return ret;
+ 	}
+ 
+ 	/* RPM only accepts <=INT_MAX rates */
+@@ -397,8 +412,12 @@
+ 	sleep_rate = min_t(u64, sleep_rate, INT_MAX);
+ 
+ 	if (active_rate != qp->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE]) {
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock qp ACTIVE begin old=%u khz=%llu\n", qp->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE], active_rate);
+ 		ret = qcom_icc_rpm_set_bus_rate(qp->bus_clk_desc, QCOM_SMD_RPM_ACTIVE_STATE,
+ 						active_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock qp ACTIVE end ret=%d\n", ret);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -407,8 +426,12 @@
+ 	}
+ 
+ 	if (sleep_rate != qp->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE]) {
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock qp SLEEP begin old=%u khz=%llu\n", qp->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE], sleep_rate);
+ 		ret = qcom_icc_rpm_set_bus_rate(qp->bus_clk_desc, QCOM_SMD_RPM_SLEEP_STATE,
+ 						sleep_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock qp SLEEP end ret=%d\n", ret);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -424,8 +447,12 @@
+ 	sleep_rate = qcom_icc_calc_rate(qp, src_qn, QCOM_SMD_RPM_SLEEP_STATE);
+ 
+ 	if (active_rate != src_qn->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE]) {
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock src_qn ACTIVE begin old=%u khz=%llu\n", src_qn->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE], active_rate);
+ 		ret = qcom_icc_rpm_set_bus_rate(src_qn->bus_clk_desc, QCOM_SMD_RPM_ACTIVE_STATE,
+ 						active_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock src_qn ACTIVE end ret=%d\n", ret);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -434,8 +461,12 @@
+ 	}
+ 
+ 	if (sleep_rate != src_qn->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE]) {
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock src_qn SLEEP begin old=%u khz=%llu\n", src_qn->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE], sleep_rate);
+ 		ret = qcom_icc_rpm_set_bus_rate(src_qn->bus_clk_desc, QCOM_SMD_RPM_SLEEP_STATE,
+ 						sleep_rate);
++		if (v30_icc_sync_trace_active)
++			dev_notice(provider->dev, "V30-R17 clock src_qn SLEEP end ret=%d\n", ret);
+ 		if (ret)
+ 			return ret;
+ 

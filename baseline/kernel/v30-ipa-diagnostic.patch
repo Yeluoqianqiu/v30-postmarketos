@@ -1,0 +1,81 @@
+--- a/drivers/net/ipa/ipa_main.c
++++ b/drivers/net/ipa/ipa_main.c
+@@ -108,6 +108,10 @@
+  * called from ipa_probe() after GSI firmware has been successfully
+  * loaded, authenticated, and started by Trust Zone.
+  */
++static bool ipa_boot_hold;
++module_param_named(boot_hold, ipa_boot_hold, bool, 0444);
++MODULE_PARM_DESC(boot_hold, "V30 diagnostic: retain probe power reference");
++
+ int ipa_setup(struct ipa *ipa)
+ {
+ 	struct ipa_endpoint *exception_endpoint;
+@@ -907,7 +911,10 @@
+ 	if (ret)
+ 		goto err_deconfig;
+ done:
+-	(void)pm_runtime_put_autosuspend(dev);
++	dev_info(dev, "V30-STAGE probe done hold=%d\n", ipa_boot_hold);
++	if (!ipa_boot_hold)
++		(void)pm_runtime_put_autosuspend(dev);
++	dev_info(dev, "V30-STAGE probe returning\n");
+ 
+ 	return 0;
+ 
+--- a/drivers/net/ipa/ipa_power.c
++++ b/drivers/net/ipa/ipa_power.c
+@@ -125,13 +125,16 @@
+ {
+ 	struct ipa *ipa = dev_get_drvdata(dev);
+ 
++	dev_info(dev, "V30-STAGE runtime suspend begin\n");
+ 	/* Endpoints aren't usable until setup is complete */
+ 	if (ipa->setup_complete) {
+ 		ipa_endpoint_suspend(ipa);
+ 		gsi_suspend(&ipa->gsi);
+ 	}
+ 
++	dev_info(dev, "V30-STAGE endpoints suspended; power disable\n");
+ 	ipa_power_disable(ipa);
++	dev_info(dev, "V30-STAGE runtime suspend end\n");
+ 
+ 	return 0;
+ }
+--- a/drivers/net/ipa/ipa_qmi.c
++++ b/drivers/net/ipa/ipa_qmi.c
+@@ -124,6 +124,8 @@
+ 	struct ipa *ipa;
+ 	int ret;
+ 
++	ipa = container_of(ipa_qmi, struct ipa, qmi);
++	dev_info(ipa->dev, "V30-STAGE qmi ready modem=%d uc=%d indication=%d\n", ipa_qmi->modem_ready, ipa_qmi->uc_ready, ipa_qmi->indication_requested);
+ 	/* We aren't ready until the modem and microcontroller are */
+ 	if (!ipa_qmi->modem_ready || !ipa_qmi->uc_ready)
+ 		return;
+@@ -142,7 +144,9 @@
+ 
+ 	/* We're ready.  Start up normal operation */
+ 	ipa = container_of(ipa_qmi, struct ipa, qmi);
++	dev_info(ipa->dev, "V30-STAGE modem netdev start\n");
+ 	ret = ipa_modem_start(ipa);
++	dev_info(ipa->dev, "V30-STAGE modem netdev result=%d\n", ret);
+ 	if (ret)
+ 		dev_err(ipa->dev, "error %d starting modem\n", ret);
+ }
+@@ -499,6 +503,7 @@
+ 
+ 	/* Send the request, and if successful wait for its response */
+ 	req = init_modem_driver_req(ipa_qmi);
++	dev_info(dev, "V30-STAGE QMI INIT send skip_uc=%u dst=%u:%u\n", req->skip_uc_load, ipa_qmi->modem_sq.sq_node, ipa_qmi->modem_sq.sq_port);
+ 	ret = qmi_send_request(qmi, &ipa_qmi->modem_sq, &txn,
+ 			       IPA_QMI_INIT_DRIVER, IPA_QMI_INIT_DRIVER_REQ_SZ,
+ 			       ipa_init_modem_driver_req_ei, req);
+@@ -507,6 +512,7 @@
+ 	else if ((ret = qmi_txn_wait(&txn, timeout)))
+ 		dev_err(dev, "error %d awaiting init driver response\n", ret);
+ 
++	dev_info(dev, "V30-STAGE QMI INIT result=%d\n", ret);
+ 	ipa_qmi->dbg_send_ret = ret;
+ 
+ 	if (!ret) {

@@ -1,0 +1,85 @@
+--- a/drivers/interconnect/qcom/msm8998.c
++++ b/drivers/interconnect/qcom/msm8998.c
+@@ -22,6 +22,8 @@
+  */
+ 
+ #include <linux/device.h>
++#include <linux/init.h>
++#include <linux/kstrtox.h>
+ #include <linux/interconnect-provider.h>
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
+@@ -1905,13 +1907,35 @@
+ };
+ MODULE_DEVICE_TABLE(of, qnoc_of_match);
+ 
++/* Temporary diagnostic: preserve pre-sync behavior for this RAM boot only.
++ * Default is the original icc_sync_state path; never toggle after startup.
++ */
++static bool v30_icc_hold_sync;
++
++static int __init v30_icc_hold_sync_setup(char *arg)
++{
++	return kstrtobool(arg, &v30_icc_hold_sync);
++}
++early_param("v30.icc_hold_sync", v30_icc_hold_sync_setup);
++
++static void v30_msm8998_sync_state(struct device *dev)
++{
++	dev_notice(dev, "V30-R16 ICC sync begin hold=%d\n", v30_icc_hold_sync);
++	if (v30_icc_hold_sync) {
++		dev_notice(dev, "V30-R16 ICC sync held; preserve boot state\n");
++		return;
++	}
++	icc_sync_state(dev);
++	dev_notice(dev, "V30-R16 ICC sync end\n");
++}
++
+ static struct platform_driver qnoc_driver = {
+ 	.probe = qnoc_probe,
+ 	.remove = qnoc_remove,
+ 	.driver = {
+ 		.name = "qnoc-msm8998",
+ 		.of_match_table = qnoc_of_match,
+-		.sync_state = icc_sync_state,
++		.sync_state = v30_msm8998_sync_state,
+ 	}
+ };
+ static int __init qnoc_driver_init(void)
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -454,7 +454,11 @@
+ 		__func__);
+ 
+ 	klist_add_tail(&dev->p->knode_driver, &dev->driver->p->klist_devices);
++	if (!strcmp(dev_name(dev), "1e40000.ipa"))
++		dev_notice(dev, "V30-R16 device_links_driver_bound begin\n");
+ 	device_links_driver_bound(dev);
++	if (!strcmp(dev_name(dev), "1e40000.ipa"))
++		dev_notice(dev, "V30-R16 device_links_driver_bound end\n");
+ 
+ 	device_pm_check_callbacks(dev);
+ 
+@@ -467,6 +471,8 @@
+ 
+ 	bus_notify(dev, BUS_NOTIFY_BOUND_DRIVER);
+ 	kobject_uevent(&dev->kobj, KOBJ_BIND);
++	if (!strcmp(dev_name(dev), "1e40000.ipa"))
++		dev_notice(dev, "V30-R16 driver_bound complete\n");
+ }
+ 
+ static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
+--- a/drivers/base/core.c
++++ b/drivers/base/core.c
+@@ -1241,7 +1241,11 @@
+ 		if (dev != dont_lock_dev)
+ 			device_lock(dev);
+ 
++		if (dont_lock_dev && !strcmp(dev_name(dont_lock_dev), "1e40000.ipa"))
++			dev_notice(dev, "V30-R16 IPA supplier sync begin\n");
+ 		dev_sync_state(dev);
++		if (dont_lock_dev && !strcmp(dev_name(dont_lock_dev), "1e40000.ipa"))
++			dev_notice(dev, "V30-R16 IPA supplier sync end\n");
+ 
+ 		if (dev != dont_lock_dev)
+ 			device_unlock(dev);

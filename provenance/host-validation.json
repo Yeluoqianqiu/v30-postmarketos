@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-31",
+  "phone_operations": false,
+  "sms_unit_tests": {
+    "passed": 23
+  },
+  "voice_unit_tests": {
+    "passed_linux_root": 6,
+    "macos_skipped_root_case": 1
+  },
+  "packaging_unit_tests": {
+    "passed": 3
+  },
+  "charge_policy_trajectory": "passed",
+  "private_bus_and_network_namespace_sms": "passed; synthetic service only; no real SMS",
+  "pinned_kernel_archive_and_patch_sequence": "SHA512 inputs and full sequence passed",
+  "imsd_preparation": "pinned clone+patch passed; 23 implementation/test files match the already built candidate",
+  "imsd_existing_candidate_validation": "8 suites and 5 products; manual clang23/libc++ module build, not Crafter lint",
+  "dtb_reconstruction": "byte-identical to the prior local MCLK DTB",
+  "boot_repack": "byte-identical reconstruction of the existing local r35 image using private local inputs; no image uploaded",
+  "whole_kernel_rebuild_this_publication": false,
+  "new_device_validation": false,
+  "source_syntax_doc_links_and_staging": "passed on macOS and root Linux",
+  "limits": [
+    "Public packaging/path adaptations remain host-only",
+    "No firmware or owner image is included",
+    "No fresh physical test or CI result is claimed"
+  ]
+}

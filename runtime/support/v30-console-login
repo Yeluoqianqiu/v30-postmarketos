@@ -1,0 +1,11 @@
+#!/bin/sh
+# 由 tty1 的 getty 以 root 运行；tmux 中唯一初始进程是正常的 login。
+set -eu
+umask 077
+mkdir -p /run/v30-console
+chmod 700 /run/v30-console
+export TERM=linux
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+/usr/local/sbin/v30-console-font > /run/v30-console/font-result.json
+exec /usr/bin/tmux -u -S /run/v30-console/tmux.sock -f /etc/v30-console.conf new-session -s local -n console 'exec /sbin/getty -i -L 38400 - screen'

@@ -1,0 +1,2 @@
+# Replace only the tty1 line after saving the original; /bin/login still authenticates.
+tty1::respawn:/sbin/getty -n -i -l /usr/local/sbin/v30-console-login 38400 tty1 linux

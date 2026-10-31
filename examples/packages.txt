@@ -1,0 +1,17 @@
+python3
+py3-gobject3
+modemmanager
+networkmanager
+libqmi
+dbus
+polkit
+nftables
+pipewire
+pipewire-tools
+alsa-utils
+tmux
+kbd
+bluez
+bluez-deprecated
+tqftpserv
+rmtfs

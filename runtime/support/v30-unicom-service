@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+description="LG V30 temporary China Unicom radio policy (no permanent NV writes)"
+depend() {
+    need v30-wifi v30-charge-limit
+    after networkmanager sshd
+    before modemmanager
+}
+start() {
+    ebegin "Applying LG V30 temporary Unicom radio policy"
+    timeout 80 /usr/local/sbin/v30-unicom-init
+    eend $?
+}

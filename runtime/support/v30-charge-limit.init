@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+description="Battery charging limit at 80 percent with 75 percent restart"
+supervisor=supervise-daemon
+command=/usr/local/sbin/v30-charge-limit
+respawn_delay=5
+output_log=/var/log/v30-charge-limit.log
+error_log=/var/log/v30-charge-limit.log
+depend() {
+    need localmount
+    after modules
+    before v30-health-monitor
+}
+start_pre() {
+    test -w /sys/class/power_supply/pmi8998-charger/charge_behaviour || return 1
+    touch /var/log/v30-charge-limit.log
+    chmod 600 /var/log/v30-charge-limit.log
+    /usr/local/sbin/v30-charge-limit --once
+}

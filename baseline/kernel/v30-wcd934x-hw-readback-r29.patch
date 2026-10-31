@@ -1,0 +1,75 @@
+--- a/sound/soc/codecs/wcd934x.c
++++ b/sound/soc/codecs/wcd934x.c
+@@ -35,6 +35,11 @@
+ module_param(amic_hold_release, bool, 0644);
+ MODULE_PARM_DESC(amic_hold_release,
+ 		"Diagnostic: release analog TX hold after ADC power-up and 300 ms");
++
++static bool tx_hw_snapshot;
++module_param(tx_hw_snapshot, bool, 0644);
++MODULE_PARM_DESC(tx_hw_snapshot,
++		"Diagnostic: compare cached and direct AMIC1/DEC6 register reads");
+ 
+ #define WCD934X_RATES_MASK (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
+ 			    SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_48000 |\
+@@ -5152,6 +5157,42 @@
+ 	}
+ }
+ 
++/* These configuration registers have no read-to-clear status bits.
++ * regmap_read_bypassed() locks the map and restores both cache flags before
++ * returning. No global debugfs cache setting or new register write is used.
++ * Reads happen in the powered ADC callback, never from a later work item.
++ */
++static void wcd934x_tx_hw_snapshot(struct snd_soc_component *comp,
++				 const char *phase)
++{
++	static const u16 regs[] = {
++		WCD934X_ANA_AMIC1,
++		WCD934X_ANA_AMIC2,
++		WCD934X_ANA_MICB1,
++		WCD934X_CDC_TX6_TX_PATH_CTL,
++		WCD934X_CDC_TX6_TX_PATH_CFG0,
++		WCD934X_CDC_TX6_TX_PATH_CFG1,
++		WCD934X_CDC_TX6_TX_VOL_CTL,
++		WCD934X_CDC_TX0_TX_PATH_SEC2 + 16 * 6,
++		WCD934X_CDC_TX_INP_MUX_ADC_MUX6_CFG0,
++		WCD934X_CDC_IF_ROUTER_TX_MUX_CFG1,
++	};
++	struct wcd934x_codec *wcd = snd_soc_component_get_drvdata(comp);
++	unsigned int cached, hardware;
++	int cached_ret, hardware_ret;
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		cached = hardware = 0;
++		cached_ret = regmap_read(wcd->regmap, regs[i], &cached);
++		hardware_ret = regmap_read_bypassed(wcd->regmap, regs[i],
++						   &hardware);
++		dev_info(comp->dev,
++			 "V30-TX-HW phase=%s reg=%#x cached_rc=%d cached=%#x hw_rc=%d hw=%#x\n",
++			 phase, regs[i], cached_ret, cached, hardware_ret, hardware);
++	}
++}
++
+ static int wcd934x_codec_enable_adc(struct snd_soc_dapm_widget *w,
+ 				    struct snd_kcontrol *kcontrol, int event)
+ {
+@@ -5162,6 +5203,8 @@
+ 		wcd934x_codec_set_tx_hold(comp, w->reg, true);
+ 		break;
+ 	case SND_SOC_DAPM_POST_PMU:
++		if (READ_ONCE(tx_hw_snapshot) && w->reg == WCD934X_ANA_AMIC1)
++			wcd934x_tx_hw_snapshot(comp, "adc-up-before-release");
+ 		if (READ_ONCE(amic_hold_release)) {
+ 			u16 hold_reg;
+ 			u8 hold_mask;
+@@ -5192,6 +5235,8 @@
+ 			if (after & hold_mask)
+ 				return -EIO;
+ 		}
++		if (READ_ONCE(tx_hw_snapshot) && w->reg == WCD934X_ANA_AMIC1)
++			wcd934x_tx_hw_snapshot(comp, "adc-up-after-release");
+ 		break;
+ 	default:
+ 		break;

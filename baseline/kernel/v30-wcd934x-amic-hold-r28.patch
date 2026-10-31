@@ -1,0 +1,87 @@
+--- a/sound/soc/codecs/wcd934x.c
++++ b/sound/soc/codecs/wcd934x.c
+@@ -4,6 +4,7 @@
+ #include <linux/cleanup.h>
+ #include <linux/clk.h>
+ #include <linux/clk-provider.h>
++#include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/kernel.h>
+ #include <linux/mfd/wcd934x/registers.h>
+@@ -25,6 +26,15 @@
+ #include "wcd-mbhc-v2.h"
+ 
+ #include <dt-bindings/sound/qcom,wcd934x.h>
++
++/* Diagnostic only. ADC POST_PMU follows the decimator/mux power sequence;
++ * releasing in the mux callback would precede ADC PRE_PMU setting the hold.
++ * Synchronous settling under DAPM cannot race a later power-down callback.
++ */
++static bool amic_hold_release;
++module_param(amic_hold_release, bool, 0644);
++MODULE_PARM_DESC(amic_hold_release,
++		"Diagnostic: release analog TX hold after ADC power-up and 300 ms");
+ 
+ #define WCD934X_RATES_MASK (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
+ 			    SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_48000 |\
+@@ -5151,6 +5161,38 @@
+ 	case SND_SOC_DAPM_PRE_PMU:
+ 		wcd934x_codec_set_tx_hold(comp, w->reg, true);
+ 		break;
++	case SND_SOC_DAPM_POST_PMU:
++		if (READ_ONCE(amic_hold_release)) {
++			u16 hold_reg;
++			u8 hold_mask;
++			unsigned int before, after;
++
++			switch (w->reg) {
++			case WCD934X_ANA_AMIC1:
++			case WCD934X_ANA_AMIC2:
++				hold_reg = WCD934X_ANA_AMIC2;
++				break;
++			case WCD934X_ANA_AMIC3:
++			case WCD934X_ANA_AMIC4:
++				hold_reg = WCD934X_ANA_AMIC4;
++				break;
++			default:
++				return -EINVAL;
++			}
++			hold_mask = (w->reg == WCD934X_ANA_AMIC1 ||
++				     w->reg == WCD934X_ANA_AMIC3) ? 0x40 : 0x20;
++			before = snd_soc_component_read(comp, hold_reg);
++			msleep(300);
++			wcd934x_codec_set_tx_hold(comp, w->reg, false);
++			after = snd_soc_component_read(comp, hold_reg);
++			dev_info(comp->dev,
++				 "V30-TX-HOLD adc=%s reg=%#x mask=%#x before=%#x after=%#x adc_ctl=%#x\n",
++				 w->name, hold_reg, hold_mask, before, after,
++				 snd_soc_component_read(comp, w->reg));
++			if (after & hold_mask)
++				return -EIO;
++		}
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -5629,13 +5671,17 @@
+ 			   SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU |
+ 			   SND_SOC_DAPM_PRE_PMD | SND_SOC_DAPM_POST_PMD),
+ 	SND_SOC_DAPM_ADC_E("ADC1", NULL, WCD934X_ANA_AMIC1, 7, 0,
+-			   wcd934x_codec_enable_adc, SND_SOC_DAPM_PRE_PMU),
++			   wcd934x_codec_enable_adc,
++			   SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU),
+ 	SND_SOC_DAPM_ADC_E("ADC2", NULL, WCD934X_ANA_AMIC2, 7, 0,
+-			   wcd934x_codec_enable_adc, SND_SOC_DAPM_PRE_PMU),
++			   wcd934x_codec_enable_adc,
++			   SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU),
+ 	SND_SOC_DAPM_ADC_E("ADC3", NULL, WCD934X_ANA_AMIC3, 7, 0,
+-			   wcd934x_codec_enable_adc, SND_SOC_DAPM_PRE_PMU),
++			   wcd934x_codec_enable_adc,
++			   SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU),
+ 	SND_SOC_DAPM_ADC_E("ADC4", NULL, WCD934X_ANA_AMIC4, 7, 0,
+-			   wcd934x_codec_enable_adc, SND_SOC_DAPM_PRE_PMU),
++			   wcd934x_codec_enable_adc,
++			   SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU),
+ 	SND_SOC_DAPM_SUPPLY("MIC BIAS1", SND_SOC_NOPM, MIC_BIAS_1, 0,
+ 			    wcd934x_codec_enable_micbias, SND_SOC_DAPM_PRE_PMU |
+ 			    SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_POST_PMD),

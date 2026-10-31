@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="Opt-in final Bluetooth-off policy for the headless profile"
+depend() {
+    need localmount
+    after bluetooth v30-bluetooth joan-bt-address
+}
+start() {
+    ebegin "Keeping Bluetooth powered off"
+    if [ -d /sys/class/bluetooth/hci0 ]; then
+        btmgmt --index hci0 power off || { eend 1; return 1; }
+    fi
+    eend 0
+}

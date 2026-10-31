@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+description="LG V30 modem dependencies for WLAN"
+depend() {
+    need localmount
+    after modules udev
+    before rmtfs
+}
+start() {
+    ebegin "Loading LG V30 WLAN modem dependencies"
+    modprobe qrtr_smd && modprobe rmtfs_mem && \
+        modprobe qcom_q6v5_mss && modprobe qcom_pd_mapper
+    eend $?
+}
