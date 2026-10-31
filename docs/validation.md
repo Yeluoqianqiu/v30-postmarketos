@@ -19,10 +19,10 @@ Registration, a local active signal or a successful socket write is not proof of
 
 ## Host-only validation
 
-The initial publication, localization and review-status work did not operate the phone. The later selected r37 device work is recorded separately below; it does not turn host reconstruction checks into a full-device pass.
+The initial publication, localization and review-status work did not operate the phone. The later selected r37/r38 device work is recorded separately below; it does not turn host reconstruction checks into a full-device pass.
 
 - SMS logic: 23 unit cases.
-- Voice, alerts and history: 30 unit cases; Linux root covers private-path ownership validation. The root-specific case is skipped when run without root.
+- Voice, alerts, history and console status: 36 unit cases (30 at r37 plus six for r38); Linux root covers private-path ownership validation. The root-specific case is skipped when run without root.
 - Notification/archive integration: one isolated case uses the real SMS store and verifies counts persist until explicit read without deleting the message.
 - Incoming observer: actual Gio snapshots/signals on a private D-Bus/network namespace cover owner replacement, spoof-sender rejection, cancellation/answer and persisted call outcomes, using synthetic calls without audio or modem access.
 - Synthetic ModemManager: actual Gio calls on a private D-Bus and network namespace. Checks cover partial-to-complete reception, persistence over watcher restart, no duplicate submission for a reused request ID, and literal Unicode/quote handling. No real modem or SMS is used.
@@ -60,3 +60,26 @@ Before installation, save original files, runlevels, NetworkManager connections 
 Selected userspace additions have their own [incoming-alert, volume, history and notification record](incoming-alerts.md). It separates operator-confirmed ringing/display and a roughly 60-second two-way call from later playback-only ADC-gain preservation and final notification-frame checks. Nonzero SMS/read-clear notification behavior used isolated data with the actual SMS store. No r37 reboot or complete clean-device reconstruction was performed; the historical baseline results do not qualify untested combinations.
 
 The machine-readable [r37 checkpoint](../provenance/r37-validation.json) records selected source hashes and validation limits. The publication host suite contains 57 tests: 23 SMS, 30 voice/alerts/history, three packaging and one SMS-store notification integration case, plus the charge-policy simulation. The private Gio incoming-call bench is separate and uses no real modem or audio.
+
+## Additional r38 evidence
+
+The [volume and cellular status record](console-status.md) documents installation
+of two userspace files with guarded backups, source-hash checks and inspection
+of the 120-column device framebuffer. It showed separate RING/VOL levels, the
+registered operator, current LTE technology, fresh signal bars and retained
+notification counts. A stale readout was also explicitly labeled; stale-bar
+formatting, no-service/searching, roaming and multiple-modem behavior have
+isolated tests rather than a completed hardware transition matrix.
+
+The inspected device preference was saved at `RING 100%`; its speaker control
+remained 8/15 (`VOL 53%`). Six services, IMS registration, SMS readiness, four
+closed PCM devices, filesystem health, rotation and Bluetooth-off were checked.
+Protected files and the existing boot remained unchanged. These observations do
+not establish ringtone loudness at 100%, a new call/SMS pass, ordinary reboot,
+or graphical/touch/Chinese-input qualification.
+
+The [r38 checkpoint](../provenance/r38-validation.json) pins the two installed
+sources. Its Linux-root suite contains 63 tests: 23 SMS, 36 voice/alerts/history/
+status, three packaging and one SMS-store notification case, plus the separate
+charge-policy simulation. Publication reruns host checks without operating the
+phone or reusing old one-time allowances.

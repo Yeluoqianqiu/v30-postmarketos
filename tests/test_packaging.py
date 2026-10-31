@@ -28,6 +28,7 @@ class PackagingTests(unittest.TestCase):
             self.assertIn('/etc/init.d/v30-sms',files);self.assertIn('/etc/init.d/v30-ims',files)
             self.assertIn('/etc/init.d/v30-incoming',files)
             self.assertIn('/opt/v30-mobile/libexec/alert_view.py',files)
+            self.assertIn('/opt/v30-mobile/libexec/console_status.py',files)
             self.assertIn('/opt/v30-mobile/libexec/call_history.py',files)
             self.assertEqual((dest/'etc/v30-incoming.json').stat().st_mode&0o777,0o600)
             self.assertEqual((dest/'opt/v30-mobile/libexec/incoming_alerts.py').stat().st_mode&0o777,0o755)

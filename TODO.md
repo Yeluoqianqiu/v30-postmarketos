@@ -4,7 +4,7 @@ Roadmap updated 2026-10-31. Every unchecked item is open work, including impleme
 
 The target remains an experimental portable Linux server on the LG V30 US998, with a landscape TTY, normal login authentication and Bluetooth off. A desktop environment is not required. P0 establishes a dependable server baseline; P1 adds telephony usability and broader validation; P2 is optional. Priorities are not release dates.
 
-r37's core incoming alerts, ringtone-volume display/control, private call history and persistent missed-call/unread-SMS counters are implemented. Checked items below refer to that bounded implementation and its recorded evidence, not completion of the full device matrix or a clean-image/reboot qualification.
+r37's core incoming alerts, ringtone-volume display/control, private call history and persistent missed-call/unread-SMS counters are implemented. r38 adds separate speaker/ringtone levels, registered operator, current radio technology and signal status; its device preference is saved at 100% while the shared ringtone example stays at 60%. Checked items below refer to that bounded implementation and its recorded evidence, not completion of the full device matrix or a clean-image/reboot qualification.
 
 ## P0 - Server reliability and recovery
 
@@ -85,6 +85,23 @@ r37's core incoming alerts, ringtone-volume display/control, private call histor
 
 - [ ] **Repeat reconstruction from the published sources on a clean target.**
   Pin remaining package/dependency inputs, reconstruct from documented owner-supplied firmware/base boot inputs and record deviations. Acceptance: the published paths, staging, English CLI, Bluetooth-off service and complete boot/data/voice/SMS stack pass a fresh end-to-end deployment. Historical r35/r36 results do not qualify later publication changes.
+
+## Console status and input follow-up
+
+- [x] **Implement separate speaker/ringtone levels, current operator/radio technology and bounded signal bars.**
+  The r38 reader uses read-only ModemManager properties and ALSA control readback; unknown and stale states are explicit. The 120-column device framebuffer and retained notification counts were inspected; six new cases bring the Linux-root suite to 63 tests. See [console status](docs/console-status.md) for evidence and limitations.
+
+- [ ] **Listen to and qualify the 100% ringtone preference.**
+  The application setting is saved, with the existing waveform peak limit and hardware playback gain retained. Arrange a fresh authorized call to confirm perceived level, stop/handoff behavior and clear two-way speech. Changing the stored percentage or reading it on screen is not a listening test.
+
+- [ ] **Qualify the status bar after reboot and during network transitions.**
+  Check no service, roaming, modem-owner replacement, stale quality and notifications during an authorized call. Signal percentages are modem estimates, not throughput or calibrated antenna measurements.
+
+- [ ] **Evaluate an optional touch desktop and Chinese input session.**
+  The installed kernel exposes DRM/GPU and stmfts touch; the TTY image has graphics libraries but no configured desktop, on-screen keyboard or Chinese IME. Evaluate a compositor/mobile shell, touch rotation, virtual keyboard, CJK font coverage and an integrated input method together. Keep authenticated landscape TTY and Bluetooth-off as the default, with a reliable return path. Do not mark package installation as successful interaction testing.
+
+- [ ] **Assess Android component reuse only for a concrete missing feature.**
+  Firmware and driver references can help mainline work; Android HAL binaries depend on the Android userspace/BSP. A libhybris adaptation or Waydroid session is separate compatibility work, not an APK copied into the current TTY. Record kernel/runtime requirements and actual device evidence before claiming support.
 
 ## P2 - Optional extensions
 

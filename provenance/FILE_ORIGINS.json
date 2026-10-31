@@ -139,9 +139,9 @@
   },
   "runtime/support/v30-console-metrics.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "7aa4783d5fc9f10220c967080896ed8dfa58fb379ca6a6fc4d9c0aa5ab2d2b20",
+    "sha256": "73184f664c7d30e2c896dfe4c5df6a3f97455a84ffb34ed507ec8e45938c8a54",
     "pre_localization_sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "runtime/support/v30-console.conf": {
     "origin": "local source; published as board/carrier reference",
@@ -301,9 +301,9 @@
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "da37ffa6f7f0dfdab242a6b1637bd3da624374247a0232fae759988c04c7640b",
+    "sha256": "913ce56bf971df8d05318519761eaf6fade6a338a75fbec1ffdf0e9bb5b3e3d6",
     "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -333,8 +333,8 @@
   },
   "tests/test_packaging.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "b4d0ff4811679362337573422c9fa0e029986b188b7917af1c0e5ff4acb856c3",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "sha256": "be65817d35446b595d07cf4a174d9fb3704f087427d0535a100f2e7bb7a10b73",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "docs/upstream.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -350,9 +350,9 @@
   },
   "docs/validation.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "23bb64d93c24efd15957078e9f7d339d1ebe437b2e7b602c9558469ef66821eb",
+    "sha256": "aca9180a599ef39eb4e1d673d00119f9c8d499795eec8fcd7c19ccccad249f6d",
     "pre_localization_sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "docs/build-and-install.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -400,8 +400,8 @@
   },
   "scripts/stage-rootfs.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "4aa62b6fa5a430a0313a0e0fc98eb804e6f37ebbec4edcec9921184bf58bdd1b",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "sha256": "ff74e26e8dac0d7911c31de275c8a26e82782b8ee21a9bf92d227cac968cdca5",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "scripts/check.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -452,18 +452,18 @@
   },
   "TODO.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
-    "sha256": "80032d9603a3d4509109422915c86dd4945bbe4630d63b0e74a72a0a0dac6e6f",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "sha256": "812492864822a32abe247cca97f6b0d174b90cf0fefe6eaf952a5355823fc44c",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "docs/contributions.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
-    "sha256": "ce27a35c930d4eecce03a35e21e9a04ccfa30025aedb40c172a14b6e79cc188c",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "sha256": "7db5f9511cf8167881f3c2482906f7a5f2fa6de3c6678e9aa4cd3361c6d6bb10",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "README.en.md": {
     "origin": "English counterpart of the project README, 2026-10-31",
-    "sha256": "b50c24499fccf5a7f267eb61db61f8724263c599dcd6f39f2fc62b7a33ec54ee",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "sha256": "c14276e125976257911659af42e6272d763b79ed1fb4fe2a3e4ae8c452ff8896",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
   "docs/incoming-alerts.md": {
     "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
@@ -524,5 +524,25 @@
     "origin": "V30 r37 incoming alerts, volume, call history and persistent notification publication, 2026-10-31",
     "sha256": "2b0c48bc2ed25d2bbe034415d4cfd7a85801589278f9bc2626f4e5a44bd3e5e6",
     "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/console_status.py": {
+    "origin": "Local r38 console status and input-capability documentation",
+    "sha256": "23dfcfcc06b1c34effd607d880382d09f865fcd04ba23e283436ad82cc3a372a",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+  },
+  "runtime/voice/test_console_status.py": {
+    "origin": "Local r38 console status and input-capability documentation",
+    "sha256": "a1946ca8d7dfe68a0e4388bc9b55c04e9487f5851d1506c6e44ac1b81966f720",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+  },
+  "docs/console-status.md": {
+    "origin": "Local r38 console status and input-capability documentation",
+    "sha256": "f3a290f905643163d28a026b9b8cc581d48379ef3fb8889c4fab13d65d21cdfa",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+  },
+  "provenance/r38-validation.json": {
+    "origin": "Local r38 console status and input-capability documentation",
+    "sha256": "f5639d939582b62ec5fbb053d858280891772c75adf2ef27be08db3730546c29",
+    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   }
 }

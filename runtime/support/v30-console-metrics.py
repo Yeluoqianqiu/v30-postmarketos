@@ -4,6 +4,7 @@ import datetime,fcntl,json,os,subprocess,sys,time,struct,termios
 from pathlib import Path
 sys.path.insert(0, '/opt/v30-mobile/libexec')
 from alert_view import incoming_line,ring_volume,notification_counts,notification_line
+from console_status import cellular_status,speaker_status,format_rows
 RUN=Path('/run/v30-console')
 RUN.mkdir(mode=0o700,exist_ok=True)
 
@@ -55,46 +56,33 @@ def sample(previous):
         bt_at=now
     wifi='UP' if read('/sys/class/net/wlan0/operstate')=='up' else 'DOWN'
     volume=ring_volume();ring=f'{volume}%' if volume else 'MUTE'
-    bt_ring=bt+'  RING '+ring
+    speaker=speaker_status()
+    cellular=cellular_status()
+    carrier=cellular['operator']+(' ROAM' if cellular.get('roaming') else '')
     gpu_state=read('/sys/bus/platform/devices/5000000.gpu/power/runtime_status')
     if gpu_state=='suspended':gpu='SLEEP'
     elif gpu_state=='active':
         freq=number('/sys/class/devfreq/5000000.gpu/cur_freq',1e6)
         gpu=f'{freq:.0f}MHz' if freq is not None else 'ACTIVE'
     else:gpu='--'
-    uptime=float(read('/proc/uptime','0').split()[0]);hours=int(uptime//3600);minutes=int(uptime%3600//60)
     with open('/dev/tty1','rb',buffering=0) as terminal:
         rows,columns,_,_=struct.unpack('HHHH',fcntl.ioctl(terminal,termios.TIOCGWINSZ,bytes(8)))
     clock=datetime.datetime.now().strftime('%H:%M')
-    def cell(label,value,width,color='cyan'):
-        plain=f'{label} {value}' if label else value
-        space=max(0,width-len(plain));left=' '*(space//2);right=' '*(space-space//2)
-        styled=left+f'#[fg=white,nobold]{label+" " if label else ""}#[fg={color},nobold]{value}#[fg=white,nobold]'+right
-        return left+plain+right,styled
-    def row(items):
-        # Allow for rounded corners: four cells (96px) per side in landscape, three in portrait.
-        margin=4 if columns>=90 else 3
-        width=max(1,(columns-2*margin-3*(len(items)-1))//len(items))
-        cells=[cell(*item,width) for item in items]
-        plain=' │ '.join(p for p,f in cells)
-        styled=' #[fg=blue,nobold]│ '.join(f for p,f in cells)
-        spare=max(0,columns-len(plain));left=' '*(spare//2);right=' '*(spare-spare//2)
-        return left+plain+right,left+styled+right
-    if columns>=90:
-        pairs=[row([('BAT',f'{capacity}% {state} {battery_temp}'),('BT',bt_ring),('WiFi',wifi),('',clock)]),
+    row=lambda items: format_rows(columns,items)
+    if columns>=112:
+        pairs=[row([('BAT',f'{capacity}% {state} {battery_temp}'),('VOL',speaker+' RING '+ring),('BT',bt+' WiFi '+wifi),('',clock)]),
+               row([('CELL',carrier),('NET',cellular['network']),('SIG',cellular['signal'])]),
                row([('CPU',f'{cpu} {temp(("cpu","clust"))}'),('GPU',f'{gpu} {temp(("gpu-",))}'),('RAM',ram),('SD',f'{used:.1f}/{size:.0f}G')])]
     else:
-        pairs=[row([('BAT',f'{capacity}% {state}'),('TEMP',battery_temp+'  '+clock)]),
-               row([('CPU',f'{cpu}  {temp(("cpu","clust"))}'),('GPU',f'{gpu}  {temp(("gpu-",))}')]),
-               row([('RAM',ram),('SD',f'{used:.1f}/{size:.0f}G')]),
-               row([('BT',bt_ring),('WiFi',wifi+f'  {hours}h{minutes:02}')])]
+        pairs=[row([('BAT',f'{capacity}% '+clock),('VOL',speaker+' RING '+ring)]),
+               row([('CELL',carrier+' '+cellular['network']),('SIG',cellular['signal'])]),
+               row([('CPU',cpu+' RAM '+ram),('BT',bt+' WiFi '+wifi)])]
     incoming=incoming_line('/run/v30-alerts/display.json',read('/proc/sys/kernel/random/boot_id'),now,columns)
     counts=notification_counts();notice=notification_line(counts,columns)
     extra=[line for line in [incoming,notice] if line is not None]
-    if len(pairs)+len(extra)>5:pairs=pairs[:2]+pairs[-1:]
     pairs=extra+pairs
     lines=[p for p,f in pairs];formats=[f for p,f in pairs]
-    return {'sampled_at':now,'cpu':{'total':total,'idle':idle},'bluetooth':bt,'bluetooth_at':bt_at,'notifications':counts,'lines':lines,'formats':formats}
+    return {'sampled_at':now,'cpu':{'total':total,'idle':idle},'bluetooth':bt,'bluetooth_at':bt_at,'notifications':counts,'cellular':cellular,'speaker':speaker,'ring_volume':volume,'lines':lines,'formats':formats}
 
 def visible():
     return read('/sys/class/graphics/fb0/blank')=='0' and read('/run/v30-display/requested')!='off'

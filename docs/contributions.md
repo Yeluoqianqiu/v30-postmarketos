@@ -52,9 +52,10 @@ This [userspace addition](incoming-alerts.md) has scoped operator-confirmed ring
 
 - Fixed fuel-gauge charger-status/current reporting and exposed charge inhibition while retaining USB input power. Added a userspace charge-limit policy with 75% resume / 80% inhibition thresholds and conservative sensor/temperature decisions.
 - Integrated a landscape TTY, larger console glyphs, a Celsius glyph, corner-aware status placement and shared display/refresh locking while retaining normal login authentication.
+- Added r38 read-only speaker-level, registered-operator, current-radio and four-bar signal reporting to the TTY. Separate RING/VOL levels and explicit unknown/stale states fit alongside persistent notifications; staging includes the new status module. The device ringtone preference was saved at the bounded application maximum, while the shared example remains 60%.
 - Added short-power-key display toggling and an opt-in Bluetooth-off policy. Display blanking does not suspend the system.
 
-Sources: [support tools](../runtime/support/), [kernel candidates](../patches/current-kernel/). Charge inhibition with USB power was checked on hardware; hysteresis and abnormal-temperature decisions have simulation coverage only. The two GCC clock changes adapt Dmitry Baryshkov's patches and retain his authorship. IPA system-header, GLINK and ADC/MCLK fixes already present in the newer base are not duplicate new contributions.
+Sources: [support tools](../runtime/support/), [console status reader](../runtime/voice/console_status.py), [kernel candidates](../patches/current-kernel/). The [r38 record](console-status.md) separates device framebuffer/service checks from unperformed ringtone listening, calls and reboot qualification. Charge inhibition with USB power was checked on hardware; hysteresis and abnormal-temperature decisions have simulation coverage only. The two GCC clock changes adapt Dmitry Baryshkov's patches and retain his authorship. IPA system-header, GLINK and ADC/MCLK fixes already present in the newer base are not duplicate new contributions.
 
 ## Reconstruction, validation and upstream submissions
 
@@ -67,4 +68,4 @@ Sources: [support tools](../runtime/support/), [kernel candidates](../patches/cu
 
 Historical r35/r36 testing used the older `7.2.0-rc2-v30-r30` kernel stack on one US998 with China Unicom. It covered an earlier outgoing call, incoming calls of about 60 seconds in RAM and after default boot, short Chinese SMS in both directions, archive persistence after one ordinary reboot, data checks, landscape TTY and Bluetooth off.
 
-The complete published source tree has not been freshly deployed end to end on a clean device. Publication-specific adaptations do not inherit historical passes; the selected r37 device changes and their remaining gaps are documented separately. The newer kernel series has four affected objects compiled, with no full image build or device boot. Final-version 24/72-hour stability and broader telephony/storage qualification remain open in [TODO](../TODO.md).
+The complete published source tree has not been freshly deployed end to end on a clean device. Publication-specific adaptations do not inherit historical passes; the selected r37 and r38 device changes and their remaining gaps are documented separately. The newer kernel series has four affected objects compiled, with no full image build or device boot. Final-version 24/72-hour stability and broader telephony/storage qualification remain open in [TODO](../TODO.md).

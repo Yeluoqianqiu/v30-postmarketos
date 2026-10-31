@@ -1,0 +1,52 @@
+{
+  "checkpoint": "r38",
+  "date": "2026-10-31",
+  "scope": "Read-only cellular and speaker status in landscape TTY; persistent ringtone preference at the application maximum",
+  "installed_sources_sha256": {
+    "runtime/voice/console_status.py": "23dfcfcc06b1c34effd607d880382d09f865fcd04ba23e283436ad82cc3a372a",
+    "runtime/support/v30-console-metrics.py": "73184f664c7d30e2c896dfe4c5df6a3f97455a84ffb34ed507ec8e45938c8a54"
+  },
+  "device": {
+    "kernel": "7.2.0-rc2-v30-r30",
+    "boot_unchanged": true,
+    "userspace_files_installed": 2,
+    "ring_volume_percent": 100,
+    "speaker_control": {
+      "value": 8,
+      "minimum": 0,
+      "maximum": 15,
+      "display": "53%"
+    },
+    "current_technology": "4G LTE",
+    "operator_source": "Current registered network PLMN fallback; OperatorName empty",
+    "signal_source": "ModemManager SignalQuality with explicit stale indication; last-known bars retained",
+    "landscape_columns": 120,
+    "notification_counts_preserved": true,
+    "bluetooth_off": true,
+    "ims_registered": true,
+    "sms_receiver_ready": true,
+    "pcm_devices_closed": 4,
+    "protected_hashes_unchanged": true,
+    "framebuffer_bar_inspected": true
+  },
+  "host": {
+    "linux_root_tests": 63,
+    "charge_policy_simulation": "passed",
+    "syntax_links_privacy_manifest": "passed"
+  },
+  "not_performed": [
+    "New live call or SMS",
+    "Ringtone listening at 100%",
+    "Reboot or flash",
+    "Graphical session or touch interaction",
+    "Chinese virtual keyboard/input interaction",
+    "Radio-loss/roaming/multi-modem hardware matrix"
+  ],
+  "rollback": "Root-only r38 receipt retains the original metrics file and a guarded rollback; current ringtone preference and archives are preserved.",
+  "publication": {
+    "scope": "Publish the already inspected r38 sources and bilingual documentation; host checks only",
+    "new_device_operations": false,
+    "ringtone_example_default_percent": 60,
+    "full_clean_device_deployment": false
+  }
+}
