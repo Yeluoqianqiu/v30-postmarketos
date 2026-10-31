@@ -374,5 +374,9 @@
   "runtime/support/v30-wifi.init": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
     "sha256": "78d464b2e2503d897b5ad41ac18d1be87e97870066eaeea685db6b826aa64723"
+  },
+  ".gitattributes": {
+    "origin": "preserve literal patch context during Git whitespace checks",
+    "sha256": "cc828eba2f63866093fcaa6feb105911ebf638e4be70724a3800d83d4adc8a21"
   }
 }
