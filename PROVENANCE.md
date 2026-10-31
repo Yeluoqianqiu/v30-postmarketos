@@ -6,7 +6,7 @@
 | `patches/current-kernel/` | Five submitted kernel commits. The two GCC changes derive from Dmitry Baryshkov and retain original authorship/sign-offs and the backporter's sign-off. |
 | `patches/imsd/` | V30 interoperability changes against Catcrafts imsd `2b5de7a…`, GPL-3.0-only. Their publication here does not imply upstream acceptance. |
 | `runtime/voice/ims-pdn-up.sh` and D-Bus/polkit files | Derived from Catcrafts imsd; original GPL-3.0-only and Catcrafts copyright headers are preserved. |
-| Other `runtime/`, `scripts/`, `tests/` and repository documentation | Local integration tools and publication adaptations, GPL-3.0-only; references are listed in the acknowledgements. Current prose and CLI localization changes have host validation only. |
+| Other `runtime/`, `scripts/`, `tests/` and repository documentation | Local integration tools and publication adaptations, GPL-3.0-only; references are listed in the acknowledgements. Initial publication adaptations had host checks; selected r37 device changes and their limits are documented in [incoming alerts](docs/incoming-alerts.md). |
 | Console font | No bitmap is bundled. The operator explicitly captures the device's original console glyphs before scaling them. The original font's license continues to apply. |
 
 The root LICENSE and LICENSES/GPL-3.0-only.txt contain GPLv3. LICENSES/GPL-2.0-only.txt is the GPLv2 text supplied by Linux. The root license does not relicense third-party code.

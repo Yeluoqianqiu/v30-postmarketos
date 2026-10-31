@@ -4,13 +4,33 @@
 
 Unofficial, experimental postmarketOS integration and reconstruction notes for the LG V30 US998, using a landscape TTY interface.
 
-This project builds on **postmarketOS, Linux and ShapeShifter499's V30 mainline port**. The IMS protocol and media implementation come from **Catcrafts imsd**. Our additions cover component integration, boot ordering, per-call audio ownership and cleanup, persistent SMS, selected interoperability fixes, and scoped validation. See [acknowledgements](ACKNOWLEDGEMENTS.md) and [provenance](PROVENANCE.md) for upstream work and licensing.
+This project builds on **postmarketOS, Linux and ShapeShifter499's V30 mainline port**. The IMS protocol and media implementation come from **Catcrafts imsd**. Our additions cover component integration, boot ordering, per-call audio ownership and cleanup, persistent SMS, incoming alerts and ringtone volume, call history and persistent notifications, selected interoperability fixes, and scoped validation. See [acknowledgements](ACKNOWLEDGEMENTS.md) and [provenance](PROVENANCE.md) for upstream work and licensing.
 
-**Validation applies to specific versions and tests.** Historical r35/r36 results came from one US998 on China Unicom. The published reconstruction tools and subsequent packaging, path and language adaptations have host validation only. The complete published tree has not undergone a fresh end-to-end deployment on a clean device. The newer kernel candidates have not been booted on the device. Ready for review describes the PR stage, not upstream acceptance or device qualification.
+**Validation applies to specific versions and tests.** Historical r35/r36 results came from one US998 on China Unicom. Host reconstruction/packaging checks are distinct from device observations; selected r37 changes and later revisions are scoped below. The complete published tree has not undergone a fresh end-to-end deployment on a clean device. The newer kernel candidates have not been booted on the device. Ready for review describes the PR stage, not upstream acceptance or device qualification.
 
 See the [integration contribution map](docs/contributions.md) for our completed work and its upstream foundations, and the [open TODO / roadmap](TODO.md) for server reliability, ringing/caller ID, SMS improvements and remaining qualification work. Roadmap items include acceptance criteria and remain open until supported by evidence.
 
 The Chinese README is a localized overview; the remaining project documentation and CLI messages are currently in English.
+
+## Incoming calls and notifications
+
+r37 adds these features to the landscape TTY:
+
+- Audible ringing, automatic display wake and caller ID; missing or unsafe numbers display as `Unknown/withheld`, and the current-call row clears when the call ends.
+- Configurable ringtone volume from 0 to 100%, defaulting to 60%, shown as `RING 60%`; zero mutes ringing while display wake/caller ID remain available.
+- Persistent local call history distinguishing answered, missed, rejected and unknown outcomes when evidence is incomplete.
+- A persistent `MISSED n   SMS n` row that remains until the corresponding marks are explicitly handled, independently of the current-call row's expiry.
+
+```sh
+sudo v30-phone ring-volume
+sudo v30-phone ring-volume 60
+sudo v30-phone history --missed
+sudo v30-phone history --missed --mark-read
+sudo v30-sms list --unread
+sudo v30-sms read ID
+```
+
+Listing calls alone leaves notification marks intact. `--mark-read` clears only the displayed records' marks and retains history. Reading an SMS clears its local unread mark without replying. The percentage controls the next call's bounded ringtone amplitude, not in-call gain or measured loudness. Install the alert modules, media wrapper, status bar, commands and configuration together; see [incoming alerts, volume, history and notifications](docs/incoming-alerts.md). The default profile retains login authentication and Bluetooth off, with no automatic answer or dial.
 
 ## Validation summary
 
@@ -21,6 +41,7 @@ Historical observations summarized as of 2026-10-31 (Asia/Shanghai), including e
 | TTY interface | Landscape text console, larger glyphs, tmux status bar and normal login authentication | Published font-path/staging changes are host-only; long-term interaction and other variants remain unqualified |
 | Wi-Fi and cellular data | Startup integration and DNS/HTTPS checks bound to the cellular interface | Long-term connectivity and other carriers remain unqualified |
 | IMS voice | One earlier outgoing call; incoming calls of about 60 seconds in RAM and after normal default boot, with human confirmation of clear two-way speech; mixer/PCM cleanup checked | Published-source redeployment, long calls, hold/transfer, full media renegotiation and emergency calling remain unqualified |
+| Incoming alerts | r37 ringing, wake/caller display and cancellation cleanup confirmed by the operator; a later call of about 60.37 seconds had clear two-way speech; persistent missed-call/SMS counters checked in the device framebuffer | [Volume, history and notifications](docs/incoming-alerts.md) separate revisions: later ADC-gain preservation has a local playback cleanup check; nonzero SMS/read-clear uses isolated data, with no further speech or reboot qualification |
 | SMS | One short Chinese message sent and confirmed by the recipient, one received, and archive persistence without duplicate submission after one normal reboot | Real multipart SMS, long-term storage and disk-full recovery remain unqualified |
 | Charge limiting | Earlier hardware checks exercised charge inhibition while retaining USB input power | The 75/80% hysteresis and temperature/sensor decisions were simulated in logic tests; actual temperature-fault handling and a complete physical charge cycle were not validated |
 | Bluetooth policy | Bluetooth remained off in the tested local profile | This is an opt-in policy; the newly packaged final-off service has host checks only |
@@ -31,6 +52,7 @@ The charge-limit policy retains existing hardware safeguards; this project does 
 
 - **Historical r35/r36 reconstruction inputs:** `baseline/kernel/`, `runtime/` and `patches/imsd/`, with pins in [sources.lock.json](sources.lock.json). The old kernel base is `1b42626…`, with local release `7.2.0-rc2-v30-r30`, microphone MCLK routes and the r35/r36 userspace. Current published adaptations do not inherit the historical device pass.
 - **Newer upstream candidates:** `patches/current-kernel/`, corresponding to [kernel PR #12](https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/12), based on `dc9c669…`. Four affected objects compiled, but no complete kernel image was built or booted. [Harness PR #11](https://github.com/ShapeShifter499/lg-v30-port/pull/11) publishes SMS tooling and the version-gated voice reference. Both PRs are Ready for review as of 2026-10-31; neither has been merged.
+- **Selected r37 userspace additions:** incoming alerts, configurable ringtone volume, call history and persistent notification counters in `runtime/`. Their [device and host evidence](docs/incoming-alerts.md) retains the old-kernel gates and does not establish a fresh image or reboot pass.
 
 The historical snapshot retains diagnostic parameters and compatibility interfaces needed to explain that older stack. Keep it separate from the cleaned upstream series. The kernel and hardware gates in `runtime/voice` remain in place.
 

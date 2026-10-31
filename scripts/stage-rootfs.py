@@ -15,10 +15,11 @@ def install(destination, imsd_build=None):
         target_path=destination/target.lstrip('/');target_path.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(src,target_path);target_path.chmod(mode)
     v=ROOT/'runtime/voice';s=ROOT/'runtime/support';sms=ROOT/'runtime/sms'
-    for name in ['mobile_common.py','ims_supervisor.py','call_media.py','audio_session.py','media_helpers.py','link.py','physical.conf','gvariant_json.py','ims-pdn-up.sh']:
-        add(v/name,'/opt/v30-mobile/libexec/'+name,0o755 if name in ['ims_supervisor.py','call_media.py','ims-pdn-up.sh'] else 0o644)
-    for name in ['v30-ipa','v30-cellular','v30-ims']:add(v/name,'/etc/init.d/'+name)
+    for name in ['mobile_common.py','ims_supervisor.py','call_media.py','audio_session.py','media_helpers.py','link.py','physical.conf','gvariant_json.py','ims-pdn-up.sh','alert_audio.py','alert_view.py','incoming_alerts.py','call_history.py']:
+        add(v/name,'/opt/v30-mobile/libexec/'+name,0o755 if name in ['ims_supervisor.py','call_media.py','ims-pdn-up.sh','incoming_alerts.py'] else 0o644)
+    for name in ['v30-ipa','v30-cellular','v30-ims','v30-incoming']:add(v/name,'/etc/init.d/'+name)
     add(v/'v30-phone','/usr/local/sbin/v30-phone')
+    add(ROOT/'examples/v30-incoming.json','/etc/v30-incoming.json',0o600)
     add(v/'net.catcrafts.IMS1.conf','/usr/share/dbus-1/system.d/net.catcrafts.IMS1.conf',0o644)
     add(v/'net.catcrafts.IMS1.policy','/usr/share/polkit-1/actions/net.catcrafts.IMS1.policy',0o644)
     for name in ['sms_core.py','sms_bus.py','smsd.py']:add(sms/name,'/opt/v30-sms/'+name,0o755 if name=='smsd.py' else 0o644)

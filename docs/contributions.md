@@ -39,6 +39,15 @@ Sources: [audio session](../runtime/voice/audio_session.py), [call media lifecyc
 
 Sources: [SMS implementation and tests](../runtime/sms/). The archive is `/var/lib/v30-sms/messages.sqlite`, with SQLite WAL/SHM files in the same directory when in use. The directory is mode 0700 and the database is mode 0600. Message bodies and numbers are stored as unencrypted database text, not one text file per message. `/run/v30-sms/status.json` contains transient status/counts, not the archive. One ordinary reboot preserved the tested messages without duplicate submission; automatic off-device backup is still open work.
 
+## Incoming notifications, volume and history
+
+- Added a read-only imsd observer with startup and unique-owner reconciliation, sanitized TTY caller labels and one display wake per incoming call.
+- Added a bounded playback-only ringtone and call-priority reservation so speaker playback/mixers are released before call media starts. A private mixer journal supports recovery after worker failure.
+- Added a configured ringtone level, status-bar volume display, private SQLite call history and persistent missed-call/unread-SMS counters. Explicit call-history acknowledgement clears selected marks without deleting records; SMS read state comes from the existing archive.
+- Added lifecycle/lock/label/tone regressions and an actual Gio signal/snapshot bench on a private D-Bus/network namespace. No automatic call-control operation was added.
+
+This [userspace addition](incoming-alerts.md) has scoped operator-confirmed ringing/display and a roughly 60-second voice call. Later ADC-gain preservation passed a playback-only device check; the final notification row was checked in the physical framebuffer. These observations do not establish a fresh full-tree deployment, a reboot pass or a long-term call matrix.
+
 ## Power and landscape console
 
 - Fixed fuel-gauge charger-status/current reporting and exposed charge inhibition while retaining USB input power. Added a userspace charge-limit policy with 75% resume / 80% inhibition thresholds and conservative sensor/temperature decisions.
@@ -58,4 +67,4 @@ Sources: [support tools](../runtime/support/), [kernel candidates](../patches/cu
 
 Historical r35/r36 testing used the older `7.2.0-rc2-v30-r30` kernel stack on one US998 with China Unicom. It covered an earlier outgoing call, incoming calls of about 60 seconds in RAM and after default boot, short Chinese SMS in both directions, archive persistence after one ordinary reboot, data checks, landscape TTY and Bluetooth off.
 
-The complete published source tree has not been freshly deployed end to end on a clean device. Publication-specific packaging, paths and English adaptations have host checks only. The newer kernel series has four affected objects compiled, with no full image build or device boot. Final-version 24/72-hour server stability, local audible ringing, automatic TTY caller display and persistent call history are open work, tracked in [TODO](../TODO.md).
+The complete published source tree has not been freshly deployed end to end on a clean device. Publication-specific adaptations do not inherit historical passes; the selected r37 device changes and their remaining gaps are documented separately. The newer kernel series has four affected objects compiled, with no full image build or device boot. Final-version 24/72-hour stability and broader telephony/storage qualification remain open in [TODO](../TODO.md).

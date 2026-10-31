@@ -7,6 +7,7 @@ from audio_session import CallAudioSession
 from media_helpers import forward_media
 from mobile_common import start_ticks
 from link import connect_media
+from alert_audio import media_audio_lock
 
 BASE = Path('/opt/v30-mobile')
 ROOT = Path('/run/v30-call-audio')
@@ -102,10 +103,12 @@ def main():
     while not OWNER.exists() and time.monotonic() < end: time.sleep(.02)
     owner = read_owner()
     args = media_arguments(sys.argv[1:], owner)
-    lock = Path('/run/v30-call-audio.lock').open('a')
-    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    prepare_audio_root()
-    return run_audio(owner, args)
+    # Reserve call priority first. A ringtone notices it, stops playback and
+    # restores its mixers before this lock allows call audio to start.
+    with media_audio_lock():
+        read_owner()
+        prepare_audio_root()
+        return run_audio(owner, args)
 
 
 if __name__ == '__main__':

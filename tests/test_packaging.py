@@ -26,6 +26,11 @@ class PackagingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             dest=Path(d)/'root';files=stage.install(dest)
             self.assertIn('/etc/init.d/v30-sms',files);self.assertIn('/etc/init.d/v30-ims',files)
+            self.assertIn('/etc/init.d/v30-incoming',files)
+            self.assertIn('/opt/v30-mobile/libexec/alert_view.py',files)
+            self.assertIn('/opt/v30-mobile/libexec/call_history.py',files)
+            self.assertEqual((dest/'etc/v30-incoming.json').stat().st_mode&0o777,0o600)
+            self.assertEqual((dest/'opt/v30-mobile/libexec/incoming_alerts.py').stat().st_mode&0o777,0o755)
             self.assertFalse((dest/'etc/runlevels').exists());self.assertFalse((dest/'etc/inittab').exists());self.assertFalse((dest/'opt/v30-mobile/bin/imsd').exists())
             self.assertEqual((dest/'usr/local/sbin/v30-phone').stat().st_mode&0o777,0o755)
             with self.assertRaises(ValueError):stage.install(dest)

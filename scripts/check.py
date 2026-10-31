@@ -32,7 +32,8 @@ if manifest.exists():
 if fail:raise SystemExit('\n'.join(fail))
 for args in [
  [sys.executable,'-m','unittest','discover','-s','runtime/sms','-p','test_sms.py','-v'],
- [sys.executable,'-m','unittest','discover','-s','runtime/voice','-p','test_integration.py','-v'],
+ [sys.executable,'-m','unittest','discover','-s','runtime/voice','-p','test_*.py','-v'],
  [sys.executable,'-m','unittest','discover','-s','tests','-p','test_packaging.py','-v'],
+ [sys.executable,'-m','unittest','discover','-s','tests','-p','test_notifications.py','-v'],
  [sys.executable,'tests/test_charge_policy.py']]:subprocess.run(args,cwd=ROOT,check=True)
 print('PASS: syntax, links, private-path/binary scan, manifest and host tests')

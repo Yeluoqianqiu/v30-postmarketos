@@ -19,10 +19,12 @@ Registration, a local active signal or a successful socket write is not proof of
 
 ## Host-only validation
 
-Publication, localization and review-status updates have not connected to or modified the phone. They have not initiated calls, SMS, reboots or partition writes.
+The initial publication, localization and review-status work did not operate the phone. The later selected r37 device work is recorded separately below; it does not turn host reconstruction checks into a full-device pass.
 
 - SMS logic: 23 unit cases.
-- Voice integration: six unit cases; Linux root covers private-path ownership validation. The root-specific case is skipped when run without root.
+- Voice, alerts and history: 30 unit cases; Linux root covers private-path ownership validation. The root-specific case is skipped when run without root.
+- Notification/archive integration: one isolated case uses the real SMS store and verifies counts persist until explicit read without deleting the message.
+- Incoming observer: actual Gio snapshots/signals on a private D-Bus/network namespace cover owner replacement, spoof-sender rejection, cancellation/answer and persisted call outcomes, using synthetic calls without audio or modem access.
 - Synthetic ModemManager: actual Gio calls on a private D-Bus and network namespace. Checks cover partial-to-complete reception, persistence over watcher restart, no duplicate submission for a reused request ID, and literal Unicode/quote handling. No real modem or SMS is used.
 - Charge policy: simulated 75/80% hysteresis, restart-state retention, warm/cold recovery, invalid sensors and charger-health decisions. These are logic checks, not physical thermal-safety tests.
 - Packaging helpers: three unit cases cover preservation of the owner's ramdisk/unrelated boot header, rejection of truncated/unsupported input, and staging without overwriting an existing tree or enabling services.
@@ -52,3 +54,9 @@ Before installation, save original files, runlevels, NetworkManager connections 
 - The SMS SQLite archive is user data. Uninstalling the receiver does not imply deleting the archive. Stop it before a consistent database/WAL/checkpoint backup; do not automatically delete original modem messages.
 - Restore console glyphs from the same device's captured original font and restore its tty1 line/rotation without interrupting an interactive login.
 - Do not reuse another device's backups or historical one-shot test state. There is no automatic flash/erase/recovery procedure in this repository; stopping a service is not a reason to write an internal partition.
+
+## Additional r37 evidence
+
+Selected userspace additions have their own [incoming-alert, volume, history and notification record](incoming-alerts.md). It separates operator-confirmed ringing/display and a roughly 60-second two-way call from later playback-only ADC-gain preservation and final notification-frame checks. Nonzero SMS/read-clear notification behavior used isolated data with the actual SMS store. No r37 reboot or complete clean-device reconstruction was performed; the historical baseline results do not qualify untested combinations.
+
+The machine-readable [r37 checkpoint](../provenance/r37-validation.json) records selected source hashes and validation limits. The publication host suite contains 57 tests: 23 SMS, 30 voice/alerts/history, three packaging and one SMS-store notification integration case, plus the charge-policy simulation. The private Gio incoming-call bench is separate and uses no real modem or audio.

@@ -4,6 +4,8 @@ Roadmap updated 2026-10-31. Every unchecked item is open work, including impleme
 
 The target remains an experimental portable Linux server on the LG V30 US998, with a landscape TTY, normal login authentication and Bluetooth off. A desktop environment is not required. P0 establishes a dependable server baseline; P1 adds telephony usability and broader validation; P2 is optional. Priorities are not release dates.
 
+r37's core incoming alerts, ringtone-volume display/control, private call history and persistent missed-call/unread-SMS counters are implemented. Checked items below refer to that bounded implementation and its recorded evidence, not completion of the full device matrix or a clean-image/reboot qualification.
+
 ## P0 - Server reliability and recovery
 
 - [ ] **Qualify the final baseline for 24 hours, then 72 hours under a representative server workload.**
@@ -35,22 +37,31 @@ The target remains an experimental portable Linux server on the LG V30 US998, wi
 
 ## P1 - Incoming calls and TTY usability
 
-- [ ] **Display incoming caller ID automatically on the TTY.**
-  imsd already exposes a parsed number in call information and `v30-phone calls` can inspect current calls; a persistent TTY notification listener is still needed. Use call lifecycle events and reconcile current calls after restart. Acceptance: show a sanitized number or a clear unknown/withheld label, handle SIP/TEL identities without claiming identity verification, preserve login/input usability, and define display-wake and locked-screen privacy policy. Keep Bluetooth off and require explicit acceptance of a call.
+- [x] **Implement incoming caller display and wake on the landscape TTY.**
+  The [incoming-alert implementation](docs/incoming-alerts.md) includes startup/owner reconciliation and sanitized labels. Operator feedback and device TTY checks covered wake/caller display and removal after cancellation/acceptance. Login and Bluetooth-off policy remain intact. Carrier-specific withheld-identity behavior is still unqualified.
 
-- [ ] **Play an audible incoming ringtone.**
-  SIP `180 Ringing` is signaling; it does not establish that a local speaker ringtone exists. Add a bounded-volume ringtone worker that shares the call-audio ownership rules. Stop it and release playback PCM before call media acquires audio. Acceptance: repeated incoming calls ring; accept, reject, remote CANCEL, timeout and service failure all stop ringing, restore mixers and close PCM devices. No idle microphone capture or automatic answer/dial.
+- [x] **Implement an audible ringtone with configured volume and media handoff.**
+  The operator confirmed ringing, cancellation and the adjusted level; an accepted call lasted about 60.37 seconds with clear two-way speech. The status bar shows RING volume. A later gain-preservation change passed playback-only cleanup checks for all ten controls, without capture. Exact evidence/revision boundaries are in the [feature document](docs/incoming-alerts.md).
 
-- [ ] **Persist call history and missed-call state.**
-  Current calls are transient and removed on deletion. Add a private archive for direction, available caller identity, timestamps and outcome. Acceptance: reconcile duplicate events and daemon restarts without fabricating answered calls; define retention and export, and keep call history private.
+- [ ] **Broaden incoming-alert device qualification.**
+  Exercise local reject, timeout, observer/IMS/ModemManager failure, repeated calls, restart during a live call, carrier privacy behavior and ordinary reboot. Acceptance: stop/clear/recovery and media ownership are correct across the matrix. Host failure-path tests and a short accepted call do not complete this matrix.
+
+- [x] **Add private call history and missed-call state with a TTY query.**
+  SQLite records direction, sanitized identity, times and outcome. Real device rows include missed and answered calls; one earlier verified test was explicitly imported as test-report evidence. Incomplete terminal evidence becomes unknown. Host tests cover persistence, duplicates and owner-bound IDs. Device reboot, retention/export and full-storage recovery remain open.
+
+- [ ] **Add call-history export, retention and a verified restore path.**
+  Define an export format and explicit retention/deletion controls. Acceptance: consistent backup/restore preserves outcomes and unread marks; acknowledging displayed rows never acknowledges a concurrently arriving call; deletion is an explicit operation. Cover archive corruption, disk-full behavior and preservation on uninstall.
 
 - [ ] **Qualify longer and repeated calls.**
   Cover longer duration, successive calls, remote/local hangup, cancellation and crash cleanup. Acceptance: human-confirmed two-way speech, preserved data/TTY behavior, bounded resource use and clean mixer/PCM teardown across the matrix. Keep hold, transfer, headset switching and full SDP media renegotiation explicitly unqualified until separately implemented and tested. Emergency calling is outside the present validation claim.
 
 ## P1 - SMS usability and storage
 
-- [ ] **Add an unobtrusive unread-SMS indicator or notification.**
-  Reuse archive state rather than reading message bodies into status logs. Acceptance: unread counts survive restart, marking a message read changes only local read state, and outgoing submission is never presented as proof of recipient delivery. Define display privacy before exposing sender/content on a logged-out TTY.
+- [x] **Add persistent missed-call and unread-SMS counts to the TTY.**
+  The notification row reads archive counts without message bodies or read-state changes, and remains until marks are explicitly handled. Device framebuffer checks show missed-call/SMS counts alongside RING volume and normal login. Isolated tests use the actual SMS store to verify nonzero counts persist until explicit read, with records retained. No fresh carrier SMS was sent for this addition; new-message notification/reboot qualification remains open.
+
+- [ ] **Qualify notification updates with a fresh carrier SMS and ordinary reboot.**
+  Arrange a separately authorized incoming message. Acceptance: the unread count appears without marking the message read, remains through observer/console restarts and a device reboot, then clears after explicit reading while the archived message remains. Verify missed-call marks follow the same persistence rule and normal display blanking is respected.
 
 - [ ] **Qualify multipart and boundary-case messages.**
   Short Chinese SMS in each direction passed historically; real multipart and binary SMS have not been qualified. Test GSM7 extension characters, UCS2 boundaries, multiple equal-content messages and the supported segment limit with controlled recipients. Acceptance: exact content/order and no duplicate submission; unsupported encodings and non-BMP input produce a clear error rather than silent corruption.

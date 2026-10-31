@@ -27,15 +27,15 @@
   },
   "runtime/voice/v30-phone": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "678fc63ab2844987b7ecdbd8e1d5e9c5a1e65bbe3bbed5c2799cabb168ffad8e",
+    "sha256": "15cb40043517434d92aac330d9eacf5b1b7c7aa80fe31831042d9d03ae9b8fac",
     "pre_localization_sha256": "94cbfc42b6c924c3f47d5115387e4d7eab8d8e972f35b6b96bd70c3a0f267694",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "runtime/voice/call_media.py": {
     "origin": "r35 source reference; upstream harness PR #11",
-    "sha256": "7f8de8ff25681f770d352404cc2d56e23b14a7386d5e21a464cd3ee6e5bb826e",
+    "sha256": "558fd0f7da8efd1a5f2b29a98ca9556a860e8e727f82a1bcc3f5e0704f6c1f79",
     "pre_localization_sha256": "21a8d209c7091d3eb3ba445e55bb76d756215eead271b244c8d9cafb85181c63",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "runtime/voice/physical.conf": {
     "origin": "r35 source reference; upstream harness PR #11",
@@ -139,9 +139,9 @@
   },
   "runtime/support/v30-console-metrics.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "a38acb5b094fef4b1ec80625f275c427b1ae3438db703d2be07a98fc365481bc",
+    "sha256": "7aa4783d5fc9f10220c967080896ed8dfa58fb379ca6a6fc4d9c0aa5ab2d2b20",
     "pre_localization_sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "runtime/support/v30-console.conf": {
     "origin": "local source; published as board/carrier reference",
@@ -295,15 +295,15 @@
   },
   "PROVENANCE.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "8d2399a9e6b721ea5734c7b56342716bf0b419264b70bb7fcb9e7bf9abc454be",
+    "sha256": "9210b95aad52e489aae18598926d197ff95f595a2e1f2bedd5c13fc4608be189",
     "pre_localization_sha256": "05e3b86d81c274e205e580a3bd27fa17a26f3f500897cb240d509780cff75075",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "b1a834d3ff118efca01a3d764cfd4dfa037426f202318b5cf938318faeedfc9b",
+    "sha256": "da37ffa6f7f0dfdab242a6b1637bd3da624374247a0232fae759988c04c7640b",
     "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
-    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -333,7 +333,8 @@
   },
   "tests/test_packaging.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "637b011f4cdd34e5245b75612e93ed9533c68333f97f0b8f7952f294932781a1"
+    "sha256": "b4d0ff4811679362337573422c9fa0e029986b188b7917af1c0e5ff4acb856c3",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "docs/upstream.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -343,21 +344,21 @@
   },
   "docs/architecture.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "72cf91b4bf51f532ae8cbafb143b572520a5622a4a583f1daab26ab50055b5a7",
+    "sha256": "2e2aab375863ad374bc447b3c735e5fa8844a6c15da6f24eec343d8d7fdba82e",
     "pre_localization_sha256": "210cea73a66ba5d34844e1f076f77df2a7d97827efbbd99ba29ae1c61c20dcad",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "docs/validation.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "8847698955d9b8fad71f027144ddbf63f8d02dd0348b31e4f254aca01b0e398e",
+    "sha256": "23bb64d93c24efd15957078e9f7d339d1ebe437b2e7b602c9558469ef66821eb",
     "pre_localization_sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "docs/build-and-install.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "652e86cc11eb7c892f7d48ddcdafa4ac0c6bb1e562327d065efe8b1cfdfbc9a7",
+    "sha256": "bb81125b58976acebe7c617074bbe3a16354beb4c4bf9982456859d0c6922fd5",
     "pre_localization_sha256": "1a99e15d33c492a39b78aeaae8e122a259f840a8f9fd892af0351c6863214c1b",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "provenance/host-validation.json": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -399,13 +400,14 @@
   },
   "scripts/stage-rootfs.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "0058be69476068101af554df231d02f768dc435b2611a18c0997df285df8b581"
+    "sha256": "4aa62b6fa5a430a0313a0e0fc98eb804e6f37ebbec4edcec9921184bf58bdd1b",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "scripts/check.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "ece9f0c0c24075e632dbbf0d6219db0a91b342583404efba4750220bad6c7201",
+    "sha256": "3d2ef83ba0a274bbdfc915693e6de3eee8c05168a1211e30b993cae90d6533c7",
     "pre_localization_sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9",
-    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "scripts/prepare-sources.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -450,15 +452,77 @@
   },
   "TODO.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
-    "sha256": "ce743d9f6c3761b86bb9512089d58b033c7f9697b0ced799868f3885517e7215"
+    "sha256": "80032d9603a3d4509109422915c86dd4945bbe4630d63b0e74a72a0a0dac6e6f",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "docs/contributions.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
-    "sha256": "594a24b2b76ca79e90326754525b9e06bd3c225ac5343877217e47319b9f697c"
+    "sha256": "ce27a35c930d4eecce03a35e21e9a04ccfa30025aedb40c172a14b6e79cc188c",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
   "README.en.md": {
     "origin": "English counterpart of the project README, 2026-10-31",
-    "sha256": "0f087934e121c8a70846e3c0e12e7a8e11eb1cd783222e0d5ebad7c6023252cc",
-    "adaptation": "Bilingual README publication and narrowly scoped language-policy alignment; host-only checks, no new device action, 2026-10-31."
+    "sha256": "b50c24499fccf5a7f267eb61db61f8724263c599dcd6f39f2fc62b7a33ec54ee",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "docs/incoming-alerts.md": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "eeb2b763c23018c44a3ab460c934e1bb00eee0769e48d27f7805ce5552a1464f",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/alert_audio.py": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "c67f2a5ee15fb07bb2e10f3bda39ef740543589d07132b2e0270e64144c21f53",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/alert_view.py": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "cedd7bff66bac5465493003e279dbf72014276125fa3a5e481137c9f3c257e06",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/bench_incoming_bus.py": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "a6e028b306dcd3602396988e1cb15fa93c2c8af3451e2dacc48e2754c7ffab96",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/incoming_alerts.py": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "d76eb2657766e043e1ae78faadc0fc3b2b55786ebb074beb2556d265c61ff89f",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/test_incoming.py": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "974bf0698b04db6e59e0e20b9020e9fb28ab3e4e3419a0142c3d6929e2a26453",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/v30-incoming": {
+    "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
+    "sha256": "172b40421145c6864632e8b16c0bf4ffc9ed86128c287892eedb91af998e4c6a",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "examples/v30-incoming.json": {
+    "origin": "V30 r37 incoming alerts, volume, call history and persistent notification integration, 2026-10-31",
+    "sha256": "28f56641a3072f813d29f2ec966ce5ed92a2e6be280bd8e65b31f43b8e7f20fd",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/call_history.py": {
+    "origin": "V30 r37 incoming alerts, volume, call history and persistent notification integration, 2026-10-31",
+    "sha256": "1c2c652f064f654225f22ceff3f504019181b63b7b8efedb25b7f657bf5e5394",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "runtime/voice/test_history.py": {
+    "origin": "V30 r37 incoming alerts, volume, call history and persistent notification integration, 2026-10-31",
+    "sha256": "bfda4551b6399fd13ac89ef86087113c1bba57f404725956d525fa3856611fb2",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "tests/test_notifications.py": {
+    "origin": "V30 r37 incoming alerts, volume, call history and persistent notification integration, 2026-10-31",
+    "sha256": "beb02fd8e677577ffb64ace74919b22b39f58ca3b5a0c707998dc2cb89bfcc2c",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+  },
+  "provenance/r37-validation.json": {
+    "origin": "V30 r37 incoming alerts, volume, call history and persistent notification publication, 2026-10-31",
+    "sha256": "2b0c48bc2ed25d2bbe034415d4cfd7a85801589278f9bc2626f4e5a44bd3e5e6",
+    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   }
 }

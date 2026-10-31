@@ -1,6 +1,6 @@
 # Build, configuration and installation
 
-This reconstruction path is intended for device owners familiar with Linux and pmbootstrap. Host helpers do not connect to a phone, start device services or write boot/recovery. The published integration is experimental: packaging, font-path, Bluetooth-ordering and language adaptations have host validation only. Historical r35/r36 device results are scoped in [validation.md](validation.md).
+This reconstruction path is intended for device owners familiar with Linux and pmbootstrap. Host helpers do not connect to a phone, start device services or write boot/recovery. The published integration is experimental: initial publication adaptations had host checks, and historical r35/r36 device results are scoped in [validation.md](validation.md). Selected later r37 device changes have separate [incoming-alert evidence](incoming-alerts.md); they do not qualify the full reconstruction path.
 
 ## 1. Prepare the environment
 
@@ -92,10 +92,13 @@ After device-specific checks, the owner can explicitly enable the chosen OpenRC 
 ```text
 v30-charge-limit, v30-modem-modules, rmtfs, tqftpserv, v30-wifi,
 networkmanager, v30-audio, v30-unicom, v30-ipa, v30-cellular, v30-ims,
-v30-console-status, v30-power-key, v30-bluetooth-off, v30-sms
+v30-console-status, v30-power-key, v30-bluetooth-off, v30-sms,
+v30-incoming (optional incoming ringtone, wake and caller-ID profile)
 ```
 
 Use the actual scripts and the device's rc-update -u output to check dependencies. Avoid a second ModemManager instance. Staging does not rewrite /etc/inittab, BlueZ or private NM connections and does not enable the services. Complete the [validation checklist](validation.md) before considering a default boot change.
+
+The optional [incoming alerts](incoming-alerts.md) require the updated media wrapper, console metrics tool, `v30-phone`, all four alert/history modules and the ringtone configuration together. Host checks do not replace a fresh ringing/display/voice test on the target device.
 
 ## 7. Explicit use
 

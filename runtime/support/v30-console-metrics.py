@@ -2,6 +2,8 @@
 """Read-only console status bar; cache in /run and stop updates while blanked."""
 import datetime,fcntl,json,os,subprocess,sys,time,struct,termios
 from pathlib import Path
+sys.path.insert(0, '/opt/v30-mobile/libexec')
+from alert_view import incoming_line,ring_volume,notification_counts,notification_line
 RUN=Path('/run/v30-console')
 RUN.mkdir(mode=0o700,exist_ok=True)
 
@@ -52,6 +54,8 @@ def sample(previous):
             bt=f'ON({count})' if count is not None else 'ON'
         bt_at=now
     wifi='UP' if read('/sys/class/net/wlan0/operstate')=='up' else 'DOWN'
+    volume=ring_volume();ring=f'{volume}%' if volume else 'MUTE'
+    bt_ring=bt+'  RING '+ring
     gpu_state=read('/sys/bus/platform/devices/5000000.gpu/power/runtime_status')
     if gpu_state=='suspended':gpu='SLEEP'
     elif gpu_state=='active':
@@ -77,26 +81,31 @@ def sample(previous):
         spare=max(0,columns-len(plain));left=' '*(spare//2);right=' '*(spare-spare//2)
         return left+plain+right,left+styled+right
     if columns>=90:
-        pairs=[row([('BAT',f'{capacity}% {state} {battery_temp}'),('BT',bt),('WiFi',wifi),('',clock)]),
+        pairs=[row([('BAT',f'{capacity}% {state} {battery_temp}'),('BT',bt_ring),('WiFi',wifi),('',clock)]),
                row([('CPU',f'{cpu} {temp(("cpu","clust"))}'),('GPU',f'{gpu} {temp(("gpu-",))}'),('RAM',ram),('SD',f'{used:.1f}/{size:.0f}G')])]
     else:
         pairs=[row([('BAT',f'{capacity}% {state}'),('TEMP',battery_temp+'  '+clock)]),
                row([('CPU',f'{cpu}  {temp(("cpu","clust"))}'),('GPU',f'{gpu}  {temp(("gpu-",))}')]),
                row([('RAM',ram),('SD',f'{used:.1f}/{size:.0f}G')]),
-               row([('BT',bt),('WiFi',wifi+f'  {hours}h{minutes:02}')])]
+               row([('BT',bt_ring),('WiFi',wifi+f'  {hours}h{minutes:02}')])]
+    incoming=incoming_line('/run/v30-alerts/display.json',read('/proc/sys/kernel/random/boot_id'),now,columns)
+    counts=notification_counts();notice=notification_line(counts,columns)
+    extra=[line for line in [incoming,notice] if line is not None]
+    if len(pairs)+len(extra)>5:pairs=pairs[:2]+pairs[-1:]
+    pairs=extra+pairs
     lines=[p for p,f in pairs];formats=[f for p,f in pairs]
-    return {'sampled_at':now,'cpu':{'total':total,'idle':idle},'bluetooth':bt,'bluetooth_at':bt_at,'lines':lines,'formats':formats}
+    return {'sampled_at':now,'cpu':{'total':total,'idle':idle},'bluetooth':bt,'bluetooth_at':bt_at,'notifications':counts,'lines':lines,'formats':formats}
 
 def visible():
     return read('/sys/class/graphics/fb0/blank')=='0' and read('/run/v30-display/requested')!='off'
 
-def refresh():
+def refresh(force=False):
     with (RUN/'metrics.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         try:previous=json.loads((RUN/'metrics.json').read_text())
         except (OSError,ValueError):previous={}
         if not visible():return previous
-        if previous and time.monotonic()-previous.get('sampled_at',0)<4:return previous
+        if not force and previous and time.monotonic()-previous.get('sampled_at',0)<4:return previous
         result=sample(previous)
         pending=RUN/'metrics.tmp';pending.write_text(json.dumps(result));pending.replace(RUN/'metrics.json')
         if (RUN/'tmux.sock').exists():
@@ -115,7 +124,7 @@ if __name__=='__main__':
     daemon='--daemon' in sys.argv
     while True:
         try:
-            result=refresh()
+            result=refresh(force='--force' in sys.argv)
             if not daemon:print(json.dumps(result,ensure_ascii=False))
         except (OSError,ValueError,KeyError,IndexError,subprocess.TimeoutExpired) as error:
             print('status refresh: '+str(error),file=sys.stderr,flush=True)

@@ -1,0 +1,57 @@
+{
+  "checkpoint": "r37-publication",
+  "date": "2026-10-31",
+  "timezone": "Asia/Shanghai",
+  "target": {
+    "device_variant": "LG V30 US998",
+    "carrier": "China Unicom",
+    "kernel": "7.2.0-rc2-v30-r30"
+  },
+  "source_sha256": {
+    "runtime/voice/alert_audio.py": "c67f2a5ee15fb07bb2e10f3bda39ef740543589d07132b2e0270e64144c21f53",
+    "runtime/voice/alert_view.py": "cedd7bff66bac5465493003e279dbf72014276125fa3a5e481137c9f3c257e06",
+    "runtime/voice/incoming_alerts.py": "d76eb2657766e043e1ae78faadc0fc3b2b55786ebb074beb2556d265c61ff89f",
+    "runtime/voice/call_history.py": "1c2c652f064f654225f22ceff3f504019181b63b7b8efedb25b7f657bf5e5394",
+    "runtime/voice/v30-incoming": "172b40421145c6864632e8b16c0bf4ffc9ed86128c287892eedb91af998e4c6a",
+    "runtime/voice/call_media.py": "558fd0f7da8efd1a5f2b29a98ca9556a860e8e727f82a1bcc3f5e0704f6c1f79",
+    "runtime/support/v30-console-metrics.py": "7aa4783d5fc9f10220c967080896ed8dfa58fb379ca6a6fc4d9c0aa5ab2d2b20",
+    "runtime/voice/v30-phone": "15cb40043517434d92aac330d9eacf5b1b7c7aa80fe31831042d9d03ae9b8fac",
+    "examples/v30-incoming.json": "28f56641a3072f813d29f2ec966ce5ed92a2e6be280bd8e65b31f43b8e7f20fd"
+  },
+  "host_checks": {
+    "linux_root_unit_tests": 57,
+    "private_gio_bus_and_network_namespace": true,
+    "synthetic_calls_and_sms_only": true,
+    "package_staging_does_not_enable_services": true
+  },
+  "device_observations": {
+    "operator_confirmed_ring_wake_caller_display_and_cancel_cleanup": true,
+    "operator_confirmed_ringtone_volume_display_and_two_way_speech": true,
+    "accepted_call_seconds": 60.372,
+    "media_cleanup": {
+      "controls_restored": 10,
+      "pcm_closed": 4
+    },
+    "notification_row_checked_in_framebuffer": true,
+    "final_playback_only_check": {
+      "controls_restored": 10,
+      "capture_opened": false,
+      "aplay_exit": 0
+    }
+  },
+  "revision_boundaries": [
+    "The accepted speech call preceded the final ADC-gain preservation and persistent-counter revisions.",
+    "Those final changes have playback/idle/host checks, without a further speech call or reboot.",
+    "The speech test controller reported a pre-ringing ADC baseline mismatch; the media lifecycle completed cleanup, and later ADC preservation passed a separate playback-only check.",
+    "Nonzero SMS notification and explicit-read clearing used the actual SMS store with isolated synthetic data, without a fresh carrier SMS.",
+    "A failed playback-sampling gate and its retry records are retained privately; production code has no automatic Accept or Dial."
+  ],
+  "not_qualified": [
+    "ordinary reboot of r37",
+    "full clean-device reconstruction",
+    "long-term and repeated-call/fault matrix",
+    "other carriers or device variants",
+    "newer kernel track"
+  ],
+  "evidence_policy": "Sanitized summary of private observations and host checks; no raw subscriber state, call logs, database, audio or device identifier is published."
+}

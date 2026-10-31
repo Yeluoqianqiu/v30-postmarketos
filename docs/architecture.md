@@ -27,6 +27,8 @@ Data and IMS use separate connections. NetworkManager manages data. The IMS scri
 
 The reference uses MultiMedia1 capture and MultiMedia2 speaker playback. Hold, transfer, route switching and complete SDP media renegotiation are unqualified. The old-kernel gates, debug-ABI checks and dedicated v30/UID10000 audio user are part of that version-specific reference. Removing assertions would not establish compatibility with a different kernel.
 
+The optional [incoming-alert service](incoming-alerts.md) observes imsd through read-only D-Bus methods/signals. It wakes the display, adds a transient caller row and maintains a private SQLite call history. A configured ringtone level and persistent missed-call/unread-SMS counters appear in the TTY status area. Its playback-only ringtone yields the shared audio lock to a call-media priority reservation. Scoped device observations and later playback/notification changes are separated in the feature document.
+
 ## SMS
 
 `runtime/sms/sms_bus.py` adapts Gio system-bus calls and binds object paths to a bus owner and boot. `smsd.py` archives complete received messages and follows Messaging.Messages to inventory startup messages. `sms_core.py` stores a private SQLite archive, local read state and durable send intent.

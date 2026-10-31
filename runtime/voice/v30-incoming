@@ -1,0 +1,19 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="V30 incoming ringtone, display wake and TTY caller ID"
+supervisor=supervise-daemon
+command=/opt/v30-mobile/libexec/incoming_alerts.py
+respawn_delay=5
+respawn_max=5
+respawn_period=120
+retry="TERM/12/KILL/3"
+depend() {
+    need localmount dbus v30-audio
+    after v30-ims v30-console-status v30-power-key
+}
+start_pre() {
+    [ "$(uname -r)" = "7.2.0-rc2-v30-r30" ] || return 1
+    checkpath --directory --mode 0700 --owner root:root /run/v30-alerts
+    command -v aplay >/dev/null || return 1
+    command -v amixer >/dev/null || return 1
+}
