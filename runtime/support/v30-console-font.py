@@ -10,6 +10,9 @@ original=bytearray(base64.b64decode(source['bitmap']))
 # Slot zero maps the nondisplayable NUL; draw U+2103 while preserving the C baseline.
 assert source['width']==8 and source['height']==16 and source['charcount']==256
 original[:32]=bytes(32)
+glyphs=json.loads(Path('/opt/v30-mobile/libexec/console-glyphs.json').read_text())
+native={int(slot):base64.b64decode(bitmap) for slot,bitmap in glyphs['glyphs'].items()}
+for slot in native:original[slot*32:slot*32+32]=bytes(32)
 fd=os.open('/dev/tty1',os.O_RDWR)
 rotation=Path('/sys/class/graphics/fbcon/rotate')
 # Set the font before rotating to avoid retaining stale rotated glyph caches.
@@ -56,6 +59,12 @@ for scale in [3,2]:
     for y,bits in enumerate(ring):
         for x in range(7):
             if bits&(1<<(6-x)):put(0,x,2*scale+y)
+    # Native 24x48 cells: preserve fine strokes instead of scaling 8x16 icons.
+    for slot, bitmap in native.items():
+        for y in range(height):
+            for x in range(width):
+                sx=x*24//width;sy=y*48//height
+                put(slot,x,y,bool(bitmap[sy*3+sx//8] & (0x80>>(sx%8))))
     buf=ctypes.create_string_buffer(bytes(data))
     obj=Font(4 if height>32 else 0,0,width,height,source['charcount'],ctypes.cast(buf,ctypes.c_void_p))
     code=lib.ioctl(fd,0x4B72,ctypes.byref(obj))
@@ -67,10 +76,12 @@ class Pair(ctypes.Structure):
     _fields_=[('unicode',ctypes.c_ushort),('fontpos',ctypes.c_ushort)]
 class Map(ctypes.Structure):
     _fields_=[('entry_ct',ctypes.c_ushort),('entries',ctypes.POINTER(Pair))]
-pairs=(Pair*1)(Pair(0x2103,0));mapping=Map(1,pairs)
+entries=[Pair(0x2103,0)]+[Pair(0xe000+slot,slot) for slot in native]
+pairs=(Pair*len(entries))(*entries);mapping=Map(len(entries),pairs)
 if lib.ioctl(fd,0x4b67,ctypes.byref(mapping))<0:
     raise OSError(ctypes.get_errno(),'Cannot map Celsius glyph')
 os.write(fd,b'\x1b%G')
 rotation.write_text('1\n')
 os.close(fd)
-print(json.dumps({'attempts':results,'rotation':rotation.read_text().strip()}))
+Path('/run/v30-console/icons-v2').touch(mode=0o600)
+print(json.dumps({'attempts':results,'rotation':rotation.read_text().strip(),'icons':2}))

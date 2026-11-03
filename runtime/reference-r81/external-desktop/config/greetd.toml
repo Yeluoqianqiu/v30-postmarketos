@@ -1,0 +1,15 @@
+[terminal]
+vt = 8
+switch = true
+
+[general]
+source_profile = false
+runfile = "/run/v30-desktop-r72/greetd-run"
+
+[initial_session]
+command = "/opt/v30-desktop-r72/weston-session.sh"
+user = "v30"
+
+[default_session]
+command = "sh -c 'touch /run/v30-desktop-r72/user/session-ended; exec sleep 86400'"
+user = "v30"

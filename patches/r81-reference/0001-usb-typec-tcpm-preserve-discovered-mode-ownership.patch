@@ -1,0 +1,53 @@
+Subject: [PATCH] usb: typec: tcpm: retain ownership of discovered modes
+
+Discovery completion can revisit partner-mode registration. Preserve an
+already registered slot instead of overwriting its device reference, so
+detach can unregister the original instance and deliver DP hot-unplug.
+
+Do not register DP while the port is a USB device: the DP driver requires
+the host data role, and the existing data-role swap path rediscoveries can
+register it afterward. Unregister the actual owned arrays even when
+identity discovery has reset the mode counters.
+
+---
+diff --git a/drivers/usb/typec/tcpm/tcpm.c b/drivers/usb/typec/tcpm/tcpm.c
+--- a/drivers/usb/typec/tcpm/tcpm.c
++++ b/drivers/usb/typec/tcpm/tcpm.c
+@@ -32,6 +32,7 @@
+ #include <linux/usb/role.h>
+ #include <linux/usb/tcpm.h>
+ #include <linux/usb/typec_altmode.h>
++#include <linux/usb/typec_dp.h>
+ 
+ #include <uapi/linux/sched/types.h>
+ 
+@@ -2030,6 +2031,15 @@
+ 		return;
+ 
+ 	for (i = 0; i < modep->altmodes; i++) {
++		/* SOP and cable discovery can both complete this registration. */
++		if (port->partner_altmode[i])
++			continue;
++
++		/* DP entry is only valid after a data-role swap to host. */
++		if (modep->altmode_desc[i].svid == USB_TYPEC_DP_SID &&
++		    port->data_role != TYPEC_HOST)
++			continue;
++
+ 		altmode = typec_partner_register_altmode(port->partner,
+ 						&modep->altmode_desc[i]);
+ 		if (IS_ERR(altmode)) {
+@@ -4891,11 +4901,11 @@
+ 	struct pd_mode_data *modep_prime = &port->mode_data_prime;
+ 	int i;
+ 
+-	for (i = 0; i < modep->altmodes; i++) {
++	for (i = 0; i < ARRAY_SIZE(port->partner_altmode); i++) {
+ 		typec_unregister_altmode(port->partner_altmode[i]);
+ 		port->partner_altmode[i] = NULL;
+ 	}
+-	for (i = 0; i < modep_prime->altmodes; i++) {
++	for (i = 0; i < ARRAY_SIZE(port->plug_prime_altmode); i++) {
+ 		typec_unregister_altmode(port->plug_prime_altmode[i]);
+ 		port->plug_prime_altmode[i] = NULL;
+ 	}

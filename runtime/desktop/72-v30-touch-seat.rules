@@ -1,0 +1,4 @@
+# Grant only stmfts touch to the existing graphics group, not every input device.
+# Weston must never remap the phone touchscreen to the external monitor. With
+# DSI disabled it has no enabled matching output and does not dispatch touch.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="stmfts", GROUP="video", MODE="0660", TAG+="seat", TAG+="uaccess", ENV{WL_OUTPUT}="DSI-1"

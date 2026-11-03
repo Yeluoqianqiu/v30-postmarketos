@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-01",
+  "default_kernel": "7.2.0-rc2-v30-r30",
+  "lightweight_keyboard": {
+    "operator_clicks": "Much better, slight delay remains",
+    "operator_strips": "More frequent near touches",
+    "qualified": false,
+    "separate_chinese_terminal_confirmation": false
+  },
+  "full_redraw": {
+    "operator_strips": "At page top and near touches",
+    "qualified": false
+  },
+  "bare_drm": {
+    "signature_verified": true,
+    "test_seconds": 20.937,
+    "prefilled_buffers": 2,
+    "ongoing_cpu_drawing": false,
+    "gtk_xorg_cursor_involved": false,
+    "pageflip_completion_hz": {
+      "min": 59.54,
+      "median": 59.63,
+      "max": 59.7,
+      "samples": 19,
+      "meaning": "Completion-event rate, not visible-frame correctness"
+    },
+    "inactive": true,
+    "exit_status": 0,
+    "no_reboot_or_flash": true
+  },
+  "bare_drm_operator_result": {
+    "alternating_patterns": true,
+    "horizontal_artifacts": true,
+    "automatic_landscape_tty_return": true
+  },
+  "post_health": {
+    "ims_registered": true,
+    "healthy_service_checks": 13,
+    "pcm_closed": 4,
+    "bluetooth_off": true,
+    "tty8_restored": true,
+    "protected_files_unchanged": true
+  },
+  "scr1_source_comparison": {
+    "scope": "720x16, RGB, 8bpc/8bpp, DSC1.1 SCR1 only; source calculation not hardware qualification",
+    "source_sha256": {
+      "vendor-mdss-panel.c": "0e638280c568d74c56f778c01410419a26fa04f12c1c39542669653f6e26660a",
+      "mainline-drm-dsc-helper.c": "a4d0df3f61fff2846a94f95928e2267e76f3b2c4c6cd57d2920f7b0dc7367fef"
+    },
+    "scr1_ranges_equal_drm_1_2_444": true,
+    "changed_range_indexes_zero_based": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "derived_differences": {
+      "first_line_bpg_offset": {
+        "current": 12,
+        "stock_scr1": 15
+      },
+      "initial_dec_delay": {
+        "current": 616,
+        "stock_scr1": 706
+      },
+      "nfl_bpg_offset": {
+        "current": 1639,
+        "stock_scr1": 2048
+      },
+      "scale_increment_interval": {
+        "current": 443,
+        "stock_scr1": 388
+      }
+    },
+    "hardware_fix_proven": false
+  },
+  "r46_candidate": {
+    "scope": "SW43402-only SCR1 RC ranges and stock first_line_bpg_offset=15, before dependent calculations",
+    "wire_dsc_version": "1.1 unchanged",
+    "r42_clock_patch_included": false,
+    "r40_early_flip_patch_included": false,
+    "status": "Rejected: same horizontal strips in bare DRM; GUI skipped; unchanged default restored",
+    "hardware_tested": true,
+    "flash_authorized": false,
+    "image_sha256": "e6821a611c6d985ce052aca562714590ddd47b00d9c7c912da3924c08ced4f78",
+    "image_bytes": 28049408,
+    "matching_modules": 1636,
+    "config_difference": "LOCALVERSION only",
+    "same_default_cmdline_and_dtb": true,
+    "independent_image_audit": true,
+    "boot_authorized": true,
+    "authorization_closed": true,
+    "one_ram_boot": true,
+    "one_pattern_test": true,
+    "gui_tested": false,
+    "physical_quality_pass": false,
+    "default_restored": true,
+    "cellular_status_restored": true,
+    "ims_registered_after_restore": true,
+    "previously_paused_services_restored": 11,
+    "archives_preserved": true,
+    "boot_recovery_unchanged": true,
+    "live_build_id_matches_audited_vmlinux": true,
+    "early_log_rolled_over": true,
+    "live_pps_readback": false,
+    "pageflip_completion_hz": {
+      "min": 59.21,
+      "median": 59.635,
+      "max": 59.7,
+      "samples": 18,
+      "meaning": "completion events; not visible-frame correctness"
+    }
+  },
+  "references": [
+    "https://lists.openwall.net/linux-kernel/2026/03/06/2018",
+    "https://github.com/LineageOS/android_kernel_lge_msm8998/blob/c022ed57679b432bff277eaca0a2366a72218925/drivers/video/fbdev/msm/mdss_panel.c",
+    "https://github.com/ShapeShifter499/lg-v30-port/blob/master/docs/d1-dsi-link-rate-fix.md"
+  ],
+  "operator_priority_decision": {
+    "date": "2026-11-01",
+    "status": "Known limitation; active strip investigation deferred",
+    "priority": "low",
+    "operator_assessment": "Transient strips slightly affect experience but do not prevent use",
+    "gui_core_dependency": false,
+    "historical_quality_results_changed": false,
+    "fixed": false,
+    "automatic_further_experiments_planned": false,
+    "default": "Authenticated landscape TTY, Bluetooth off; GUI optional"
+  }
+}

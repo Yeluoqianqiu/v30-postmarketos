@@ -1,5 +1,8 @@
 # Validation boundaries and recovery
 
+See the [r81 checkpoint](r81-progress.md) for the latest default and test scope. Older results below describe their original baselines.
+
+
 ## Historical device observations
 
 The contributor used one LG V30 US998 on China Unicom. The table combines earlier bring-up observations with local r35/r36 acceptance; the latter voice/SMS acceptance was recorded on 2026-10-31 (Asia/Shanghai). They do not qualify the latest kernel branch, other devices or every file in the subsequently published repository.

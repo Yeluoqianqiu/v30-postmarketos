@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-02",
+  "scope": "One private r52 dual-output RAM trial; bounded legacy flip gate, then at most two external GUI windows",
+  "result": "Bounded flip progress and first physical interaction/ReturnTTY passed; second-window detach was followed by unexpected reset; no default promotion",
+  "hardware_tested": true,
+  "ram_boots": 1,
+  "actual_gui_windows": 2,
+  "authorization_closed": true,
+  "remaining_authorization_reusable": false,
+  "candidate": {
+    "integration_version": "r52",
+    "reused_integration_image": "r51",
+    "image_sha256": "3238ccc3b52f50419905ee8c0c8929bc89f9e85530cc99ba3a49c511feb6e2ff",
+    "kernel_dtb_modules_reused_from": "r50",
+    "kernel_release": "7.2.0-rc2-v30-r50",
+    "matching_kernel_modules": 1636,
+    "kernel_rebuilt": false,
+    "production_r30_telephony_guards_preserved": true,
+    "gui_autostart_enabled": false,
+    "graphical_audio_enabled": false,
+    "rendering": "Weston DRM/Pixman memory shadow; rootful Xwayland -shm, Glamor disabled",
+    "external_output": "DP-1, complete fixed 1920x1080@60 modeline",
+    "internal_output": "DSI-1 mode=current, compositor background during GUI, not simultaneous TTY",
+    "xwayland_output": "-output DP-1",
+    "kiosk_output_app_id": "org.freedesktop.Xwayland",
+    "public_runtime_contains_tested_r52": false,
+    "public_runtime_status": "Rejected r51 single-output prototype; staging public runtime does not install the tested private r52 source/harness"
+  },
+  "legacy_flip_gate": {
+    "api": "legacy modetest -v pageflip",
+    "bounded_seconds": 10,
+    "completed_batches_of_60": 9,
+    "minimum_completed_page_flip_events": 540,
+    "dp_vsync_counts": [
+      994,
+      1362,
+      1637
+    ],
+    "dsi_mapping_retained": true,
+    "new_dpu_display_errors_in_gate": false,
+    "normal_exit": true,
+    "expected_visual_pattern": "Alternating color bars and a plain-color buffer",
+    "operator_confirmed_expected_alternation": true,
+    "operator_confirmed_phone_tty_normal": true,
+    "abnormal_flicker_claimed": false,
+    "qualified": "Bounded pageflip/IRQ progress only, not sustained or all-path operation"
+  },
+  "first_gui_window": {
+    "operator_confirmed_physical_picture": true,
+    "operator_confirmed_input": true,
+    "operator_confirmed_chinese_input": true,
+    "operator_confirmed_return_to_tty": true,
+    "gui_helpers_and_seatd_absent_after_exit": true,
+    "tty8_permissions_restored": true,
+    "mixers_unchanged": true,
+    "all_four_pcm_streams_closed": true,
+    "software_png_size": "1920x1080",
+    "software_png_scope": "Rendered application pixels only; physical interaction acceptance comes from operator feedback",
+    "qualified": "One bounded dual-output interaction and normal ReturnTTY cycle"
+  },
+  "second_gui_detach": {
+    "desktop_active_before_detach": true,
+    "operator_action": "Unplugged AOC and connected Mac",
+    "operator_observed_lg_logo": true,
+    "new_boot_id_and_default_kernel_verified": true,
+    "unexpected_reset": true,
+    "host_default_transition_executed": false,
+    "detach_to_tty_passed": false,
+    "clean_gui_return_claimed": false,
+    "root_cause": "Unknown",
+    "pstore_mounted": true,
+    "pstore_files": 0,
+    "ram_boot_logbook_rows": 0,
+    "crash_evidence_limit": "Empty pstore and missing RAM-boot logbook rows neither identify nor exclude panic, watchdog, power or driver causes"
+  },
+  "default_after_reset": {
+    "profile": "Unchanged r35/r30",
+    "return_mechanism": "Unexpected reset during the detach scenario, not a host-requested default-transition",
+    "full_health_passed": true,
+    "operator_confirmed_landscape_tty": true,
+    "ims_registered": true,
+    "all_11_previously_paused_services_restored": true,
+    "bluetooth_off": true,
+    "all_four_pcm_streams_closed": true,
+    "ext4_errors": 0,
+    "original_sms_records_preserved": 2,
+    "original_call_records_preserved": 4,
+    "archive_content_and_sqlite_checks_passed": true,
+    "protected_runlevel_boot_recovery_hashes_unchanged": true,
+    "broader_application_data_consistency": {
+      "read_only_quick_check_passed": [
+        "shijing live database including WAL",
+        "logbook live database including WAL"
+      ],
+      "full_application_content_comparison_performed": false
+    }
+  },
+  "default_integration_complete": false,
+  "default_flash_performed": false,
+  "new_kernel_telephony_qualified": false,
+  "call_or_sms_test_performed": false,
+  "4k_qualified": false,
+  "sustained_output_qualified": false,
+  "repeated_hotplug_qualified": false,
+  "phosh_plasma_tested_in_scope": false,
+  "publication_status": "Local documentation only; r52 source/harness remains private, no default promotion or upstream submission",
+  "remaining_work": [
+    "Diagnose the detach-associated reset with concrete evidence and fresh applicable authorization",
+    "Qualify detach/reconnect, repeated cycles, both orientations and sustained output",
+    "Qualify new-kernel IMS/voice/SMS separately while retaining production guards",
+    "Test Phosh/Plasma and resource use after external-output integration"
+  ]
+}

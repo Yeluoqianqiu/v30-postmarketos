@@ -1,0 +1,110 @@
+{
+  "date": "2026-11-01",
+  "default_kernel": "7.2.0-rc2-v30-r30",
+  "direct_kms_trial": {
+    "kernel_rebooted": false,
+    "new_packages_installed": false,
+    "production_gui_files_replaced": false,
+    "backend": "Xorg modesetting; AccelMethod none; ShadowFB true; native portrait",
+    "weston_xwayland_refresh_helper_used": false,
+    "touch_enabled": true,
+    "temporary_tty8_owner_restored": true,
+    "operator_quality_pass": false,
+    "operator_report": "Same symptoms remain",
+    "chinese_input": "Not separately confirmed",
+    "first_probe": {
+      "requested_updates": 69,
+      "painted_frames": 65,
+      "elapsed": 5.673532485999999,
+      "median_paint_interval_ms": 16.689182999982677,
+      "max_paint_interval_ms": 3180.135875000019
+    },
+    "warm_probe": {
+      "requested_updates": 133,
+      "painted_frames": 129,
+      "elapsed": 5.212123965000046,
+      "median_paint_interval_ms": 16.69705850002856,
+      "max_paint_interval_ms": 1181.2767070000518
+    },
+    "trace": {
+      "event_counts": {
+        "msm_atomic_commit_tail_start": 128,
+        "dpu_enc_kickoff": 128,
+        "dpu_enc_phys_cmd_pp_tx_done": 128,
+        "dpu_crtc_complete_flip": 128,
+        "drm_vblank_event_delivered": 128,
+        "msm_atomic_commit_tail_finish": 128,
+        "dpu_crtc_frame_event_done": 128
+      },
+      "atomic_commit_ms": {
+        "count": 128,
+        "median": 19.746999999938453,
+        "max": 25.86200000007466
+      },
+      "kickoff_to_done_ms": {
+        "median": 19.105000000024575,
+        "max": 25.291000000038366
+      }
+    },
+    "limit": "Software paint clocks and an automated trace do not measure physical FPS or establish strip absence",
+    "stopped": true,
+    "default_tty_landscape": true,
+    "bluetooth_off": true,
+    "ims_registered": true,
+    "six_core_services_healthy": true,
+    "closed_pcm_devices": 4
+  },
+  "clock_candidate": {
+    "release": "7.2.0-rc2-v30-r42",
+    "base": "Qualified r30 source and all inherited recipe patches",
+    "delta": "Remove CLOCK_NON_CONTINUOUS from SW43402 mode flags; retain LPM",
+    "r40_early_flip_patch_included": false,
+    "rationale": "Stock DV3.1 enables force-clock-lane-hs; downstream clock-on sets bit28; mainline selects the same force request when NON_CONTINUOUS is absent. This is a testable discrepancy, not a proven root cause.",
+    "stock_panel_source": "https://github.com/LineageOS/android_kernel_lge_msm8998/blob/c022ed57679b432bff277eaca0a2366a72218925/arch/arm64/boot/dts/lge/dsi-panel-sw43402-dsc-qhd-cmd-dv3_1.dtsi",
+    "stock_clock_source": "https://github.com/LineageOS/android_kernel_lge_msm8998/blob/c022ed57679b432bff277eaca0a2366a72218925/drivers/video/fbdev/msm/msm_mdss_io_8974.c",
+    "image_sha256": "cbe955afcf5f3482d8cd50069caa72af7eb13ae67ba116b4434c2359c61b2cc2",
+    "image_bytes": 28049408,
+    "full_arm64_build": true,
+    "matching_modules": 1636,
+    "same_default_cmdline_and_dtb": true,
+    "config_difference": "LOCALVERSION only",
+    "independent_image_audit": true,
+    "unchanged_initramfs_entries": 331,
+    "matched_initramfs_module_files": 18,
+    "hardware_tested": true,
+    "boot_authorized": true,
+    "flash_authorized": false,
+    "production_r30_telephony_guards_changed": false,
+    "requires": "Authorization closed; do not promote this failed candidate. Future RAM experiments need fresh on-site authorization.",
+    "authorization_closed": true,
+    "quality_pass": false,
+    "operator_result": "Black screen; startup stage not observed",
+    "fb_blank_readback": 0,
+    "backlight_readback": 255,
+    "drm_active": true,
+    "new_log_observations": [
+      "encoder disabled while waiting for transfer completion, ret=-11",
+      "stmfts error"
+    ],
+    "log_causality": "Not established; these messages alone do not prove the root cause",
+    "normal_close_by_agent": true,
+    "default_restored": true,
+    "ims_registered_after_restore": true,
+    "previously_stopped_services_restored": 11,
+    "sms_records_preserved": 2,
+    "call_records_preserved": 4,
+    "boot_and_recovery_unchanged": true,
+    "late_upstream_review": "Upstream D2 had already rejected continuous clock for blank/wake regression; this historical evidence was found after r42. Do not repeat this direction."
+  },
+  "input_followup": {
+    "scope": "Separate lightweight GTK3 dock keyboard on unchanged default r30; same direct KMS, GTK3/UIM and Openbox",
+    "onboard_used": false,
+    "new_packages": false,
+    "production_gui_replaced": false,
+    "operator_result": "Clicks much better, slight delay, strips more frequent near touch; overall quality failed",
+    "default_tty_bluetooth_policy": "Unchanged; manual session only",
+    "isolated_uim_readback": "nihao -> \u4f60\u597d in a dedicated synthetic Entry",
+    "chinese_terminal_operator_confirmation": false,
+    "clean_stop_and_tty_health": true
+  }
+}

@@ -139,9 +139,9 @@
   },
   "runtime/support/v30-console-metrics.py": {
     "origin": "local source; published as board/carrier reference",
-    "sha256": "73184f664c7d30e2c896dfe4c5df6a3f97455a84ffb34ed507ec8e45938c8a54",
+    "sha256": "90cdf351052bca26035f41f0dc39561a2e9734be4beff45f0a4d17c95d22a459",
     "pre_localization_sha256": "db965b093590f66086eefc8639cbb5aaee14264f12271c56cc850c6e61e893fe",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "runtime/support/v30-console.conf": {
     "origin": "local source; published as board/carrier reference",
@@ -177,9 +177,9 @@
   },
   "runtime/support/v30-console-font.py": {
     "origin": "local console scaling; public font-state path adaptation",
-    "sha256": "4b93f66b032d8252f6b18574ddbd8224e88f5537473f44fdc2d12bc235258c75",
+    "sha256": "eff8969abecefbccc0e1ce1eafa7be95c5e75f4a87e2ca3f2b7ad7803229ac5d",
     "pre_localization_sha256": "45709ac57d54b81a08ba6f7a7ff2f7070309efc38e20a1b71c05a97c21f24525",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "tests/test_charge_policy.py": {
     "origin": "charge-policy trajectory regression",
@@ -295,21 +295,21 @@
   },
   "PROVENANCE.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "9210b95aad52e489aae18598926d197ff95f595a2e1f2bedd5c13fc4608be189",
+    "sha256": "214b5518f35d2cdf6084d8afad1546121679c1f5a015600d7e5a546a0b4a49eb",
     "pre_localization_sha256": "05e3b86d81c274e205e580a3bd27fa17a26f3f500897cb240d509780cff75075",
-    "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "README.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "913ce56bf971df8d05318519761eaf6fade6a338a75fbec1ffdf0e9bb5b3e3d6",
+    "sha256": "3d795d167357b48863d164b6ce312c7c57baf2ba80645cff66ba1f7a1ab1031e",
     "pre_localization_sha256": "42739ecde4d2337c25c673e4472fdf0b6c7781247462a1217e7812c0a83f8a65",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "ACKNOWLEDGEMENTS.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "c3d957323dcd7a2a2711226b1a8c27824946aad1405802efc1e1b6f463b6299a",
+    "sha256": "13ee76b8cf3b8e056fe8cf36832cbd8f7b8e7c5c613dc7754b0aefe02514c430",
     "pre_localization_sha256": "35241c2f98e94c7e18e4fd9a10347bd734607a0c16e06f5dc971812fa94d70ff",
-    "adaptation": "English text or validation/review metadata update; host-only validation, no new hardware operation."
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   ".gitignore": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -333,8 +333,8 @@
   },
   "tests/test_packaging.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "be65817d35446b595d07cf4a174d9fb3704f087427d0535a100f2e7bb7a10b73",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "b99c07cb667f8636565d978f471e61b4f23b58fc9cefea2e86630159a274dacf",
+    "adaptation": "r39 compact TTY; both Wayland rendering profiles rejected for lag/artifacts; experimental X11 framebuffer candidate pending physical acceptance."
   },
   "docs/upstream.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
@@ -350,7 +350,7 @@
   },
   "docs/validation.md": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "aca9180a599ef39eb4e1d673d00119f9c8d499795eec8fcd7c19ccccad249f6d",
+    "sha256": "d83e00a251e22cf3e07f87762e272b592ee38dff01eb9f4f8c01ac7629c817c7",
     "pre_localization_sha256": "cc55ceaa0f72f36ee9e1d809cec02d5c4931452a614e23e18deda26049fab6b5",
     "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
   },
@@ -400,12 +400,12 @@
   },
   "scripts/stage-rootfs.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "ff74e26e8dac0d7911c31de275c8a26e82782b8ee21a9bf92d227cac968cdca5",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "a44ea0149e79734ae3df603b590574f5fa51b341a44f0afbec1b09f6d4b448d4",
+    "adaptation": "r39 compact TTY; both Wayland rendering profiles rejected for lag/artifacts; experimental X11 framebuffer candidate pending physical acceptance."
   },
   "scripts/check.py": {
     "origin": "standalone source/documentation preparation, 2026-10-31",
-    "sha256": "3d2ef83ba0a274bbdfc915693e6de3eee8c05168a1211e30b993cae90d6533c7",
+    "sha256": "15b731a7938a49861f9677581efb14cde930c834f10224299d571f1e7abdb4bd",
     "pre_localization_sha256": "08486634471ea128381898c8fdb7580de07126b8162b6771bcd5529f8e841cb9",
     "adaptation": "r37 publication with bilingual feature/usage overview, explicit TODO qualification gaps and scoped device/host evidence; no new hardware operation during publication."
   },
@@ -452,8 +452,8 @@
   },
   "TODO.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
-    "sha256": "812492864822a32abe247cca97f6b0d174b90cf0fefe6eaf952a5355823fc44c",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "58ab3cee708bbd0bccd8b3eab2b4ee6847c50f1bef40f117c95e2c11c2b0ef0f",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "docs/contributions.md": {
     "origin": "Project contribution map and open-work roadmap, 2026-10-31",
@@ -462,8 +462,8 @@
   },
   "README.en.md": {
     "origin": "English counterpart of the project README, 2026-10-31",
-    "sha256": "c14276e125976257911659af42e6272d763b79ed1fb4fe2a3e4ae8c452ff8896",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "1a367a892cd7fee239cae3724f7fd865f3a70ffb307d109534df39feff6beca2",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "docs/incoming-alerts.md": {
     "origin": "V30 incoming ringtone, display wake and TTY caller-ID integration, 2026-10-31",
@@ -527,22 +527,349 @@
   },
   "runtime/voice/console_status.py": {
     "origin": "Local r38 console status and input-capability documentation",
-    "sha256": "23dfcfcc06b1c34effd607d880382d09f865fcd04ba23e283436ad82cc3a372a",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "62111685fe04ea4813c56e061c18e0f4429020484abc2df31d42454845a2f2a3",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "runtime/voice/test_console_status.py": {
     "origin": "Local r38 console status and input-capability documentation",
-    "sha256": "a1946ca8d7dfe68a0e4388bc9b55c04e9487f5851d1506c6e44ac1b81966f720",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "c2b05880e167d9f69d8b51c114dae428b73f9598a32d108b870b3904b42ac2ff",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "docs/console-status.md": {
     "origin": "Local r38 console status and input-capability documentation",
-    "sha256": "f3a290f905643163d28a026b9b8cc581d48379ef3fb8889c4fab13d65d21cdfa",
-    "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+    "sha256": "3450d6886733414836aa5a28f779e2f201738284010fc995a9eda9b7c47895af",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
   },
   "provenance/r38-validation.json": {
     "origin": "Local r38 console status and input-capability documentation",
     "sha256": "f5639d939582b62ec5fbb053d858280891772c75adf2ef27be08db3730546c29",
     "adaptation": "r38 publication: separate speaker/ringtone levels, current registered network and signal; scoped device evidence, bilingual documentation and host checks. No device operation during publication."
+  },
+  "LICENSES/OFL-1.1.txt": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
+  },
+  "docs/manual-desktop.md": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "df3eab27589a7d85347149d729b58948ab58f7c3a6793b4fb06302d2ca6e4954",
+    "adaptation": "Records failed Phoc/fbdev candidates, current Weston memory-shadow diagnostics and pending physical quality acceptance; preserves default TTY/BT and telephony boundaries."
+  },
+  "provenance/r39-validation.json": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "a46ee50f765b2dbd38b120f8c9402666e367582c2a56b2ece82c26adf7f10169",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
+  },
+  "runtime/desktop/72-v30-touch-seat.rules": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "65e567da8e5f76e468d7590d2720c9eb5c310bf6c736042b326b501c9d910c42",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/apps.sh": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "444104935c4e193a909eb3f6d1550346213c3be9ad38106b319ca2d0c27639b8",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/dconf-profile": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "9462f7c7fa7da463ed60c805dd715ca3322166fc56be7997b4afff2d7c7f0350",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/foot.ini": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "bcef89171f93b6a5b9e91f9bba77569749726e790f7e6e5c95a0b2e0e3e7cdfb",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/greetd.toml": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "828b5abb58273d9b3b63d6a2ce85827e06b616914195887346b1564d35538cec",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/home.py": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "84e14fcedd408c52ac6c29cf81b81e2910964bfcaa0782e25df5e772c4d39b41",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/phoc.ini": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "d373de0ad2ce99c9cc629f4580b15ff3bcdc900b6233e46118923438108897d5",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/session.sh": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "05b085770d1490a5b3c1c009dbf33ede70d1adf6a2e7d01c5138de784239088b",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/v30-gui": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "1f4e2040f6f299fe2678fc428896a207df94ab894cccdf148325e221c476fe20",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/support/console-glyphs.json": {
+    "origin": "Original battery/signal drawings plus derived Noto Sans CJK SC bitmap subset; GPL-3.0-only / OFL-1.1 as identified in the file",
+    "sha256": "87ca8c1438294946893d70db40e2f21ae140f0423bddf416b3a4c08285bd47ce",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
+  },
+  "runtime/voice/console_icons.py": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "b38aa0d73afc87c8a4e22b1a44b9751262ad876134845c3b103513ff4b8e3b40",
+    "adaptation": "r39 native console labels and a manual graphical session; initial operator interaction accepted, GPU faults retained as failure evidence and software rendering under comparison."
+  },
+  "runtime/desktop/x11-session.sh": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "17242710371afce76f7d3da9c25acbfaf1b1bbf6dc8a93b1ea4083b376f412e0",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/x11-apps.sh": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "0087f382c416988e6f1aa0d97f0c66f0dccc5d0fa7053b667afda5e77240f1a3",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/xorg.conf": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "2384dc04d6c352973a64d2a1cdac83ebf057dfe2b2bfc23fb307d1a33406544e",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/x11-home.py": {
+    "origin": "Local r39 compact TTY and optional manual GUI integration",
+    "sha256": "1ca8f97068cf2e7b9a93d5ddf59ca24a7b2d128f8c107f94e90c17486db9322a",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/fb-refresh.py": {
+    "origin": "Local r39 XDamage-to-fbdev refresh integration for observed MSM command-mode panel staleness",
+    "sha256": "0c02895e6a7ef25a125318caa56f8f84e3f29198f44819e32edb003d86643068",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/gtk-settings.ini": {
+    "origin": "Local r39 per-session GTK configuration",
+    "sha256": "76aa5124dcbd75feffec573729b35dfd702ce8c67f8d68a20491bfba2757b2c4",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test."
+  },
+  "runtime/desktop/uim.scm": {
+    "origin": "Local r39 session-specific UIM key/default-engine configuration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "32585fe9bcc106415160a43bbbe6092eaf8e243bbc3f27c4e70b1cfa7e39fab1"
+  },
+  "runtime/desktop/weston.ini": {
+    "origin": "Local r39 manual graphical session integration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "51738a7bb691b4a59e22614c154f56c93f22ca8518772a97cea258fea2d70e3b"
+  },
+  "runtime/desktop/weston-session.sh": {
+    "origin": "Local r39 manual graphical session integration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "6be54c61d64e30576aef64e8d01ddfe7b85f63f4dd5f4bd82188d2537e11a074"
+  },
+  "runtime/desktop/weston-x11.sh": {
+    "origin": "Local r39 manual graphical session integration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "c9358336b2778690adcdc93c3935c4c771ee6baa23332c74f78ffbe32c5e1007"
+  },
+  "runtime/desktop/gtk4-settings.ini": {
+    "origin": "Local r39 manual graphical session integration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "d07d296201edb6a9c855c7dbc79eafae87980aa1606517bdb681ffda8f9507a9"
+  },
+  "docs/external-display.md": {
+    "origin": "Local r48 USB-C/PD prerequisite report and linked upstream/stock references",
+    "adaptation": "One r48 RAM PD prerequisite passed and default restored. Separate unbooted r49 DP-only candidate passed offline kernel/module/DTB/image and bounded new-binding audits; physical video, recovery and telephony remain unqualified. No new RAM approval, DCO submission or publication.",
+    "sha256": "10f4293ec35a027076847501eb361c1134159ff4cb7ab9c1b897c44c30db421e"
+  },
+  "runtime/desktop/test_gui_output.py": {
+    "origin": "Local r39 manual graphical session integration",
+    "adaptation": "Weston/Pixman memory-shadow plus software rootful Xwayland failed physical quality acceptance too; Phoc/fbdev failures retained in manual-desktop documentation. Chinese input passed the earlier native GTK3 profile and isolated current-backend readback; two separately authorized r40 RAM display diagnostics verified early-flip timing but physical retest still showed horizontal strips and latency. Direct KMS and full redraw also failed; a lightweight keyboard improved clicks but increased strips, and official immutable-buffer modetest reproduced them below GUI components. The r42 clock candidate black-screened and was rejected; r46 SCR1 parameter candidate passed audits but failed one authorized bare-DRM RAM test with unchanged strips; GUI skipped and default cellular/IMS/services restored, authorization closed. Unchanged r35 default and services restored, no partition flash or fresh call/SMS test.",
+    "sha256": "ddc0d479b65288b31ceb7c77dab32e8acdeea638c508dddb858fefa450d074c2"
+  },
+  "docs/display-investigation.md": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "2c368f91dbde5c8d3166db385dc076eda114c9f9cbdeffa1c8af26fe192254ad"
+  },
+  "docs/r81-progress.md": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "3aa97736588f83b617daba92667cf924c65554a77c6210f3c59fc28fac988252"
+  },
+  "patches/r81-reference/0001-usb-typec-tcpm-preserve-discovered-mode-ownership.patch": {
+    "origin": "Local r68 Linux TCPM ownership and data-role change",
+    "sha256": "9ff66ee894a808b2b96f1f8057dbfca42030441a5ac4121eedfea11fcfca2436"
+  },
+  "provenance/r41-r42-display-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "fa35703f30f04069d5170bef6b275b2b6fb7d69e1b332c484622b92968435bc7"
+  },
+  "provenance/r43-r46-display-investigation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "c0ed68c732f7e2e68a23ec772a6170b4850bfaca2260dcf6bb282d278c51435a"
+  },
+  "provenance/r48-r50-external-display-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "80dca74265133e61e7b5b78c907aa8d34104eb8c0263b1f00b4aebe15916dcab"
+  },
+  "provenance/r51-usb2-integration-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "1a173c0bc0a17804bf1b0d04a6a43ff77cfdaff9f02f4b36e1fcf7ca3cde2f8f"
+  },
+  "provenance/r52-dual-output-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "d5eb57698d2edfdd8714d80b06738f7dddc7ce97584158f138c4fe0ce446c8d6"
+  },
+  "provenance/r53-legacy-detach-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "4c5e15e39ae92a7c8941470b082c3e26484e3ddc0143857288846be92dd15137"
+  },
+  "provenance/r54-fbdev-hotplug-validation.json": {
+    "origin": "Public US998 integration documentation or validation helper",
+    "sha256": "a3a49b13255c45ed89a1f8e12fb6f0a7c2425569f59065b07f5b289d7189d0ba"
+  },
+  "runtime/reference-r81/README.md": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "2f6b7ed3dae27cedd8652cc96812bb406495b8d3aeafa7613c40a69eedc131c0"
+  },
+  "runtime/reference-r81/console/console-glyphs.json": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "34059ebf02f9f26bd0a3ce11157f70fe3dea22bc6301610fd23dfdc7f12397b0"
+  },
+  "runtime/reference-r81/console/console_alerts.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "ec0ea5ddf59fad0b439767a27d96d0bdc216208ab4c6b42e16dae0e244ea64c4"
+  },
+  "runtime/reference-r81/console/sms-raster.c": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "ea035e7fb2210c7a12d4e545cd29a6554d429dfdb1596da96d38b6499c6af35f"
+  },
+  "runtime/reference-r81/console/v30-console-font": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "0386b3661175ad3a53a6d48f65d9961871a06a782c01ef6de364e94c08dd7b09"
+  },
+  "runtime/reference-r81/console/v30-console-metrics": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "e6e925699dcef9e444dbf97540e1bae00106ee22ff7418cf2b73b4ae7d050865"
+  },
+  "runtime/reference-r81/external-desktop/config/73-v30-r72-touch-output.rules": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "65e567da8e5f76e468d7590d2720c9eb5c310bf6c736042b326b501c9d910c42"
+  },
+  "runtime/reference-r81/external-desktop/config/dconf-profile": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "9462f7c7fa7da463ed60c805dd715ca3322166fc56be7997b4afff2d7c7f0350"
+  },
+  "runtime/reference-r81/external-desktop/config/greetd.toml": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "32e50ee1fc7e0aec99776152217cf030f58122dd3c57511dc56bec71c06f7ecb"
+  },
+  "runtime/reference-r81/external-desktop/config/gtk-3.0/settings.ini": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "76aa5124dcbd75feffec573729b35dfd702ce8c67f8d68a20491bfba2757b2c4"
+  },
+  "runtime/reference-r81/external-desktop/config/uim.scm": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "32585fe9bcc106415160a43bbbe6092eaf8e243bbc3f27c4e70b1cfa7e39fab1"
+  },
+  "runtime/reference-r81/external-desktop/config/weston.ini": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "cc56bf5548dded75acb468afff74bc0334f65cf33aa6ce1a577472e4183f25bf"
+  },
+  "runtime/reference-r81/external-desktop/drm_modes.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "dcc6224e931f85fb62611235c62f0d3f848c158d48e8ad37d439e0f0909edeb6"
+  },
+  "runtime/reference-r81/external-desktop/mode_plan.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "25de76426b7691cd280551c5fb05550b0eff48a44bf7113926bbc98ed6e846fa"
+  },
+  "runtime/reference-r81/external-desktop/v30-gui": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "c9564ea221b610ee8449fb52b99916f47802a3a803255a8833d9b435aa5a95b2"
+  },
+  "runtime/reference-r81/external-desktop/weston-session.sh": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "461fb82519bebcb523b9fb03551d63c9ca77a07143633556080d931f7d97e30f"
+  },
+  "runtime/reference-r81/external-desktop/weston-x11.sh": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "55d61511da5a8c6d94770e068416284b76b04ed6af805152b3116f1163c2ede8"
+  },
+  "runtime/reference-r81/external-desktop/x11-apps.sh": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "882bf995cf08dd3a27981a4f561efd5052d1123cd95be2681121e0876bd9cbf0"
+  },
+  "runtime/reference-r81/external-desktop/x11-home.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "90ec44a0bed2d5b35fc2146822a0c343df3cfc0475382d15f00ca63b5eb39f0c"
+  },
+  "runtime/reference-r81/orientation/orientation.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "c7f848f757eabbe4aa5b2fcc7d851dd7982dd380f3e75a0e870db080f30a4ad9"
+  },
+  "runtime/reference-r81/orientation/panel_rotation.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "f89caaf10d6f19921c96fc8bd769c99b0255be6dad00975be572845127efbbe2"
+  },
+  "runtime/reference-r81/orientation/prepare.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "e590d6d7fd9aace7151110db3169bab6ff1027aac2fc0e256ee1e5418232d32f"
+  },
+  "runtime/reference-r81/orientation/smgr.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "54a06601b50e8e580e969c4bef00ee21c016b8758fd2a02ef6d819ae647ccaa5"
+  },
+  "runtime/reference-r81/orientation/tty_orientation.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "8552315d1490bc8bdb2949af0dd30f45cd3d7bddb7faf025b32892b7df327fcf"
+  },
+  "runtime/reference-r81/orientation/v30-console-orientation.init": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "e29bafc16115bf11de2ded91e2315471dc6215eca48b1ac998eb4695a69c5de5"
+  },
+  "runtime/reference-r81/panel/control.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "368bb72d43a5765e0c57c9fdce27cf39f45c61dfcc6eeec9c25a07d1cae4d319"
+  },
+  "runtime/reference-r81/panel/fixture.c": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "b3718b7ff86784e957f74bf2e6efb4b41044666d4b99c13214a37820d4a5fac8"
+  },
+  "runtime/reference-r81/panel/key_listener.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "90d1e8266ecf21c49ffa26a444a4bd623d1fe33bb52cfd346af0133c24022aa7"
+  },
+  "runtime/reference-r81/panel/kms.c": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "dd09717b35abb7381f9d10b2036aa6e378eeaa07fa80d6011edd42311d474e44"
+  },
+  "runtime/reference-r81/panel/kms.h": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "fb3a13913f733044629b81256037d5f262f0a008ec08919cc4a755fbe3972a65"
+  },
+  "runtime/reference-r81/panel/lv_conf.h": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "3b2209f90cb276f41dbeff5d641c485b740b3f2dfb4ac865601b97a54172aa25"
+  },
+  "runtime/reference-r81/panel/panel.c": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "530bdeab83040b35155e25fa5a59b4e51cfcd965fcb5c89bea5500f22feefec3"
+  },
+  "runtime/reference-r81/panel/panel_media.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "ff0a82ac5254e3c0f9b648c4f0b4f5510281e93601ba7b69b0c91afe9ca95acd"
+  },
+  "runtime/reference-r81/panel/pin_auth.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "0b0a6c8001023c1f8f34eb4e4ea69347279203a2a45889f7b498f2ef61ce36ea"
+  },
+  "runtime/reference-r81/panel/runner.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "bc2d03f71a6feacf443cca47fcc43d15e86ff6947dc3be1d6fb0e2d8821f7b36"
+  },
+  "runtime/reference-r81/panel/touch_profile.py": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "6a8427e4dd5db64ef9e8f1a87b7e6f672a4a78b193ec7d7c5294353713d22c36"
+  },
+  "runtime/reference-r81/panel/ui.c": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "7b3f05ad3ae941003f03b9a0832fc9a64008b9ca770bc1e657fd5b59b2559731"
+  },
+  "runtime/reference-r81/panel/ui.h": {
+    "origin": "Later US998 runtime reference; see runtime/reference-r81/README.md",
+    "sha256": "f9f6e393c1e525366924deb20d6cd5134f415fd7122d1f4b00e171cbbcb1a193"
   }
 }

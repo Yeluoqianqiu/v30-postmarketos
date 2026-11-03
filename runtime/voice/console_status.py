@@ -135,3 +135,42 @@ def format_rows(columns, items):
                       '#[fg=cyan,nobold]'+value+'#[fg=white,nobold]'+tail)
     return (' '*margin+' | '.join(plain)+' '*margin,
             ' '*margin+' #[fg=blue,nobold]| '.join(styled)+' '*margin)
+
+
+def compact_rows(values, columns, icons=False):
+    """Two rows on the landscape console, with no separate notification row."""
+    from console_icons import icon
+    capacity=values['capacity']
+    battery=icon('battery'+str(min(4,int(capacity)//25))) if icons and capacity.isdigit() else 'BAT'
+    state={'CHARGE':icon('charge') if icons else 'CHG',
+           'DISCHG':icon('discharge') if icons else 'DIS',
+           'HOLD':(icon('discharge') if icons else 'NOCHG')+'/HOLD',
+           'FULL':'FULL'}.get(values['state'],'?')
+    signal=values['cellular']['signal']
+    if re.fullmatch(r'[|.]{4} [0-9]+%( STALE)?',signal):
+        bars=signal[:4].count('|')
+        signal=(icon('signal'+str(bars)) if icons else 'S'+str(bars)+':')+signal[5:]
+    else:signal='SIG '+signal
+    carrier=icon('unicom') if icons and values['carrier']=='UNICOM' else values['carrier']
+    network={'4G LTE':'4G','5G NR':'5G','5G NR/LTE':'5G/LTE'}.get(values['cellular']['network'],values['cellular']['network'])
+    count=lambda n:'?' if n is None else str(n) if n<=999 else '999+'
+    primary=[values['clock'],carrier+' '+network+' '+signal,
+             battery+capacity+state+' '+values['battery_temp'],
+             'WiFi:'+('ON' if values['wifi']=='UP' else 'OFF')+' BT:'+values['bluetooth'],
+             (icon('speaker') if icons else 'VOL')+values['speaker'].removesuffix('%')+' '+
+             (icon('ring') if icons else 'RING')+values['ring'].removesuffix('%'),
+             (icon('missed') if icons else 'MISS')+count(values['notifications']['missed'])+' '+
+             (icon('sms') if icons else 'SMS')+count(values['notifications']['sms'])]
+    secondary = [('CPU', values['cpu']+' '+values['cpu_temp']),
+                 ('GPU', values['gpu']+' '+values['gpu_temp']),
+                 ('RAM', values['ram']), ('SD', values['disk'])]
+    # Keep all values at narrower widths by wrapping complete fields, never clipping.
+    lines=[]
+    for fields in [primary, [label+' '+value for label,value in secondary]]:
+        current=''
+        for field in fields:
+            if current and len(current)+len(field)+3 > max(1,columns-8):
+                lines.append(format_rows(columns,[('',current)]));current=''
+            current += ('   ' if current else '')+field
+        if current:lines.append(format_rows(columns,[('',current)]))
+    return lines

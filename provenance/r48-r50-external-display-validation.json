@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-01",
+  "scope": "Native USB-C external display; default authenticated landscape TTY, Bluetooth off",
+  "r48": {
+    "hardware_tested": true,
+    "result": "PD prerequisite passed; restored unchanged default; authorization closed",
+    "video_output_tested": false,
+    "negotiated_contract": "5 V / 3 A, not measured consumption"
+  },
+  "r49": {
+    "ram_boots": 1,
+    "result": "Rejected before AOC; wrong DT SVID/child; live DRM unbind caused Oops",
+    "aoc_connected": false,
+    "pattern_run": false,
+    "operator_key_recovery_required": true,
+    "default_health_and_archives_verified": true,
+    "authorization_closed": true
+  },
+  "r50": {
+    "hardware_tested": true,
+    "ram_authorized": false,
+    "module_count": 1636,
+    "image_bytes": 28053504,
+    "image_sha256": "94ca6663e386890bd63d8c694e3b9c336b1c97464814228346479c9d69c7c90d",
+    "kernel_module_image_audits_passed": true,
+    "selected_schema_and_two_negative_controls_passed": true,
+    "source_clock_contract_only": true,
+    "new_shutdown_path_qualified": "One ordinary PID1 return passed; broader operation unqualified",
+    "initial_scope": "RBR / one 20-second 1080p static pattern if EDID and CRTC permit",
+    "default_flash_allowed": false,
+    "ram_boots": 1,
+    "pattern_runs": 1,
+    "pattern_mode": "1920x1080@60 XR24",
+    "pattern_elapsed_seconds": 20.17268395423889,
+    "operator_confirmed_complete_stable_image": true,
+    "phone_tty_normal": true,
+    "edid_bytes": 256,
+    "edid_checksums_valid": true,
+    "default_health_and_archives_verified": true,
+    "all_11_services_restored": true,
+    "authorization_closed": true,
+    "default_integration_complete": false,
+    "new_kernel_telephony_qualified": false
+  },
+  "video_qualified": "One bounded 20-second 1080p60 static RAM trial; no interactive/default integration qualification",
+  "4k_qualified": false,
+  "new_dco_certification": false,
+  "publication_status": "Local documentation only; no external-display push or upstream submission",
+  "remaining_warnings": [
+    "Initial DRM deferral until planned module loading",
+    "Early USB clock-reference warning",
+    "Type-C DP probe -71",
+    "DSI wait-idle -11"
+  ]
+}

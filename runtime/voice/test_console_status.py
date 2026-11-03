@@ -2,7 +2,7 @@
 import re
 import unittest
 from console_status import (MODEM, GPP, cellular_from_objects, operator_label,
-                            technology, signal_label, speaker_from_text, format_rows)
+                            technology, signal_label, speaker_from_text, format_rows, compact_rows)
 
 
 class ConsoleStatusTests(unittest.TestCase):
@@ -63,6 +63,31 @@ class ConsoleStatusTests(unittest.TestCase):
             plain, styled = format_rows(columns, items)
             self.assertEqual(len(plain), columns)
             self.assertEqual(re.sub(r'#\[[^]]*\]', '', styled), plain)
+
+    def test_compact_landscape_retains_metrics_and_notifications_in_two_rows(self):
+        from console_icons import SLOTS, icon
+        values={'capacity':'92','state':'DISCHG','battery_temp':'25.5\u2103','clock':'19:20',
+                'cellular':{'network':'4G LTE','signal':'|||| 86% STALE'},'carrier':'UNICOM',
+                'wifi':'UP','bluetooth':'OFF','speaker':'53%','ring':'100%',
+                'notifications':{'missed':3,'sms':0},'cpu':'3%','cpu_temp':'32\u2103',
+                'gpu':'SLEEP','gpu_temp':'29\u2103','ram':'0.7/3.5G','disk':'5.3/112G'}
+        for icons in (False,True):
+            rows=compact_rows(values,120,icons)
+            self.assertEqual(len(rows),2)
+            plain=' '.join(p for p,f in rows)
+            for text in ['92','25.5\u2103','19:20','4G','86% STALE','53',
+                         '100','3%','32\u2103','SLEEP','29\u2103','0.7/3.5G','5.3/112G']:
+                self.assertIn(text,plain)
+            if icons:
+                self.assertIn(icon('missed')+'3',plain)
+                self.assertIn(icon('sms')+'0',plain)
+                self.assertIn(icon('unicom'),plain)
+            self.assertIn('WiFi:ON BT:OFF',plain)
+            self.assertNotIn('92%',plain)
+            self.assertNotIn('53%',plain)
+            self.assertNotIn('100%',plain)
+            self.assertTrue(all(len(p)==120 for p,f in rows))
+        self.assertEqual({slot for slots in SLOTS.values() for slot in slots},set(range(1,31)))
 
 
 if __name__ == '__main__':

@@ -4,18 +4,18 @@
 import argparse,json,os,shutil
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-def install(destination, imsd_build=None):
+def install(destination, imsd_build=None, desktop=False):
     destination=Path(destination)
     if destination.is_symlink() or destination.resolve()==Path('/'):raise ValueError('Use a new staging directory, never / or a symlink')
     if destination.exists() and any(destination.iterdir()):raise ValueError('Staging directory must be empty')
     destination.mkdir(parents=True,exist_ok=True)
     mapping={}
     def add(src,target,mode=0o755):
-        mapping[target]={'source':str(src.relative_to(ROOT)) if src.is_relative_to(ROOT) else 'operator-provided imsd build','mode':oct(mode)}
+        mapping[target]={'source':str(src.relative_to(ROOT)) if src.is_relative_to(ROOT) else 'operator-provided build artifact','mode':oct(mode)}
         target_path=destination/target.lstrip('/');target_path.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(src,target_path);target_path.chmod(mode)
     v=ROOT/'runtime/voice';s=ROOT/'runtime/support';sms=ROOT/'runtime/sms'
-    for name in ['mobile_common.py','ims_supervisor.py','call_media.py','audio_session.py','media_helpers.py','link.py','physical.conf','gvariant_json.py','ims-pdn-up.sh','alert_audio.py','alert_view.py','console_status.py','incoming_alerts.py','call_history.py']:
+    for name in ['mobile_common.py','ims_supervisor.py','call_media.py','audio_session.py','media_helpers.py','link.py','physical.conf','gvariant_json.py','ims-pdn-up.sh','alert_audio.py','alert_view.py','console_status.py','console_icons.py','incoming_alerts.py','call_history.py']:
         add(v/name,'/opt/v30-mobile/libexec/'+name,0o755 if name in ['ims_supervisor.py','call_media.py','ims-pdn-up.sh','incoming_alerts.py'] else 0o644)
     for name in ['v30-ipa','v30-cellular','v30-ims','v30-incoming']:add(v/name,'/etc/init.d/'+name)
     add(v/'v30-phone','/usr/local/sbin/v30-phone')
@@ -28,10 +28,20 @@ def install(destination, imsd_build=None):
     for name in ['v30-charge-limit','v30-power-key','v30-console-status','v30-audio','v30-wifi','v30-modem-modules','v30-bluetooth-off']:add(s/(name+'.init'),'/etc/init.d/'+name)
     add(s/'v30-unicom-service','/etc/init.d/v30-unicom');add(s/'v30-console.conf','/etc/v30-console.conf',0o644)
     for src,target in [('v30-ims.env','/etc/v30-ims.env'),('v30-audio-compat.conf','/etc/modprobe.d/v30-audio-compat.conf'),('v30-mobile.conf','/etc/modprobe.d/v30-mobile.conf')]:add(ROOT/'examples'/src,target,0o600 if src.endswith('.env') else 0o644)
+    add(s/'console-glyphs.json','/opt/v30-mobile/libexec/console-glyphs.json',0o644)
+    add(ROOT/'LICENSES/OFL-1.1.txt','/usr/share/licenses/v30-console/OFL-1.1.txt',0o644)
+    if desktop:
+        ui=ROOT/'runtime/desktop'
+        for name in ['session.sh','apps.sh','home.py','x11-session.sh','x11-apps.sh','x11-home.py','fb-refresh.py','weston-session.sh','weston-x11.sh']:add(ui/name,'/opt/v30-desktop/'+name)
+        add(ui/'gtk-settings.ini','/etc/v30-desktop/gtk-3.0/settings.ini',0o644)
+        add(ui/'gtk4-settings.ini','/etc/v30-desktop/gtk-4.0/settings.ini',0o644)
+        for name in ['phoc.ini','foot.ini','dconf-profile','greetd.toml','xorg.conf','uim.scm','weston.ini']:add(ui/name,'/etc/v30-desktop/'+name,0o644)
+        add(ui/'v30-gui','/usr/local/sbin/v30-gui')
+        add(ui/'72-v30-touch-seat.rules','/etc/udev/rules.d/72-v30-touch-seat.rules',0o644)
     if imsd_build:
         for name in ['imsd','imsd-pcscf','imsd-media']:add(Path(imsd_build)/name,'/opt/v30-mobile/bin/'+name)
-    (destination/'STAGING-MANIFEST.json').write_text(json.dumps({'files':mapping,'services_enabled':False,'phone_connected':False,'imsd_binaries_present':bool(imsd_build)},indent=2)+'\n')
+    (destination/'STAGING-MANIFEST.json').write_text(json.dumps({'files':mapping,'services_enabled':False,'phone_connected':False,'imsd_binaries_present':bool(imsd_build),'desktop_included':desktop},indent=2)+'\n')
     return mapping
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('destination',type=Path);p.add_argument('--imsd-build',type=Path);a=p.parse_args()
-    print('Staged',len(install(a.destination,a.imsd_build)),'files; no services started')
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('destination',type=Path);p.add_argument('--imsd-build',type=Path);p.add_argument('--desktop',action='store_true',help='Include manual graphical session files without enabling a display manager');a=p.parse_args()
+    print('Staged',len(install(a.destination,a.imsd_build,a.desktop)),'files; no services started')

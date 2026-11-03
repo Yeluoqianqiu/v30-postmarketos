@@ -3,8 +3,8 @@
 import datetime,fcntl,json,os,subprocess,sys,time,struct,termios
 from pathlib import Path
 sys.path.insert(0, '/opt/v30-mobile/libexec')
-from alert_view import incoming_line,ring_volume,notification_counts,notification_line
-from console_status import cellular_status,speaker_status,format_rows
+from alert_view import incoming_line,ring_volume,notification_counts
+from console_status import cellular_status,speaker_status,compact_rows
 RUN=Path('/run/v30-console')
 RUN.mkdir(mode=0o700,exist_ok=True)
 
@@ -68,24 +68,19 @@ def sample(previous):
     with open('/dev/tty1','rb',buffering=0) as terminal:
         rows,columns,_,_=struct.unpack('HHHH',fcntl.ioctl(terminal,termios.TIOCGWINSZ,bytes(8)))
     clock=datetime.datetime.now().strftime('%H:%M')
-    row=lambda items: format_rows(columns,items)
-    if columns>=112:
-        pairs=[row([('BAT',f'{capacity}% {state} {battery_temp}'),('VOL',speaker+' RING '+ring),('BT',bt+' WiFi '+wifi),('',clock)]),
-               row([('CELL',carrier),('NET',cellular['network']),('SIG',cellular['signal'])]),
-               row([('CPU',f'{cpu} {temp(("cpu","clust"))}'),('GPU',f'{gpu} {temp(("gpu-",))}'),('RAM',ram),('SD',f'{used:.1f}/{size:.0f}G')])]
-    else:
-        pairs=[row([('BAT',f'{capacity}% '+clock),('VOL',speaker+' RING '+ring)]),
-               row([('CELL',carrier+' '+cellular['network']),('SIG',cellular['signal'])]),
-               row([('CPU',cpu+' RAM '+ram),('BT',bt+' WiFi '+wifi)])]
+    counts=notification_counts()
+    pairs=compact_rows({'capacity':capacity,'state':state,'battery_temp':battery_temp,
+        'clock':clock,'cellular':cellular,'carrier':carrier,'wifi':wifi,'bluetooth':bt,
+        'speaker':speaker,'ring':ring,'notifications':counts,'cpu':cpu,
+        'cpu_temp':temp(("cpu","clust")),'gpu':gpu,'gpu_temp':temp(("gpu-",)),
+        'ram':ram,'disk':f'{used:.1f}/{size:.0f}G'},columns,(RUN/'icons-v2').is_file())
     incoming=incoming_line('/run/v30-alerts/display.json',read('/proc/sys/kernel/random/boot_id'),now,columns)
-    counts=notification_counts();notice=notification_line(counts,columns)
-    extra=[line for line in [incoming,notice] if line is not None]
-    pairs=extra+pairs
+    if incoming is not None:pairs.insert(0,incoming)
     lines=[p for p,f in pairs];formats=[f for p,f in pairs]
     return {'sampled_at':now,'cpu':{'total':total,'idle':idle},'bluetooth':bt,'bluetooth_at':bt_at,'notifications':counts,'cellular':cellular,'speaker':speaker,'ring_volume':volume,'lines':lines,'formats':formats}
 
 def visible():
-    return read('/sys/class/graphics/fb0/blank')=='0' and read('/run/v30-display/requested')!='off'
+    return read('/sys/class/tty/tty0/active')=='tty1' and read('/sys/class/graphics/fb0/blank')=='0' and read('/run/v30-display/requested')!='off'
 
 def refresh(force=False):
     with (RUN/'metrics.lock').open('a') as lock:

@@ -1,0 +1,263 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: GPL-3.0-only
+"""按需启动V30图形会话，默认保持认证横屏TTY。"""
+import argparse,errno,fcntl,hashlib,json,os,pwd,re,signal,subprocess,sys,time,struct
+from pathlib import Path
+from dataclasses import asdict
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'v30-platform-r72'))
+from kernel_profile import RELEASE
+from install_guard import require_installation
+from drm_modes import read_connector_modes
+from mode_plan import mode_from_drm,select_mode
+
+
+def parse_args(argv=None):
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('action',choices=['plan','_read-output','start','stop','status','run'],nargs='?',default='plan')
+    p.add_argument('--output',choices=['auto','internal','external'],
+                   help='Choose the output at session start (default: auto)')
+    p.add_argument('--max-seconds',type=int,help=argparse.SUPPRESS)
+    a=p.parse_args(argv)
+    if a.max_seconds is not None and (a.action not in {'start','run'} or not 30<=a.max_seconds<=180):
+        p.error('--max-seconds must be 30..180 for a bounded start')
+    if a.output is not None and a.action not in {'_read-output','start','run'}:
+        p.error('--output is only available with start')
+    a.output=a.output or 'auto'
+    return a
+
+
+def connected(connector):
+    try:return (connector/'status').read_text().strip()=='connected'
+    except FileNotFoundError:return False
+
+
+def output_plan(requested,drm=Path('/sys/class/drm'),mode_reader=read_connector_modes):
+    # V30 topology: native DSI plus one connected wired DP Alt Mode output.
+    internal=[entry for entry in drm.glob('card*-DSI-1')
+              if re.fullmatch(r'card[0-9]+-DSI-1',entry.name)]
+    external=[entry for entry in drm.glob('card*-DP-*')
+              if re.fullmatch(r'card[0-9]+-DP-[1-9][0-9]*',entry.name) and connected(entry)]
+    if len(internal)>1 or len(external)>1:raise RuntimeError('Ambiguous DRM connector topology')
+    internal=internal[0] if internal else None
+    external=external[0] if external else None
+    use_external=requested=='external' or (requested=='auto' and external is not None)
+    selected=external if use_external else internal
+    if selected is None or not connected(selected):
+        raise RuntimeError('No connected '+('DP external' if use_external else 'DSI-1 internal')+' output')
+    card,name=selected.name.split('-',1)
+    if use_external and (internal is None or internal.name.split('-',1)[0]!=card):
+        raise RuntimeError('External output must share the native DSI DRM card')
+    names={entry.name[len(card)+1:] for entry in drm.glob(card+'-*')
+           if (entry/'status').is_file() and re.fullmatch(r'[A-Za-z0-9-]+',entry.name[len(card)+1:])}
+    names.add('DSI-1')
+    plan={'output':'external' if use_external else 'internal','connector':name,
+            'drm_device':card,'status_path':str(selected),'connectors':sorted(names),
+            'mode':'preferred','weston_mode':'preferred','geometry':'1440x2880','gtk_scale':2,
+            'internal_display':'compositor-background' if use_external else 'desktop'}
+    if use_external:plan.update(select_mode(mode_reader(selected)))
+    return plan
+
+
+def read_output_record(requested):
+    snapshot={}
+    def read_modes(connector):
+        snapshot['connector_id']=int((connector/'connector_id').read_text().strip())
+        edid=(connector/'edid').read_bytes()
+        if (not edid or len(edid)%128 or edid[:8]!=b'\x00\xff\xff\xff\xff\xff\xff\x00'
+                or edid[126]+1!=len(edid)//128 or any(sum(edid[i:i+128])%256 for i in range(0,len(edid),128))):
+            raise ValueError('需要有效的当前外屏EDID')
+        snapshot['edid_sha256']=hashlib.sha256(edid).hexdigest()
+        modes=read_connector_modes(connector)
+        snapshot['drm_modes']=[asdict(mode) for mode in modes]
+        if (int((connector/'connector_id').read_text().strip())!=snapshot['connector_id']
+                or hashlib.sha256((connector/'edid').read_bytes()).hexdigest()!=snapshot['edid_sha256']):
+            raise RuntimeError('读取模式期间外屏连接发生变化')
+        return modes
+    plan=output_plan(requested,mode_reader=read_modes)
+    return {'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+            'release':RELEASE,'reader_pid':os.getpid(),'reader_fd_closed':True,
+            'prepared_monotonic_ns':time.monotonic_ns(),'plan':plan,**snapshot}
+
+
+def current_output(requested,root):
+    result=subprocess.run([sys.executable,__file__,'_read-output','--output',requested],
+                          stdout=subprocess.PIPE,text=True,check=True,timeout=10)
+    record=json.loads(result.stdout);plan=record['plan']
+    if (record['boot_id']!=Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+            or record['release']!=RELEASE or record['reader_fd_closed'] is not True
+            or not 0<=time.monotonic_ns()-record['prepared_monotonic_ns']<15_000_000_000):
+        raise RuntimeError('需要当前启动中新鲜读取并已关闭的模式记录')
+    connector=Path('/sys/class/drm')/(plan['drm_device']+'-'+plan['connector'])
+    if str(connector)!=plan['status_path'] or not connected(connector):
+        raise RuntimeError('输出连接已改变')
+    if plan['output']=='external':
+        if (int((connector/'connector_id').read_text())!=record['connector_id']
+                or hashlib.sha256((connector/'edid').read_bytes()).hexdigest()!=record['edid_sha256']):
+            raise RuntimeError('外屏ID或EDID已改变')
+        selected=select_mode([mode_from_drm(plan['drm_mode'])])
+        if any(plan.get(key)!=value for key,value in selected.items()):
+            raise RuntimeError('实际模式与配置不一致')
+    (root/'output-plan.json').write_text(json.dumps(record,indent=2)+'\n')
+    return plan
+
+
+def write_output_configuration(root,plan,base=Path('/etc/v30-desktop-r72/weston.ini')):
+    # Root-owned files bridge greetd/PAM without relying on inherited environment.
+    config=base.read_text().rstrip()+'\n'
+    for name in plan['connectors']:
+        mode=plan['weston_mode'] if name==plan['connector'] else 'off'
+        if plan['output']=='external' and name=='DSI-1':mode='current'
+        config+='\n[output]\nname='+name+'\nmode='+mode+'\ntransform=normal\nscale=1\n'
+        if plan['output']=='external' and name==plan['connector']:
+            config+='app-ids=org.freedesktop.Xwayland\n'
+    (root/'weston.ini').write_text(config)
+    (root/'weston.ini').chmod(0o644)
+    values={'V30_GUI_OUTPUT':plan['output'],'V30_GUI_CONNECTOR':plan['connector'],
+            'V30_GUI_DRM_DEVICE':plan['drm_device'],'V30_GUI_GEOMETRY':plan['geometry'],
+            'GDK_SCALE':plan['gtk_scale']}
+    (root/'session.env').write_text(''.join('export '+key+'='+str(value)+'\n' for key,value in values.items()))
+    (root/'session.env').chmod(0o644)
+
+
+def check_external_touch_mapping(inputs=Path('/sys/class/input')):
+    # Installing a rule alone does not update already enumerated input devices.
+    # Refuse external GUI until the live udev property confines stmfts to DSI.
+    for event in inputs.glob('event*'):
+        try:name=(event/'device/name').read_text().strip()
+        except FileNotFoundError:continue
+        if name!='stmfts':continue
+        properties=subprocess.check_output(['udevadm','info','--query=property',
+                                            '--path='+str(event)],text=True,timeout=5)
+        if 'WL_OUTPUT=DSI-1' not in properties.splitlines():
+            raise RuntimeError('Refresh the stmfts udev rule before external GUI; WL_OUTPUT must be DSI-1')
+
+
+def main(argv=None):
+    a=parse_args(argv)
+    run(a)
+
+
+def run(a):
+    if a.action=='plan':
+        print(json.dumps({'candidate':'r72','device_io':False,'installation':'not checked by plan',
+                          'default':'authenticated landscape tty1; GUI on demand',
+                          'modes':'fresh actual DRM timings, qualified 1080p-first policy'},indent=2))
+        return
+    if os.geteuid()!=0:raise SystemExit('Use sudo v30-gui start|stop|status')
+    os.umask(0o077)
+    if a.action in {'start','run','_read-output'}:require_installation()
+    if a.action=='_read-output':
+        print(json.dumps(read_output_record(a.output)));return
+    root=Path('/run/v30-desktop-r72');root.mkdir(mode=0o755,exist_ok=True)
+    root.chmod(0o755)
+    state=root/'state.json'
+    if a.action=='status':
+        print(state.read_text() if state.exists() else '{"active": false}')
+        raise SystemExit(0)
+    if a.action=='stop':
+        if state.exists():
+            data=json.loads(state.read_text())
+            if data['active']:
+                pid=data['pid'];proc=Path(f'/proc/{pid}/stat')
+                if proc.exists() and proc.read_text().rsplit(')',1)[1].split()[19]==data['start_ticks']:
+                    os.kill(pid,signal.SIGTERM)
+        raise SystemExit(0)
+    if a.action=='start':
+        if state.exists() and json.loads(state.read_text()).get('active'):
+            raise SystemExit('GUI already active; use status or stop')
+        with (root/'controller.log').open('a') as controller_log:
+            subprocess.Popen([sys.executable,__file__,'run','--output',a.output]+(['--max-seconds',str(a.max_seconds)] if a.max_seconds is not None else []),start_new_session=True,
+                             stdin=subprocess.DEVNULL,stdout=controller_log,stderr=controller_log)
+        print('Starting the optional GUI on tty8; use sudo v30-gui stop to return to tty1')
+        raise SystemExit(0)
+    with (root/'control.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        if Path('/sys/class/tty/tty0/active').read_text().strip()!='tty1':raise SystemExit('Start from the landscape TTY baseline')
+        if json.loads(subprocess.check_output(['/usr/local/sbin/v30-phone','calls'],text=True)):
+            raise RuntimeError('Wait until the current call has ended')
+        pcm=[p.read_text().strip() for p in Path('/proc/asound/LGV30').glob('pcm*/sub*/status')]
+        if len(pcm)!=4 or any(v!='closed' for v in pcm):raise RuntimeError('All four PCM streams must be closed')
+        gui_deadline=time.monotonic()+a.max_seconds if a.max_seconds is not None else None
+        plan=current_output(a.output,root)
+        if plan['output']=='external':check_external_touch_mapping()
+        write_output_configuration(root,plan)
+        account=pwd.getpwnam('v30')
+        user=root/'user';user.mkdir(mode=0o700,exist_ok=True);os.chown(user,account.pw_uid,account.pw_gid)
+        # The end marker is written by the unprivileged fallback session, not a greeter.
+        end=user/'session-ended';end.unlink(missing_ok=True)
+        (root/'greetd-run').unlink(missing_ok=True)
+        data={'active':True,'backend':'weston-pixman-rootful','pid':os.getpid(),'start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19]}
+        data.update({key:plan[key] for key in ('output','connector','drm_device','mode','geometry','gtk_scale','internal_display')})
+        data['output_requested']=a.output
+        state.write_text(json.dumps(data)+'\n')
+        stopping=False
+        def stop(signum,frame):
+            nonlocal stopping
+            stopping=True
+        signal.signal(signal.SIGTERM,stop)
+        signal.signal(signal.SIGINT,stop)
+        log=(root/'session.log').open('a')
+        # This manually started broker replaces unavailable logind seat ownership.
+        # It is not enabled as a boot service and never replaces an existing broker.
+        socket=Path('/run/seatd.sock')
+        if socket.exists():
+            data['active']=False;state.write_text(json.dumps(data)+'\n');log.close()
+            raise SystemExit('An existing seatd socket needs inspection before starting another broker')
+        seat=subprocess.Popen(['seatd','-g','video','-l','info'],stdout=log,stderr=log,start_new_session=True)
+        data['seat_pid']=seat.pid;state.write_text(json.dumps(data)+'\n')
+        process=None
+        try:
+            deadline=time.monotonic()+5
+            while not socket.exists() and seat.poll() is None and time.monotonic()<deadline and not stopping:time.sleep(.05)
+            if not socket.exists() or seat.poll() is not None or stopping:raise RuntimeError('Manual seat broker did not become ready')
+            process=subprocess.Popen(['greetd','--config','/etc/v30-desktop-r72/greetd.toml'],stdout=log,stderr=log,start_new_session=True)
+            while process.poll() is None and seat.poll() is None and not stopping and not end.exists():
+                if gui_deadline is not None and time.monotonic()>=gui_deadline:
+                    data['stop_reason']='diagnostic-timeout'
+                    break
+                if plan['output']=='external' and not connected(Path(plan['status_path'])):
+                    data['stop_reason']='external-disconnected'
+                    break
+                time.sleep(.25)
+        finally:
+            if process is not None and process.poll() is None:
+                process.terminate()
+                try:process.wait(timeout=10)
+                except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
+            if seat.poll() is None:
+                seat.terminate()
+                try:seat.wait(timeout=3)
+                except subprocess.TimeoutExpired:seat.kill();seat.wait()
+            # Earlier manual sessions left D-Bus/IME helpers after the display closed.
+            # Only terminate known GUI helpers from this private runtime and user.
+            helpers={'dbus-daemon','feedbackd','dconf-service','uim-helper-serv',
+                     'uim-candwin-gtk','at-spi-bus-laun','at-spi2-registr'}
+            for proc in Path('/proc').glob('[0-9]*'):
+                try:
+                    if proc.stat().st_uid!=account.pw_uid or (proc/'comm').read_text().strip() not in helpers:continue
+                    if b'XDG_RUNTIME_DIR=/run/v30-desktop-r72/user' in (proc/'environ').read_bytes().split(b'\0'):
+                        os.kill(int(proc.name),signal.SIGTERM)
+                except (FileNotFoundError,ProcessLookupError):pass
+            # greetd can leave VT_PROCESS/KD_GRAPHICS after its worker exits.
+            # Reset the manually owned tty8 before activating tty1; chvt can wait forever.
+            # PAM/elogind can revoke tty8 while greetd finishes closing its session.
+            # Reopen on EIO rather than retrying an already revoked descriptor.
+            for command,arg in [(0x5602,struct.pack('BBhhh',0,0,0,0,0)),
+                                (0x4b3a,0),(0x560c,0),(0x5606,1)]:
+                deadline=time.monotonic()+5
+                while True:
+                    fd=os.open('/dev/tty0',os.O_RDWR|os.O_NOCTTY)
+                    try:
+                        fcntl.ioctl(fd,command,arg)
+                        break
+                    except OSError as error:
+                        if error.errno!=errno.EIO or time.monotonic()>=deadline:raise
+                        time.sleep(.25)
+                    finally:os.close(fd)
+            subprocess.run(['/usr/local/sbin/v30-display','on'],check=False,timeout=10)
+            subprocess.run(['/usr/local/sbin/v30-console-metrics','--force'],stdout=subprocess.DEVNULL,check=False,timeout=10)
+            data['active']=False;data['exit_status']=process.returncode if process is not None else 125;state.write_text(json.dumps(data)+'\n')
+            log.close()
+
+
+if __name__=='__main__':main()

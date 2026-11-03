@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+description="LG V30 TTY orientation from the SLPI accelerometer"
+supervisor=supervise-daemon
+command="/usr/bin/python3"
+command_args="-B -u /opt/v30-console-orientation/orientation.py"
+respawn_delay=20
+respawn_max=2
+respawn_period=300
+retry="TERM/12/KILL/3"
+output_log="/run/v30-console-orientation/service.log"
+error_log="/run/v30-console-orientation/service.log"
+
+depend() {
+    need localmount v30-console-status
+    after v30-ims v30-panel-key
+}
+
+start_pre() {
+    [ "$(tr -d '\000' </proc/device-tree/soc@0/remoteproc@5800000/status)" = okay ] || return 1
+    checkpath --directory --mode 0700 --owner root:root /run/v30-console-orientation
+}

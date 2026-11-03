@@ -1,5 +1,8 @@
 # Console status and optional input
 
+See the [r81 checkpoint](r81-progress.md) for the latest default and test scope. Older results below describe their original baselines.
+
+
 The r38 userspace change preserves authenticated landscape TTY, Bluetooth-off,
 call/SMS archives and the r35 boot image. It changes only the metrics program and
 adds `console_status.py` under `/opt/v30-mobile/libexec/`.
@@ -87,3 +90,23 @@ See the [r38 validation checkpoint](../provenance/r38-validation.json).
 
 These checks are not another voice/SMS, ringtone listening, reboot, GUI or
 touch-interaction pass.
+
+## r39 compact rendering
+
+The later renderer places the ordinary indicators and notification counts in
+one row, with CPU/GPU/temperature/RAM/storage on the second. A temporary incoming
+caller row is still separate. Wi-Fi/Bluetooth use explicit ON/OFF text; battery
+and speaker/ringtone values omit the percent sign. Signal quality keeps its
+percentage and explicit stale indication. No archive/read marks are changed.
+
+Thirty native 24x48 glyph cells replace the coarse scaled icons. Battery and
+signal bars are original drawings with separated signal columns. Ten Chinese
+characters form fixed labels for Unicom, charging/not charging, speaker,
+ringtone, missed calls and SMS. Each Chinese character uses two private-use
+cells, avoiding disagreement between tmux CJK widths and the Linux console.
+This does not install a general Chinese TTY font or input method. The original
+console font snapshot stays device-owned; the derived Noto CJK subset retains
+OFL-1.1 attribution and its source-font digest.
+
+An optional [graphical session](manual-desktop.md) provides full CJK fonts and
+an on-screen input path. It is independent of the default two-row TTY profile.
